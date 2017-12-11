@@ -1,6 +1,6 @@
 package com.lifeonwalden.forestbatis.biz.dao;
 
-public interface KeyBasedDAO<T, E> extends CommonDAO<T, E> {
+public interface KeyBasedDAO<T> extends CommonDAO<T> {
     /**
      * update full record based on primary key
      *
@@ -23,7 +23,7 @@ public interface KeyBasedDAO<T, E> extends CommonDAO<T, E> {
      * @param param
      * @return
      */
-    Integer directUpdate(E param);
+    Integer directUpdate(T param);
 
     /**
      * get a record based on primary key

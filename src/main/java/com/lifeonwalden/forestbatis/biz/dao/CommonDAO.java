@@ -2,7 +2,7 @@ package com.lifeonwalden.forestbatis.biz.dao;
 
 import java.util.List;
 
-public interface CommonDAO<T, E> {
+public interface CommonDAO<T> {
     /**
      * full select
      *
@@ -19,12 +19,14 @@ public interface CommonDAO<T, E> {
     List<T> select(T param);
 
     /**
-     * select special columns based on query condition
+     * select special field based on query condition
      *
      * @param param
      * @return
      */
-    List<T> directSelect(E param);
+    List<T> directSelect(T param);
+
+    List<T> selectWild(T param);
 
     /**
      * insert a record
