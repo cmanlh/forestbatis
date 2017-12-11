@@ -2,7 +2,7 @@ package com.lifeonwalden.forestbatis.biz.dao;
 
 public interface KeyBasedDAO<T> extends CommonDAO<T> {
     /**
-     * update full record based on primary key
+     * update the record based on primary key
      *
      * @param param
      * @return
@@ -10,7 +10,7 @@ public interface KeyBasedDAO<T> extends CommonDAO<T> {
     Integer update(T param);
 
     /**
-     * update non-null field based on primary key
+     * update non-null field of the record based on primary key
      *
      * @param param
      * @return
@@ -18,7 +18,7 @@ public interface KeyBasedDAO<T> extends CommonDAO<T> {
     Integer updateDynamic(T param);
 
     /**
-     * update special field based on primary key
+     * update the special field of the record based on primary key
      *
      * @param param
      * @return

@@ -26,6 +26,20 @@ public interface CommonDAO<T> {
      */
     List<T> directSelect(T param);
 
+    /**
+     * select special field based on advanced query condition
+     *
+     * @param param
+     * @return
+     */
+    List<T> directSelectWild(T param);
+
+    /**
+     * select based on advanced query condition
+     *
+     * @param param
+     * @return
+     */
     List<T> selectWild(T param);
 
     /**
