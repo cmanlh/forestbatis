@@ -11,6 +11,13 @@ public interface CommonDAO<T> {
     List<T> selectAll();
 
     /**
+     * full select with special fields
+     *
+     * @return
+     */
+    List<T> directSelectAll();
+
+    /**
      * select based on query condition
      *
      * @param param
