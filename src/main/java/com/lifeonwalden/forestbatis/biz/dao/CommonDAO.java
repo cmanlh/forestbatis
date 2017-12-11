@@ -19,7 +19,7 @@ public interface CommonDAO<T> {
     List<T> select(T param);
 
     /**
-     * select special field based on query condition
+     * select special fields based on query condition
      *
      * @param param
      * @return
@@ -27,7 +27,7 @@ public interface CommonDAO<T> {
     List<T> directSelect(T param);
 
     /**
-     * select special field based on advanced query condition
+     * select special fields based on advanced query condition
      *
      * @param param
      * @return

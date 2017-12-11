@@ -18,7 +18,7 @@ public interface KeyBasedDAO<T> extends CommonDAO<T> {
     Integer updateDynamic(T param);
 
     /**
-     * update the special field of the record based on primary key
+     * update the special fields of the record based on primary key
      *
      * @param param
      * @return
@@ -32,6 +32,14 @@ public interface KeyBasedDAO<T> extends CommonDAO<T> {
      * @return
      */
     T get(T param);
+
+    /**
+     * get special fields of a record based on primary key
+     *
+     * @param param
+     * @return
+     */
+    T directGet(T param);
 
     /**
      * delete a record based on primary key
