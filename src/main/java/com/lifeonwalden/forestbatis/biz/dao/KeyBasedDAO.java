@@ -48,12 +48,4 @@ public interface KeyBasedDAO<T> extends CommonDAO<T> {
      * @return
      */
     Integer delete(T param);
-
-    /**
-     * logically delete a record based on primary key
-     *
-     * @param param
-     * @return
-     */
-    Integer logicalDelete(T param);
 }
