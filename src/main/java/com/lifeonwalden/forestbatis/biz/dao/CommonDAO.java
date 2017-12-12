@@ -4,20 +4,6 @@ import java.util.List;
 
 public interface CommonDAO<T> {
     /**
-     * full select
-     *
-     * @return
-     */
-    List<T> selectAll();
-
-    /**
-     * full select with special fields
-     *
-     * @return
-     */
-    List<T> directSelectAll();
-
-    /**
      * select based on query condition
      *
      * @param param
@@ -32,6 +18,20 @@ public interface CommonDAO<T> {
      * @return
      */
     List<T> directSelect(T param);
+
+    /**
+     * full select
+     *
+     * @return
+     */
+    List<T> selectAll();
+
+    /**
+     * full select with special fields
+     *
+     * @return
+     */
+    List<T> directSelectAll();
 
     /**
      * select special fields based on advanced query condition

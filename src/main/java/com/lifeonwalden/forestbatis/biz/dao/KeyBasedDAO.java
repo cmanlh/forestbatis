@@ -2,6 +2,22 @@ package com.lifeonwalden.forestbatis.biz.dao;
 
 public interface KeyBasedDAO<T> extends CommonDAO<T> {
     /**
+     * get a record based on primary key
+     *
+     * @param param
+     * @return
+     */
+    T get(T param);
+
+    /**
+     * get special fields of a record based on primary key
+     *
+     * @param param
+     * @return
+     */
+    T directGet(T param);
+
+    /**
      * update the record based on primary key
      *
      * @param param
@@ -24,22 +40,6 @@ public interface KeyBasedDAO<T> extends CommonDAO<T> {
      * @return
      */
     Integer directUpdate(T param);
-
-    /**
-     * get a record based on primary key
-     *
-     * @param param
-     * @return
-     */
-    T get(T param);
-
-    /**
-     * get special fields of a record based on primary key
-     *
-     * @param param
-     * @return
-     */
-    T directGet(T param);
 
     /**
      * delete a record based on primary key
