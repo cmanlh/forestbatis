@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.lifeonwalden</groupId>
     <artifactId>forestbatis</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5-SNAPSHOT</version>
     <name>forestbatis</name>
     <description>A static orm library</description>
     <url>https://github.com/cmanlh/forestbatis</url>
@@ -87,7 +87,7 @@
         <url>https://github.com/cmanlh/forestbatis.git</url>
         <connection>scm:git:git@github.com:cmanlh/forestbatis.git</connection>
         <developerConnection>scm:git:git@github.com:cmanlh/forestbatis.git</developerConnection>
-        <tag>forestbatis-0.0.4</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
