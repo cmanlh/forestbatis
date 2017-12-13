@@ -14,12 +14,11 @@ public class AbstractParamMapBean extends AbstractMapBean {
             return dataMap.remove(key);
         }
         Class<?> clazz = typeMap.get(key);
-        Object _value;
+        Object _value = null;
         if (null == clazz || clazz.isInstance(value)) {
             _value = value;
         } else if (String.class.isInstance(value)) {
             if (Integer.class.equals(clazz)) {
-                _value = Integer.valueOf((String) value);
             } else if (BigDecimal.class.equals(clazz)) {
                 _value = new BigDecimal((String) value);
             } else if (Boolean.class.equals(clazz)) {

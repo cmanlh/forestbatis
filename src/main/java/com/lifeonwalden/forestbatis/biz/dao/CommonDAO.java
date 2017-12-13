@@ -31,7 +31,7 @@ public interface CommonDAO<T> {
      *
      * @return
      */
-    List<T> directSelectAll();
+    List<T> directSelectAll(T param);
 
     /**
      * insert a record
