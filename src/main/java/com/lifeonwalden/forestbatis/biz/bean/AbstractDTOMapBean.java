@@ -5,6 +5,7 @@ import com.lifeonwalden.forestbatis.biz.support.OrderBean;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class AbstractDTOMapBean<T> extends AbstractMapBean {
     private static final long serialVersionUID = -6237098895338779800L;
 
@@ -25,7 +26,7 @@ public class AbstractDTOMapBean<T> extends AbstractMapBean {
     public List<OrderBean> getOrderBy() {
         return this.orderList;
     }
-    
+
     public T addPickedColumn(String columnName) {
         if (null == pickedColumnList) {
             this.pickedColumnList = new ArrayList<>();
