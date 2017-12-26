@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractMapBean implements Map<String, Object>, BaseBean {
+    private static final long serialVersionUID = 6315958908645743095L;
+
     private static final Logger logger = LoggerFactory.getLogger(AbstractMapBean.class);
 
     protected Map<String, Object> dataMap = new HashMap<String, Object>();
