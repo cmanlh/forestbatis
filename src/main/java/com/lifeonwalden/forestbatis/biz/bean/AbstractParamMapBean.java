@@ -2,8 +2,6 @@ package com.lifeonwalden.forestbatis.biz.bean;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class AbstractParamMapBean extends AbstractMapBean {
     private static final long serialVersionUID = 2825637947183339992L;
