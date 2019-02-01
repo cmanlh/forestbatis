@@ -8,14 +8,16 @@ import java.util.Map;
 public class AbstractParamMapBean extends AbstractMapBean {
     private static final long serialVersionUID = 2825637947183339992L;
 
-    protected static Map<String, Class<?>> typeMap = new HashMap<String, Class<?>>();
+    protected Class<?> getType(String key) {
+        return null;
+    }
 
     @Override
     public Object put(String key, Object value) {
         if (null == value) {
             return dataMap.remove(key);
         }
-        Class<?> clazz = typeMap.get(key);
+        Class<?> clazz = getType(key);
         Object _value = null;
         if (null == clazz || clazz.isInstance(value)) {
             _value = value;
