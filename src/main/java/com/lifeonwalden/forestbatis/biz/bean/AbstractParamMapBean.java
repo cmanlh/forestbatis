@@ -6,7 +6,7 @@ import java.util.Date;
 public class AbstractParamMapBean extends AbstractMapBean {
     private static final long serialVersionUID = 2825637947183339992L;
 
-    protected Class<?> getType(String key) {
+    protected Class<?> _getType(String key) {
         return null;
     }
 
@@ -15,7 +15,7 @@ public class AbstractParamMapBean extends AbstractMapBean {
         if (null == value) {
             return dataMap.remove(key);
         }
-        Class<?> clazz = getType(key);
+        Class<?> clazz = _getType(key);
         Object _value = null;
         if (null == clazz || clazz.isInstance(value)) {
             _value = value;
