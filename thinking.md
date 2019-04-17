@@ -64,3 +64,6 @@
       * predefined
       * custom handler
     * interceptor
+
+#### process strategy
+* transaction with spring, reference to JdbcTemplate DataSourceUtils & DataSourceTransactionManager & TransactionAspectSupport
