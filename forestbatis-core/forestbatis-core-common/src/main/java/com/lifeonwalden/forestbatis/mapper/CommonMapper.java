@@ -1,11 +1,8 @@
 package com.lifeonwalden.forestbatis.mapper;
 
-import com.lifeonwalden.forestbatis.result.ResultHandler;
-import com.lifeonwalden.forestbatis.sql.SQLBuilder;
-
 import java.util.List;
 
-public interface CommonMapper<P> {
+public interface CommonMapper<P, S, R> {
 
     /**
      * 基于条件查询
@@ -18,11 +15,11 @@ public interface CommonMapper<P> {
     /**
      * 基于条件查询，并可在默认SQL生成的基础上根据生成参数动态生成SQL语句
      *
-     * @param param 查询条件
+     * @param param      查询条件
      * @param sqlBuilder SQL生成参数
      * @return
      */
-    List<P> select(P param, SQLBuilder sqlBuilder);
+    List<P> select(P param, S sqlBuilder);
 
     /**
      * 基于条件查询，并可在默认SQL生成的基础上根据生成参数动态生成SQL语句
@@ -32,5 +29,5 @@ public interface CommonMapper<P> {
      * @param resultHandler
      * @return
      */
-    List<P> select(P param, SQLBuilder sqlBuilder, ResultHandler resultHandler);
+    List<P> select(P param, S sqlBuilder, R resultHandler);
 }
