@@ -1,5 +1,7 @@
 package com.lifeonwalden.forestbatis.result;
 
+import com.lifeonwalden.forestbatis.meta.ColumnMetaInfo;
+
 import java.sql.ResultSet;
 import java.util.Set;
 
@@ -13,5 +15,5 @@ public interface RecordHandler<P> {
      * @param notTableColumnSet
      * @return
      */
-    P convert(ResultSet resultSet, Set<String> tableColumnSet, Set<ColumnMetaData> notTableColumnSet);
+    P convert(ResultSet resultSet, Set<String> tableColumnSet, Set<ColumnMetaInfo> notTableColumnSet);
 }

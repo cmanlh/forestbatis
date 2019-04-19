@@ -1,6 +1,6 @@
 package com.lifeonwalden;
 
-import com.lifeonwalden.forestbatis.result.ColumnMetaData;
+import com.lifeonwalden.forestbatis.meta.ColumnMetaInfo;
 import com.lifeonwalden.forestbatis.result.RecordHandler;
 
 import java.sql.ResultSet;
@@ -22,7 +22,7 @@ public class App {
 
     static class TestHanlder implements RecordHandler<String> {
         @Override
-        public String convert(ResultSet resultSet, Set<String> tableColumnSet, Set<ColumnMetaData> notTableColumnSet) {
+        public String convert(ResultSet resultSet, Set<String> tableColumnSet, Set<ColumnMetaInfo> notTableColumnSet) {
             return null;
         }
     }
