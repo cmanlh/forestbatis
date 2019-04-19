@@ -16,15 +16,16 @@
                 * inner join
                 * left join
                 * right join
-                * where exists
-                * where not exists
             * select with query condition
               * and
                 * equal
                 * bigger than, less than, bigger equals, less equals
                 * like, not like
                 * in, not in
+                * where exists
+                * where not exists
               * or
+              * sub query
           * select without order
         * select with page splitting
       * update
