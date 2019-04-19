@@ -9,9 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>forestbatis-core-query</artifactId>
+    <artifactId>forestbatis-core-sql</artifactId>
 
-    <name>forestbatis-core-query</name>
+    <name>forestbatis-core-sql</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

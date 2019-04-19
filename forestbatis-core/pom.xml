@@ -16,7 +16,7 @@
     <modules>
         <module>forestbatis-core-common</module>
         <module>forestbatis-core-mapper</module>
-        <module>forestbatis-core-query</module>
+        <module>forestbatis-core-sql</module>
     </modules>
 
     <properties>
