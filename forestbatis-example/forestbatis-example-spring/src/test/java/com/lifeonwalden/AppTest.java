@@ -1,5 +1,7 @@
 package com.lifeonwalden;
 
+import java.sql.PreparedStatement;
+
 /**
  * Unit test for simple App.
  */
