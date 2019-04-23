@@ -5,7 +5,7 @@ package com.lifeonwalden.forestbatis.meta;
  *
  * @param <T> 值类型
  */
-public interface QueryNode<T> {
+public interface QueryNode<T> extends ValueBindingSqlNode<T> {
     /**
      * 添加与本查询条件为“且”关系的查询节点
      *
@@ -46,22 +46,4 @@ public interface QueryNode<T> {
      * @return
      */
     boolean enabled(T value);
-
-    /**
-     * 允许根据参数生成带或者不带别名的片段
-     * 并且根据值可决定该节点是否参与构建SQL
-     *
-     * @param builder
-     * @param withAlias
-     */
-    void toSql(StringBuilder builder, boolean withAlias, T value);
-
-    /**
-     * 生成默认片段
-     * 并且根据值可决定该节点是否参与构建SQL
-     *
-     * @param builder
-     * @return
-     */
-    void toSql(StringBuilder builder, T value);
 }
