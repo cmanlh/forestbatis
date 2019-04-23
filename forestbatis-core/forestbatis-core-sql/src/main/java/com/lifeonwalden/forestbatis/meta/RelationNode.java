@@ -1,6 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
-import com.lifeonwalden.forestbatis.constant.LogicRelation;
+import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
 /**
  * 逻辑关系节点
@@ -12,11 +12,11 @@ public class RelationNode<T> {
     private T node;
 
     // 该节点与主节点的逻辑关系
-    private LogicRelation logicRelation;
+    private NodeRelation nodeRelation;
 
-    public RelationNode(T node, LogicRelation logicRelation) {
+    public RelationNode(T node, NodeRelation nodeRelation) {
         this.node = node;
-        this.logicRelation = logicRelation;
+        this.nodeRelation = nodeRelation;
     }
 
     public T getNode() {
@@ -29,12 +29,12 @@ public class RelationNode<T> {
         return this;
     }
 
-    public LogicRelation getLogicRelation() {
-        return logicRelation;
+    public NodeRelation getNodeRelation() {
+        return nodeRelation;
     }
 
-    public RelationNode setLogicRelation(LogicRelation logicRelation) {
-        this.logicRelation = logicRelation;
+    public RelationNode setNodeRelation(NodeRelation nodeRelation) {
+        this.nodeRelation = nodeRelation;
 
         return this;
     }

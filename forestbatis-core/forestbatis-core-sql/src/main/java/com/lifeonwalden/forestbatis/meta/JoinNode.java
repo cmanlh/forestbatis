@@ -1,6 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
-import com.lifeonwalden.forestbatis.constant.SqlOperator;
+import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
 /**
  * 构建表联合查询
@@ -38,7 +38,7 @@ public class JoinNode implements SqlNode {
     @Override
     public void toSql(StringBuilder builder, boolean withAlias) {
         this.tableMeta.toSql(builder, true);
-        SqlOperator.ON.toSql(builder, false);
+        NodeRelation.ON.toSql(builder, false);
         this.joinCondition.toSql(builder, true);
     }
 

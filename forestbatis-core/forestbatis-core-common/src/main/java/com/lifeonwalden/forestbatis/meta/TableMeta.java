@@ -9,7 +9,7 @@ public interface TableMeta extends SqlNode {
      *
      * @return
      */
-    String getLabel();
+    String getName();
 
     /**
      * 获得表的别名

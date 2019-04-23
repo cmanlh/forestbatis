@@ -1,7 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
-import com.lifeonwalden.forestbatis.constant.LogicRelation;
-import com.lifeonwalden.forestbatis.constant.SqlOperator;
+import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,17 +18,14 @@ public class JoinCondition implements SqlNode {
     // 值
     private PropertyMeta property;
 
-    // 与兄弟条件的逻辑关系
-    private LogicRelation logicRelation;
-
     // 兄弟条件
     private List<RelationNode<JoinCondition>> siblingList;
 
     /**
      * 基于两表字段构建表联合条件
      *
-     * @param column
-     * @param anthoerTableColumn
+     * @param column 表字段
+     * @param anthoerTableColumn 另一表的字段
      */
     private JoinCondition(ColumnMeta column, ColumnMeta anthoerTableColumn) {
         this.column = column;
@@ -39,8 +35,8 @@ public class JoinCondition implements SqlNode {
     /**
      * 基于表字段与值构建表联合条件
      *
-     * @param column
-     * @param property
+     * @param column 表字段
+     * @param property 值属性
      */
     private JoinCondition(ColumnMeta column, PropertyMeta property) {
         this.column = column;
@@ -54,7 +50,7 @@ public class JoinCondition implements SqlNode {
      * @return
      */
     JoinCondition and(JoinCondition joinCondition) {
-        setupSiblingList().add(new RelationNode<>(joinCondition, LogicRelation.AND));
+        setupSiblingList().add(new RelationNode<>(joinCondition, NodeRelation.AND));
 
         return this;
     }
@@ -66,8 +62,9 @@ public class JoinCondition implements SqlNode {
      * @return
      */
     JoinCondition and(JoinCondition... joinConditions) {
+        List<RelationNode<JoinCondition>> _siblingList = setupSiblingList();
         for (JoinCondition joinCondition : joinConditions) {
-            setupSiblingList().add(new RelationNode<>(joinCondition, LogicRelation.AND));
+            _siblingList.add(new RelationNode<>(joinCondition, NodeRelation.AND));
         }
 
         return this;
@@ -80,7 +77,7 @@ public class JoinCondition implements SqlNode {
      * @return
      */
     JoinCondition or(JoinCondition joinCondition) {
-        setupSiblingList().add(new RelationNode<>(joinCondition, LogicRelation.OR));
+        setupSiblingList().add(new RelationNode<>(joinCondition, NodeRelation.OR));
 
         return this;
     }
@@ -92,19 +89,12 @@ public class JoinCondition implements SqlNode {
      * @return
      */
     JoinCondition or(JoinCondition... joinConditions) {
+        List<RelationNode<JoinCondition>> _siblingList = setupSiblingList();
         for (JoinCondition joinCondition : joinConditions) {
-            setupSiblingList().add(new RelationNode<>(joinCondition, LogicRelation.OR));
+            _siblingList.add(new RelationNode<>(joinCondition, NodeRelation.OR));
         }
 
         return this;
-    }
-
-    private List<RelationNode<JoinCondition>> setupSiblingList() {
-        if (null == this.siblingList) {
-            this.siblingList = new ArrayList<>();
-        }
-
-        return this.siblingList;
     }
 
     @Override
@@ -119,7 +109,7 @@ public class JoinCondition implements SqlNode {
         }
 
         this.column.toSql(builder, true);
-        SqlOperator.EQ.toSql(builder, false);
+        NodeRelation.EQ.toSql(builder, false);
         if (null != this.anotherTableColumn) {
             this.anotherTableColumn.toSql(builder, true);
         } else {
@@ -128,7 +118,7 @@ public class JoinCondition implements SqlNode {
 
         if (complex) {
             siblingList.forEach(sibling -> {
-                sibling.getLogicRelation().toSql(builder, false);
+                sibling.getNodeRelation().toSql(builder, false);
                 sibling.getNode().toSql(builder, true);
             });
 
@@ -139,5 +129,13 @@ public class JoinCondition implements SqlNode {
     @Override
     public void toSql(StringBuilder builder) {
         toSql(builder, true);
+    }
+
+    private List<RelationNode<JoinCondition>> setupSiblingList() {
+        if (null == this.siblingList) {
+            this.siblingList = new ArrayList<>();
+        }
+
+        return this.siblingList;
     }
 }
