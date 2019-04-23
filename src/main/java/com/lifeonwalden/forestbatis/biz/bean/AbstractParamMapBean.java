@@ -21,6 +21,7 @@ public class AbstractParamMapBean extends AbstractMapBean {
             _value = value;
         } else if (String.class.isInstance(value)) {
             if (Integer.class.equals(clazz)) {
+                _value = Integer.parseInt((String)value);
             } else if (BigDecimal.class.equals(clazz)) {
                 _value = new BigDecimal((String) value);
             } else if (Boolean.class.equals(clazz)) {
