@@ -1,5 +1,9 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.constant.JdbcType;
+
+import java.util.Optional;
+
 /**
  * Java类中属性的元信息
  */
@@ -12,9 +16,9 @@ public interface PropertyMeta extends SqlNode {
     String getName();
 
     /**
-     * 获得java数据类型
+     * 获得该属性对应的JdbcType
      *
      * @return
      */
-    String getJavaType();
+    Optional<JdbcType> getJdbcType();
 }

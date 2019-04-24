@@ -55,35 +55,62 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
 
     @Override
     public boolean enabled(T value) {
-        if (null != enableCheck) {
-            return enableCheck.apply(value);
+        if (null == enableCheck && (null == this.siblingList || this.siblingList.isEmpty())) {
+            return true;
         }
 
-        return true;
+        if (null != enableCheck && enableCheck.apply(value)) {
+            return true;
+        }
+
+        if (null != this.siblingList && this.siblingList.size() > 0) {
+            for (RelationNode relationNode : this.siblingList) {
+                if (relationNode.getNode().equals(value)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override
     public void toSql(StringBuilder builder, boolean withAlias, T value) {
-        if (!enabled(value)) {
-            return;
+        boolean hadLeadNode = false;
+        int nodeCount = 0;
+        StringBuilder innerBuilder = new StringBuilder();
+        if (null != enableCheck && enableCheck.apply(value)) {
+            this.column.toSql(innerBuilder, withAlias);
+            compareRelation.toSql(innerBuilder, withAlias);
+            this.property.toSql(innerBuilder, withAlias);
+
+            hadLeadNode = true;
+            nodeCount++;
         }
 
-        boolean complex = (null != this.siblingList && this.siblingList.size() > 0);
-        if (complex) {
-            builder.append("(");
+        if (null != this.siblingList && this.siblingList.size() > 0) {
+            for (RelationNode<QueryNode> sibling : this.siblingList) {
+                QueryNode queryNode = sibling.getNode();
+                if (queryNode.enabled(value)) {
+                    nodeCount++;
+                    if (hadLeadNode) {
+                        sibling.getNodeRelation().toSql(innerBuilder, withAlias);
+                    } else {
+                        hadLeadNode = true;
+                    }
+                    queryNode.toSql(innerBuilder, withAlias);
+                }
+            }
         }
 
-        this.column.toSql(builder, withAlias);
-        compareRelation.toSql(builder, withAlias);
-        this.property.toSql(builder, withAlias);
-
-        if (complex) {
-            siblingList.forEach(sibling -> {
-                sibling.getNodeRelation().toSql(builder, withAlias);
-                sibling.getNode().toSql(builder, withAlias);
-            });
-
-            builder.append(")");
+        switch (nodeCount) {
+            case 0:
+                return;
+            case 1:
+                builder.append(innerBuilder.toString());
+                return;
+            default:
+                builder.append("( ").append(innerBuilder.toString()).append(" )");
         }
     }
 

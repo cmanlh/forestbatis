@@ -104,7 +104,7 @@ public class TableNode implements SqlNode {
     @Override
     public void toSql(StringBuilder builder, boolean withAlias) {
         if (null == this.joinList || this.joinList.isEmpty()) {
-            this.tableMeta.toSql(builder, false);
+            this.tableMeta.toSql(builder, withAlias);
         } else {
             this.tableMeta.toSql(builder, true);
             this.joinList.forEach(join -> {

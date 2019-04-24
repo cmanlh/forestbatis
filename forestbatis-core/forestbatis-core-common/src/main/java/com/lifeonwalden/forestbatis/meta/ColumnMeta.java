@@ -2,6 +2,8 @@ package com.lifeonwalden.forestbatis.meta;
 
 import com.lifeonwalden.forestbatis.constant.JdbcType;
 
+import java.util.Optional;
+
 /**
  * 数据库列的元信息
  */
@@ -19,17 +21,17 @@ public interface ColumnMeta extends SqlNode {
      *
      * @return
      */
-    String getAlias();
+    Optional<String> getAlias();
 
     /**
      * 获得列对应的JdbcType
      *
      * @return
      */
-    JdbcType getJdbcType();
+    Optional<JdbcType> getJdbcType();
 
     /**
-     * 列在所处执行语句上下文中的下标值
+     * 获得列在所处执行语句上下文中的下标值
      *
      * @return
      */
@@ -40,5 +42,12 @@ public interface ColumnMeta extends SqlNode {
      *
      * @return
      */
-    TableMeta getTable();
+    Optional<TableMeta> getTable();
+
+    /**
+     * 获得对应java类相映射的属性
+     *
+     * @return
+     */
+    Optional<PropertyMeta> getJavaProperty();
 }
