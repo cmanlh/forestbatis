@@ -16,6 +16,9 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
     // 兄弟条件
     protected List<RelationNode<QueryNode>> siblingList;
 
+    // 组合查询条件
+    protected QueryNode compoundQuery;
+
     // 该条件是否参与构建SQL语句的判断函数
     protected Function<T, Boolean> enableCheck;
 
@@ -55,23 +58,27 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
 
     @Override
     public boolean enabled(T value) {
-        if (null == enableCheck && (null == this.siblingList || this.siblingList.isEmpty())) {
+        if (null == enableCheck && (null == this.siblingList || this.siblingList.isEmpty()) && null == this.compoundQuery) {
             return true;
         }
 
-        if (null != enableCheck && enableCheck.apply(value)) {
-            return true;
-        }
-
-        if (null != this.siblingList && this.siblingList.size() > 0) {
-            for (RelationNode relationNode : this.siblingList) {
-                if (relationNode.getNode().equals(value)) {
-                    return true;
+        if (null == enableCheck || enableCheck.apply(value)) {
+            if (null == this.compoundQuery) {
+                return true;
+            } else {
+                return innerNodeIsAble(value);
+            }
+        } else {
+            if (null != this.siblingList && this.siblingList.size() > 0) {
+                for (RelationNode relationNode : this.siblingList) {
+                    if (relationNode.getNode().equals(value)) {
+                        return true;
+                    }
                 }
             }
-        }
 
-        return false;
+            return false;
+        }
     }
 
     @Override
@@ -79,13 +86,28 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
         boolean hadLeadNode = false;
         int nodeCount = 0;
         StringBuilder innerBuilder = new StringBuilder();
-        if (null != enableCheck && enableCheck.apply(value)) {
-            this.column.toSql(innerBuilder, withAlias);
-            compareRelation.toSql(innerBuilder, withAlias);
-            this.property.toSql(innerBuilder, withAlias);
+        if (null == enableCheck || enableCheck.apply(value)) {
+            if (null == this.compoundQuery) {
+                this.column.toSql(innerBuilder, withAlias);
+                compareRelation.toSql(innerBuilder, withAlias);
+                this.property.toSql(innerBuilder, withAlias);
 
-            hadLeadNode = true;
-            nodeCount++;
+                hadLeadNode = true;
+                nodeCount++;
+            } else {
+                if (this.compoundQuery.enabled(value)) {
+                    StringBuilder compoundBuilder = new StringBuilder();
+                    this.compoundQuery.toSql(compoundBuilder, withAlias, value);
+                    if (compoundBuilder.length() > 0) {
+                        innerBuilder.append("(");
+                        innerBuilder.append(compoundBuilder.toString());
+                        innerBuilder.append(")");
+
+                        hadLeadNode = true;
+                        nodeCount++;
+                    }
+                }
+            }
         }
 
         if (null != this.siblingList && this.siblingList.size() > 0) {
@@ -103,14 +125,8 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
             }
         }
 
-        switch (nodeCount) {
-            case 0:
-                return;
-            case 1:
-                builder.append(innerBuilder.toString());
-                return;
-            default:
-                builder.append("( ").append(innerBuilder.toString()).append(" )");
+        if (1 == nodeCount) {
+            builder.append(innerBuilder.toString());
         }
     }
 
@@ -125,5 +141,21 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
         }
 
         return this.siblingList;
+    }
+
+    private boolean innerNodeIsAble(T value) {
+        if (this.compoundQuery.enabled(value)) {
+            return true;
+        } else {
+            if (null != this.siblingList && this.siblingList.size() > 0) {
+                for (RelationNode relationNode : this.siblingList) {
+                    if (relationNode.getNode().equals(value)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 }
