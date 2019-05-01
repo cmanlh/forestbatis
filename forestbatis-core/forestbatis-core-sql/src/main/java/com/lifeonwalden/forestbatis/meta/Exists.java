@@ -2,21 +2,22 @@ package com.lifeonwalden.forestbatis.meta;
 
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * not like
+ * exists
  *
  * @param <T>
  */
-public class NotLikeNode<T> extends AbstractQueryNode<T> {
+public class Exists<T> extends AbstractQueryNode<T> {
     /**
      * 构造函数
      *
      * @param column   表字段
      * @param property 值属性
      */
-    public NotLikeNode(ColumnMeta column, PropertyMeta property) {
+    public Exists(ColumnMeta column, PropertyMeta property) {
         this(column, property, null);
     }
 
@@ -25,11 +26,11 @@ public class NotLikeNode<T> extends AbstractQueryNode<T> {
      *
      * @param column 表字段
      */
-    public NotLikeNode(ColumnMeta column) {
+    public Exists(ColumnMeta column) {
         if (column.getJavaProperty().isPresent()) {
             this.column = column;
             this.property = column.getJavaProperty().get();
-            this.compareRelation = NodeRelation.NOT_LIKE;
+            this.compareRelation = NodeRelation.EXISTS;
         } else {
             throw new RuntimeException("Has to specify a java property for column");
         }
@@ -42,10 +43,10 @@ public class NotLikeNode<T> extends AbstractQueryNode<T> {
      * @param property    值属性
      * @param enableCheck 判断该节点是否参与构建SQL的函数
      */
-    public NotLikeNode(ColumnMeta column, PropertyMeta property, Function<T, Boolean> enableCheck) {
+    public Exists(ColumnMeta column, PropertyMeta property, Function<Optional<T>, Boolean> enableCheck) {
         this.column = column;
         this.property = property;
-        this.compareRelation = NodeRelation.NOT_LIKE;
+        this.compareRelation = NodeRelation.EXISTS;
         this.enableCheck = enableCheck;
     }
 
@@ -55,14 +56,19 @@ public class NotLikeNode<T> extends AbstractQueryNode<T> {
      * @param column      表字段
      * @param enableCheck 判断该节点是否参与构建SQL的函数
      */
-    public NotLikeNode(ColumnMeta column, Function<T, Boolean> enableCheck) {
+    public Exists(ColumnMeta column, Function<Optional<T>, Boolean> enableCheck) {
         if (column.getJavaProperty().isPresent()) {
             this.column = column;
             this.property = column.getJavaProperty().get();
-            this.compareRelation = NodeRelation.NOT_LIKE;
+            this.compareRelation = NodeRelation.EXISTS;
             this.enableCheck = enableCheck;
         } else {
             throw new RuntimeException("Has to specify a java property for column");
         }
+    }
+
+    @Override
+    public boolean hasSubQuery() {
+        return true;
     }
 }

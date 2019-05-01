@@ -46,4 +46,16 @@ public interface QueryNode<T> extends ValueBindingSqlNode<T> {
      * @return
      */
     boolean enabled(T value);
+
+    /**
+     * 是否存在子查询
+     *
+     * @return
+     */
+    boolean hasSubQuery();
+
+    /**
+     * 是否构成多表组合
+     */
+    boolean isJoined();
 }

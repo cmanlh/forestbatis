@@ -26,7 +26,7 @@ public class TableNode implements SqlNode {
      * @param joinNode
      * @return
      */
-    TableNode innerJoin(JoinNode joinNode) {
+    public TableNode innerJoin(JoinNode joinNode) {
         setupJoinList().add(new RelationNode<>(joinNode, NodeRelation.INNER_JOIN));
 
         return this;
@@ -38,7 +38,7 @@ public class TableNode implements SqlNode {
      * @param joinNodes
      * @return
      */
-    TableNode innerJoin(JoinNode... joinNodes) {
+    public TableNode innerJoin(JoinNode... joinNodes) {
         List<RelationNode<JoinNode>> _joinList = setupJoinList();
         for (JoinNode joinNode : joinNodes) {
             _joinList.add(new RelationNode<>(joinNode, NodeRelation.INNER_JOIN));
@@ -53,7 +53,7 @@ public class TableNode implements SqlNode {
      * @param joinNode
      * @return
      */
-    TableNode leftJoin(JoinNode joinNode) {
+    public TableNode leftJoin(JoinNode joinNode) {
         setupJoinList().add(new RelationNode<>(joinNode, NodeRelation.LEFT_JOIN));
 
         return this;
@@ -65,7 +65,7 @@ public class TableNode implements SqlNode {
      * @param joinNodes
      * @return
      */
-    TableNode leftJoin(JoinNode... joinNodes) {
+    public TableNode leftJoin(JoinNode... joinNodes) {
         List<RelationNode<JoinNode>> _joinList = setupJoinList();
         for (JoinNode joinNode : joinNodes) {
             _joinList.add(new RelationNode<>(joinNode, NodeRelation.LEFT_JOIN));
@@ -80,7 +80,7 @@ public class TableNode implements SqlNode {
      * @param joinNode
      * @return
      */
-    TableNode rightJoin(JoinNode joinNode) {
+    public TableNode rightJoin(JoinNode joinNode) {
         setupJoinList().add(new RelationNode<>(joinNode, NodeRelation.RIGHT_JOIN));
 
         return this;
@@ -92,13 +92,22 @@ public class TableNode implements SqlNode {
      * @param joinNodes
      * @return
      */
-    TableNode rightJoin(JoinNode... joinNodes) {
+    public TableNode rightJoin(JoinNode... joinNodes) {
         List<RelationNode<JoinNode>> _joinList = setupJoinList();
         for (JoinNode joinNode : joinNodes) {
             _joinList.add(new RelationNode<>(joinNode, NodeRelation.RIGHT_JOIN));
         }
 
         return this;
+    }
+
+    /**
+     * 是否为表联合查询
+     *
+     * @return
+     */
+    public boolean isJoined() {
+        return null != this.joinList && !this.joinList.isEmpty();
     }
 
     @Override

@@ -2,21 +2,22 @@ package com.lifeonwalden.forestbatis.meta;
 
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * 大于
+ * 小于
  *
  * @param <T>
  */
-public class BtNode<T> extends AbstractQueryNode<T> {
+public class Lt<T> extends AbstractQueryNode<T> {
     /**
      * 构造函数
      *
      * @param column   表字段
      * @param property 值属性
      */
-    public BtNode(ColumnMeta column, PropertyMeta property) {
+    public Lt(ColumnMeta column, PropertyMeta property) {
         this(column, property, null);
     }
 
@@ -25,11 +26,11 @@ public class BtNode<T> extends AbstractQueryNode<T> {
      *
      * @param column 表字段
      */
-    public BtNode(ColumnMeta column) {
+    public Lt(ColumnMeta column) {
         if (column.getJavaProperty().isPresent()) {
             this.column = column;
             this.property = column.getJavaProperty().get();
-            this.compareRelation = NodeRelation.BT;
+            this.compareRelation = NodeRelation.LT;
         } else {
             throw new RuntimeException("Has to specify a java property for column");
         }
@@ -42,10 +43,10 @@ public class BtNode<T> extends AbstractQueryNode<T> {
      * @param property    值属性
      * @param enableCheck 判断该节点是否参与构建SQL的函数
      */
-    public BtNode(ColumnMeta column, PropertyMeta property, Function<T, Boolean> enableCheck) {
+    public Lt(ColumnMeta column, PropertyMeta property, Function<Optional<T>, Boolean> enableCheck) {
         this.column = column;
         this.property = property;
-        this.compareRelation = NodeRelation.BT;
+        this.compareRelation = NodeRelation.LT;
         this.enableCheck = enableCheck;
     }
 
@@ -55,11 +56,11 @@ public class BtNode<T> extends AbstractQueryNode<T> {
      * @param column      表字段
      * @param enableCheck 判断该节点是否参与构建SQL的函数
      */
-    public BtNode(ColumnMeta column, Function<T, Boolean> enableCheck) {
+    public Lt(ColumnMeta column, Function<Optional<T>, Boolean> enableCheck) {
         if (column.getJavaProperty().isPresent()) {
             this.column = column;
             this.property = column.getJavaProperty().get();
-            this.compareRelation = NodeRelation.BT;
+            this.compareRelation = NodeRelation.LT;
             this.enableCheck = enableCheck;
         } else {
             throw new RuntimeException("Has to specify a java property for column");

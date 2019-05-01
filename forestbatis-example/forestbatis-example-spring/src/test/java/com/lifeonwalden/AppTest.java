@@ -3,7 +3,7 @@ package com.lifeonwalden;
 import java.sql.PreparedStatement;
 
 /**
- * Unit test for simple App.
+ * Unit builder for simple App.
  */
 public class AppTest {
     /**

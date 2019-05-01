@@ -2,20 +2,21 @@ package com.lifeonwalden.forestbatis.meta;
 
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * is not null
+ * is null
  *
  * @param <T>
  */
-public class IsNotNullNode<T> extends AbstractQueryNode<T> {
+public class IsNull<T> extends AbstractQueryNode<T> {
     /**
      * 构造函数
      *
      * @param column 表字段
      */
-    public IsNotNullNode(ColumnMeta column) {
+    public IsNull(ColumnMeta column) {
         this(column, null);
     }
 
@@ -25,9 +26,9 @@ public class IsNotNullNode<T> extends AbstractQueryNode<T> {
      * @param column      表字段
      * @param enableCheck 判断该节点是否参与构建SQL的函数
      */
-    public IsNotNullNode(ColumnMeta column, Function<T, Boolean> enableCheck) {
+    public IsNull(ColumnMeta column, Function<Optional<T>, Boolean> enableCheck) {
         this.column = column;
-        this.compareRelation = NodeRelation.IS_NOT_NULL;
+        this.compareRelation = NodeRelation.IS_NULL;
         this.enableCheck = enableCheck;
     }
 

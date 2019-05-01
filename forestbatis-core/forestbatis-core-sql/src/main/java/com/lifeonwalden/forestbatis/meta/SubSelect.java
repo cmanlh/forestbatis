@@ -11,25 +11,25 @@ import java.util.List;
  *
  * @param <T> 值类型
  */
-public class SubSelectNode<T> implements ValueBindingSqlNode<T> {
+public class SubSelect<T> implements ValueBindingSqlNode<T> {
     private List<ColumnMeta> toReturnColumnList = new ArrayList<>();
     private QueryNode queryNode;
     private TableNode tableNode;
-    private List<OrderNode> orderList;
+    private List<Order> orderList;
 
-    SubSelectNode setTableNode(TableNode tableNode) {
+    SubSelect setTableNode(TableNode tableNode) {
         this.tableNode = tableNode;
 
         return this;
     }
 
-    SubSelectNode fetchColumn(ColumnMeta columnMeta) {
+    SubSelect fetchColumn(ColumnMeta columnMeta) {
         toReturnColumnList.add(columnMeta);
 
         return this;
     }
 
-    SubSelectNode fetchColumn(ColumnMeta... columnMetas) {
+    SubSelect fetchColumn(ColumnMeta... columnMetas) {
         for (ColumnMeta columnMeta : columnMetas) {
             toReturnColumnList.add(columnMeta);
         }
@@ -37,15 +37,15 @@ public class SubSelectNode<T> implements ValueBindingSqlNode<T> {
         return this;
     }
 
-    SubSelectNode setQuery(QueryNode queryNode) {
+    SubSelect setQuery(QueryNode queryNode) {
         this.queryNode = queryNode;
 
         return this;
     }
 
-    SubSelectNode setOrderBy(OrderNode... orderNodes) {
-        for (OrderNode orderNode : orderNodes) {
-            this.orderList.add(orderNode);
+    SubSelect setOrderBy(Order... orders) {
+        for (Order order : orders) {
+            this.orderList.add(order);
         }
 
         return this;

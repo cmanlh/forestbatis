@@ -20,6 +20,29 @@ public abstract class AbstractColumnMeta implements ColumnMeta {
     // 对应java类相映射的属性
     protected PropertyMeta javaProperty;
 
+    public AbstractColumnMeta(String label) {
+        this.label = label;
+    }
+
+    public AbstractColumnMeta(String label, JdbcType jdbcType) {
+        this.label = label;
+        this.jdbcType = jdbcType;
+    }
+
+    public AbstractColumnMeta(String label, JdbcType jdbcType, TableMeta table) {
+        this.label = label;
+        this.jdbcType = jdbcType;
+        this.table = table;
+    }
+
+    public AbstractColumnMeta(String label, JdbcType jdbcType, TableMeta table, PropertyMeta javaProperty) {
+        this.label = label;
+        this.jdbcType = jdbcType;
+        this.table = table;
+        this.javaProperty = javaProperty;
+    }
+
+
     @Override
     public String getLabel() {
         return this.label;
@@ -41,12 +64,6 @@ public abstract class AbstractColumnMeta implements ColumnMeta {
         } else {
             return Optional.of(this.jdbcType);
         }
-    }
-
-    public AbstractColumnMeta setJdbcType(JdbcType jdbcType) {
-        this.jdbcType = jdbcType;
-
-        return this;
     }
 
     @Override
@@ -78,16 +95,14 @@ public abstract class AbstractColumnMeta implements ColumnMeta {
         }
     }
 
-    public AbstractColumnMeta setJavaProperty(PropertyMeta javaProperty) {
-        this.javaProperty = javaProperty;
-
-        return this;
-    }
-
     @Override
     public void toSql(StringBuilder builder, boolean withAlias) {
         if (withAlias) {
-            builder.append(this.getAlias()).append(".").append(this.getLabel());
+            if (this.getAlias().isPresent()) {
+                builder.append(this.getAlias().get()).append(".").append(this.getLabel());
+            } else {
+                throw new RuntimeException("Don't bind to a table");
+            }
         } else {
             builder.append(this.getLabel());
         }
@@ -96,5 +111,19 @@ public abstract class AbstractColumnMeta implements ColumnMeta {
     @Override
     public void toSql(StringBuilder builder) {
         this.toSql(builder, false);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o instanceof AbstractColumnMeta) {
+            AbstractColumnMeta _o = (AbstractColumnMeta) o;
+            return this.label.equals(_o.label) && this.table == _o.table;
+        }
+
+        return false;
     }
 }

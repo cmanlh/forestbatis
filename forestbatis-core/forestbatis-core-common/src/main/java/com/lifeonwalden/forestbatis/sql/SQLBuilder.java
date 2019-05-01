@@ -6,9 +6,11 @@ package com.lifeonwalden.forestbatis.sql;
  * @param <T> 值对象类型
  */
 public interface SQLBuilder<T> {
+
     /**
      * 构建sql
      *
+     * @param value 值对象
      * @return
      */
     String build(T value);

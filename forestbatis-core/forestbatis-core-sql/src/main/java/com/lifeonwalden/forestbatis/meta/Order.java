@@ -5,7 +5,7 @@ import com.lifeonwalden.forestbatis.constant.OrderEnum;
 /**
  * order by 节点
  */
-public class OrderNode implements SqlNode {
+public class Order implements SqlNode {
 
     // 排序的列
     private ColumnMeta column;
@@ -13,12 +13,12 @@ public class OrderNode implements SqlNode {
     // 排序的方式
     private OrderEnum order;
 
-    public OrderNode(ColumnMeta column, OrderEnum order) {
+    public Order(ColumnMeta column, OrderEnum order) {
         this.column = column;
         this.order = order;
     }
 
-    public OrderNode(ColumnMeta column) {
+    public Order(ColumnMeta column) {
         this(column, OrderEnum.ASC);
     }
 

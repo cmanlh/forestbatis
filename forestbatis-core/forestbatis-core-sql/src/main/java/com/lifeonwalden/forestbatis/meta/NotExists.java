@@ -2,22 +2,22 @@ package com.lifeonwalden.forestbatis.meta;
 
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * 大于等于
+ * not exists
  *
  * @param <T>
  */
-public class BteNode<T> extends AbstractQueryNode<T> {
-
+public class NotExists<T> extends AbstractQueryNode<T> {
     /**
      * 构造函数
      *
      * @param column   表字段
      * @param property 值属性
      */
-    public BteNode(ColumnMeta column, PropertyMeta property) {
+    public NotExists(ColumnMeta column, PropertyMeta property) {
         this(column, property, null);
     }
 
@@ -26,11 +26,11 @@ public class BteNode<T> extends AbstractQueryNode<T> {
      *
      * @param column 表字段
      */
-    public BteNode(ColumnMeta column) {
+    public NotExists(ColumnMeta column) {
         if (column.getJavaProperty().isPresent()) {
             this.column = column;
             this.property = column.getJavaProperty().get();
-            this.compareRelation = NodeRelation.BTE;
+            this.compareRelation = NodeRelation.NOT_EXISTS;
         } else {
             throw new RuntimeException("Has to specify a java property for column");
         }
@@ -43,10 +43,10 @@ public class BteNode<T> extends AbstractQueryNode<T> {
      * @param property    值属性
      * @param enableCheck 判断该节点是否参与构建SQL的函数
      */
-    public BteNode(ColumnMeta column, PropertyMeta property, Function<T, Boolean> enableCheck) {
+    public NotExists(ColumnMeta column, PropertyMeta property, Function<Optional<T>, Boolean> enableCheck) {
         this.column = column;
         this.property = property;
-        this.compareRelation = NodeRelation.BTE;
+        this.compareRelation = NodeRelation.NOT_EXISTS;
         this.enableCheck = enableCheck;
     }
 
@@ -56,14 +56,19 @@ public class BteNode<T> extends AbstractQueryNode<T> {
      * @param column      表字段
      * @param enableCheck 判断该节点是否参与构建SQL的函数
      */
-    public BteNode(ColumnMeta column, Function<T, Boolean> enableCheck) {
+    public NotExists(ColumnMeta column, Function<Optional<T>, Boolean> enableCheck) {
         if (column.getJavaProperty().isPresent()) {
             this.column = column;
             this.property = column.getJavaProperty().get();
-            this.compareRelation = NodeRelation.BTE;
+            this.compareRelation = NodeRelation.NOT_EXISTS;
             this.enableCheck = enableCheck;
         } else {
             throw new RuntimeException("Has to specify a java property for column");
         }
+    }
+
+    @Override
+    public boolean hasSubQuery() {
+        return true;
     }
 }

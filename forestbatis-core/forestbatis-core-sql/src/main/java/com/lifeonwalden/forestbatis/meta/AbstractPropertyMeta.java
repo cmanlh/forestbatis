@@ -11,6 +11,15 @@ public abstract class AbstractPropertyMeta implements PropertyMeta {
     // 对应的JdbcType
     protected JdbcType jdbcType;
 
+    public AbstractPropertyMeta(String name) {
+        this.name = name;
+    }
+
+    public AbstractPropertyMeta(String name, JdbcType jdbcType) {
+        this.name = name;
+        this.jdbcType = jdbcType;
+    }
+
     @Override
     public String getName() {
         return this.name;

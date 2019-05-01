@@ -4,6 +4,7 @@ import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 public abstract class AbstractQueryNode<T> implements QueryNode<T> {
@@ -20,7 +21,7 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
     protected QueryNode compoundQuery;
 
     // 该条件是否参与构建SQL语句的判断函数
-    protected Function<T, Boolean> enableCheck;
+    protected Function<Optional<T>, Boolean> enableCheck;
 
     @Override
     public QueryNode and(QueryNode queryNode) {
@@ -62,7 +63,7 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
             return true;
         }
 
-        if (null == enableCheck || enableCheck.apply(value)) {
+        if (null == enableCheck || enableCheck.apply(null == value ? Optional.empty() : Optional.of(value))) {
             if (null == this.compoundQuery) {
                 return true;
             } else {
@@ -70,10 +71,34 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
             }
         } else {
             if (null != this.siblingList && this.siblingList.size() > 0) {
-                for (RelationNode relationNode : this.siblingList) {
-                    if (relationNode.getNode().equals(value)) {
+                for (RelationNode<QueryNode> relationNode : this.siblingList) {
+                    if (relationNode.getNode().enabled(value)) {
                         return true;
                     }
+                }
+            }
+
+            return false;
+        }
+    }
+
+    @Override
+    public boolean hasSubQuery() {
+        return false;
+    }
+
+    @Override
+    public boolean isJoined() {
+        if (this.hasSubQuery()) {
+            return true;
+        }
+
+        if (null == this.siblingList || this.siblingList.isEmpty()) {
+            return false;
+        } else {
+            for (RelationNode<QueryNode> node : this.siblingList) {
+                if (node.getNode().isJoined()) {
+                    return true;
                 }
             }
 
@@ -86,7 +111,7 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
         boolean hadLeadNode = false;
         int nodeCount = 0;
         StringBuilder innerBuilder = new StringBuilder();
-        if (null == enableCheck || enableCheck.apply(value)) {
+        if (null == enableCheck || enableCheck.apply(null == value ? Optional.empty() : Optional.of(value))) {
             if (null == this.compoundQuery) {
                 this.column.toSql(innerBuilder, withAlias);
                 compareRelation.toSql(innerBuilder, withAlias);
@@ -120,12 +145,12 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
                     } else {
                         hadLeadNode = true;
                     }
-                    queryNode.toSql(innerBuilder, withAlias);
+                    queryNode.toSql(innerBuilder, withAlias, value);
                 }
             }
         }
 
-        if (1 == nodeCount) {
+        if (1 <= nodeCount) {
             builder.append(innerBuilder.toString());
         }
     }
@@ -148,8 +173,8 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
             return true;
         } else {
             if (null != this.siblingList && this.siblingList.size() > 0) {
-                for (RelationNode relationNode : this.siblingList) {
-                    if (relationNode.getNode().equals(value)) {
+                for (RelationNode<QueryNode> relationNode : this.siblingList) {
+                    if (relationNode.getNode().enabled(value)) {
                         return true;
                     }
                 }
