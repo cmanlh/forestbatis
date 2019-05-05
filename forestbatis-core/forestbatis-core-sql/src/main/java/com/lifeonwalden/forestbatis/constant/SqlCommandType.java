@@ -10,13 +10,16 @@ public enum SqlCommandType implements SqlNode {
 
     private String sign;
 
+    private String SQL_FRAGMENT;
+
     SqlCommandType(String sign) {
         this.sign = sign;
+        this.SQL_FRAGMENT = this.sign.concat(" ");
     }
 
     @Override
     public void toSql(StringBuilder builder, boolean withAlias) {
-        builder.append(this.sign).append(" ");
+        builder.append(this.SQL_FRAGMENT);
     }
 
     @Override

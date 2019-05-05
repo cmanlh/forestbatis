@@ -1,6 +1,7 @@
 package com.lifeonwalden.forestbatis.meta;
 
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
+import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
 import com.lifeonwalden.forestbatis.constant.SqlCommandType;
 
 import java.util.ArrayList;
@@ -17,19 +18,19 @@ public class SubSelect<T> implements ValueBindingSqlNode<T> {
     private TableNode tableNode;
     private List<Order> orderList;
 
-    SubSelect setTableNode(TableNode tableNode) {
+    public SubSelect setTableNode(TableNode tableNode) {
         this.tableNode = tableNode;
 
         return this;
     }
 
-    SubSelect fetchColumn(ColumnMeta columnMeta) {
+    public SubSelect fetchColumn(ColumnMeta columnMeta) {
         toReturnColumnList.add(columnMeta);
 
         return this;
     }
 
-    SubSelect fetchColumn(ColumnMeta... columnMetas) {
+    public SubSelect fetchColumn(ColumnMeta... columnMetas) {
         for (ColumnMeta columnMeta : columnMetas) {
             toReturnColumnList.add(columnMeta);
         }
@@ -37,13 +38,13 @@ public class SubSelect<T> implements ValueBindingSqlNode<T> {
         return this;
     }
 
-    SubSelect setQuery(QueryNode queryNode) {
+    public SubSelect setQuery(QueryNode queryNode) {
         this.queryNode = queryNode;
 
         return this;
     }
 
-    SubSelect setOrderBy(Order... orders) {
+    public SubSelect setOrderBy(Order... orders) {
         for (Order order : orders) {
             this.orderList.add(order);
         }
@@ -74,15 +75,13 @@ public class SubSelect<T> implements ValueBindingSqlNode<T> {
         }
         this.tableNode.toSql(builder, withAlias);
 
-        if (null != this.queryNode && this.queryNode.enabled(value)) {
+        if (null != this.queryNode && QueryNodeEnableType.DISABLED != this.queryNode.enabled(value)) {
             NodeRelation.WHERE.toSql(builder, withAlias);
-            builder.append(" ");
             queryNode.toSql(builder, withAlias, value);
         }
 
         if (null != this.orderList && this.orderList.size() > 0) {
             NodeRelation.ORDER_BY.toSql(builder, withAlias);
-            builder.append(" ");
             int index = 0;
             this.orderList.get(index).toSql(builder, withAlias);
             for (index = 1; index < this.orderList.size(); index++) {

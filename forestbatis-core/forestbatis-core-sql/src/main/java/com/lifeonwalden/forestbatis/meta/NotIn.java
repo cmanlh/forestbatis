@@ -10,7 +10,7 @@ import java.util.function.Function;
  *
  * @param <T>
  */
-public class NotIn<T> extends AbstractQueryNode<T> {
+public class NotIn<T> extends AbstractInQueryNode<T> {
     /**
      * 构造函数
      *

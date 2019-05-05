@@ -47,4 +47,15 @@ public abstract class AbstractPropertyMeta implements PropertyMeta {
     public void toSql(StringBuilder builder) {
         this.toSql(builder, false);
     }
+
+    protected void toSql(StringBuilder builder, boolean withAlias, int listPropertySize) {
+        if (null == this.jdbcType) {
+            throw new RuntimeException("Has to specify JdbcType for a Property.");
+        }
+
+        builder.append("#{").append(this.name)
+                .append(", JdbcType=").append(this.jdbcType.getJdbcType())
+                .append(", ListSize=").append(listPropertySize)
+                .append("}");
+    }
 }

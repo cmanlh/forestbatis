@@ -11,6 +11,21 @@ import java.util.function.Function;
  * @param <T>
  */
 public class Eq<T> extends AbstractQueryNode<T> {
+    // 另一表的关联字段
+    protected ColumnMeta anotherTableColumn;
+
+    /**
+     * 构造函数
+     *
+     * @param column             表字段
+     * @param anotherTableColumn 另一表的字段
+     */
+    public Eq(ColumnMeta column, ColumnMeta anotherTableColumn) {
+        this.column = column;
+        this.anotherTableColumn = anotherTableColumn;
+        this.compareRelation = NodeRelation.EQ;
+    }
+
     /**
      * 构造函数
      *
@@ -64,6 +79,17 @@ public class Eq<T> extends AbstractQueryNode<T> {
             this.enableCheck = enableCheck;
         } else {
             throw new RuntimeException("Has to specify a java property for column");
+        }
+    }
+
+    @Override
+    protected void selfBuild(StringBuilder builder, boolean withAlias, T value) {
+        if (null != this.anotherTableColumn) {
+            this.column.toSql(builder, withAlias);
+            compareRelation.toSql(builder, withAlias);
+            this.anotherTableColumn.toSql(builder, withAlias);
+        } else {
+            super.selfBuild(builder, withAlias, value);
         }
     }
 }

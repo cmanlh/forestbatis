@@ -1,5 +1,7 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
+
 /**
  * 查询条件节点
  *
@@ -45,7 +47,7 @@ public interface QueryNode<T> extends ValueBindingSqlNode<T> {
      * @param value
      * @return
      */
-    boolean enabled(T value);
+    QueryNodeEnableType enabled(T value);
 
     /**
      * 是否存在子查询

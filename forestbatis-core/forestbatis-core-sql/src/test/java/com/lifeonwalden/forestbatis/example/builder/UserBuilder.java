@@ -7,7 +7,7 @@ import com.lifeonwalden.forestbatis.meta.Eq;
 import com.lifeonwalden.forestbatis.meta.TableNode;
 
 public class UserBuilder {
-    public final static SelectBuilder BASE_SELECT = new SelectBuilder<User>(
+    public final static SelectBuilder SELECT = new SelectBuilder<User>(
             UserTableInfo.TABLE.getColumn().get(),
             new TableNode(UserTableInfo.TABLE),
             new Eq<User>(UserTableInfo.Id, user -> user.isPresent() && null != user.get().getId())
@@ -15,6 +15,4 @@ public class UserBuilder {
                     .and(new Eq<User>(UserTableInfo.Age, user -> user.isPresent() && null != user.get().getAge()))
                     .and(new Eq<User>(UserTableInfo.Birthday, user -> user.isPresent() && null != user.get().getBirthday()))
     );
-
-
 }

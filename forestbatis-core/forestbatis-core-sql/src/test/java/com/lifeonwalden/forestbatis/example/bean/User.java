@@ -1,8 +1,9 @@
 package com.lifeonwalden.forestbatis.example.bean;
 
 import java.util.Date;
+import java.util.HashMap;
 
-public class User {
+public class User extends HashMap {
     private String id;
 
     private String name;

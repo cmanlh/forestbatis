@@ -6,23 +6,20 @@ import com.lifeonwalden.forestbatis.meta.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserTableInfo {
-    private final static String TABLE_NAME = "User";
-    private final static String ALIAS_NAME = "u";
+public class AccountTableInfo {
+    private final static String TABLE_NAME = "Account";
+    private final static String ALIAS_NAME = "a";
     private final static String _id = "id";
     public final static PropertyMeta id = new AbstractPropertyMeta(_id, JdbcType.VARCHAR) {
     };
     private final static String _name = "name";
     public final static PropertyMeta name = new AbstractPropertyMeta(_name, JdbcType.VARCHAR) {
     };
-    private final static String _age = "age";
-    public final static PropertyMeta age = new AbstractPropertyMeta(_age, JdbcType.INTEGER) {
+    private final static String _userId = "userId";
+    public final static PropertyMeta userId = new AbstractPropertyMeta(_userId, JdbcType.VARCHAR) {
     };
-    private final static String _birthday = "birthday";
-    public final static PropertyMeta birthday = new AbstractPropertyMeta(_birthday, JdbcType.DATE) {
-    };
-    private final static String _sex = "sex";
-    public final static PropertyMeta sex = new AbstractPropertyMeta(_sex, JdbcType.INTEGER) {
+    private final static String _balance = "balance";
+    public final static PropertyMeta balance = new AbstractPropertyMeta(_balance, JdbcType.DECIMAL) {
     };
     private final static List<ColumnMeta> columnList = new ArrayList<>();
     public final static TableMeta TABLE = new AbstractTableMeta(TABLE_NAME, ALIAS_NAME, columnList) {
@@ -31,17 +28,16 @@ public class UserTableInfo {
     };
     public final static ColumnMeta Name = new AbstractColumnMeta(_name, JdbcType.VARCHAR, TABLE, name) {
     };
-    public final static ColumnMeta Age = new AbstractColumnMeta(_age, JdbcType.INTEGER, TABLE, age) {
+    public final static ColumnMeta UserId = new AbstractColumnMeta(_userId, JdbcType.VARCHAR, TABLE, userId) {
     };
-    public final static ColumnMeta Birthday = new AbstractColumnMeta(_birthday, JdbcType.DATE, TABLE, birthday) {
-    };
-    public final static ColumnMeta Sex = new AbstractColumnMeta(_sex, JdbcType.INTEGER, TABLE, sex) {
+
+    public final static ColumnMeta Balance = new AbstractColumnMeta(_balance, JdbcType.DECIMAL, TABLE, balance) {
     };
 
     static {
         columnList.add(Id);
         columnList.add(Name);
-        columnList.add(Age);
-        columnList.add(Birthday);
+        columnList.add(UserId);
+        columnList.add(Balance);
     }
 }

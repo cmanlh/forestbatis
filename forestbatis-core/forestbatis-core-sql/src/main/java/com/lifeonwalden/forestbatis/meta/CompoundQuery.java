@@ -1,5 +1,7 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
+
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -22,5 +24,29 @@ public class CompoundQuery<T> extends AbstractQueryNode<T> {
     public CompoundQuery(QueryNode compoundQuery, Function<Optional<T>, Boolean> enableCheck) {
         this.compoundQuery = compoundQuery;
         this.enableCheck = enableCheck;
+    }
+
+    @Override
+    public QueryNodeEnableType enabled(T value) {
+        if ((null == enableCheck || enableCheck.apply(null == value ? Optional.empty() : Optional.of(value)))
+                && QueryNodeEnableType.DISABLED != this.compoundQuery.enabled(value)) {
+            return QueryNodeEnableType.NODE;
+        } else {
+            if (null != this.siblingList && this.siblingList.size() > 0) {
+                for (RelationNode<QueryNode> relationNode : this.siblingList) {
+                    if (QueryNodeEnableType.DISABLED != relationNode.getNode().enabled(value)) {
+                        return QueryNodeEnableType.SIBLING_ONLY;
+                    }
+                }
+            }
+
+            return QueryNodeEnableType.DISABLED;
+        }
+    }
+
+    protected void selfBuild(StringBuilder builder, boolean withAlias, T value) {
+        builder.append("(");
+        this.compoundQuery.toSql(builder, withAlias, value);
+        builder.append(")");
     }
 }

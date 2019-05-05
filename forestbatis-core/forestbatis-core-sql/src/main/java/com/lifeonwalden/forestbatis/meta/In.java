@@ -2,6 +2,7 @@ package com.lifeonwalden.forestbatis.meta;
 
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -10,7 +11,7 @@ import java.util.function.Function;
  *
  * @param <T>
  */
-public class In<T> extends AbstractQueryNode<T> {
+public class In<T> extends AbstractInQueryNode<T> {
     /**
      * 构造函数
      *

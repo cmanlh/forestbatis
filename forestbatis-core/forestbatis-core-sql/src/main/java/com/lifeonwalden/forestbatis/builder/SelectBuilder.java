@@ -1,6 +1,7 @@
 package com.lifeonwalden.forestbatis.builder;
 
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
+import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
 import com.lifeonwalden.forestbatis.constant.SqlCommandType;
 import com.lifeonwalden.forestbatis.meta.ColumnMeta;
 import com.lifeonwalden.forestbatis.meta.Order;
@@ -50,18 +51,31 @@ public class SelectBuilder<T> implements SQLBuilder<T> {
     }
 
     /**
-     * 指定列不包含以覆盖返回列并构造一个新的SQL构建器
+     * 在当前返回列基础上剔除指定列并构造一个新的SQL构建器
      *
-     * @param toReturnColumnList
+     * @param excludeReturnColumnList
      * @return
      */
-    public SelectBuilder overrideReturnColumnExclude(List<ColumnMeta> toReturnColumnList) {
+    public SelectBuilder excludeReturnColumn(List<ColumnMeta> excludeReturnColumnList) {
         List<ColumnMeta> _toReturnColumnList = new ArrayList<>();
         this.toReturnColumnList.forEach(columnMeta -> {
-            if (!toReturnColumnList.contains(columnMeta)) {
+            if (!excludeReturnColumnList.contains(columnMeta)) {
                 _toReturnColumnList.add(columnMeta);
             }
         });
+        return new SelectBuilder<T>(_toReturnColumnList, this.tableNode, this.queryNode, this.orderList);
+    }
+
+    /**
+     * 在当前返回列基础上增加指定列并构造一个新的SQL构建器
+     *
+     * @param toAddReturnColumnList
+     * @return
+     */
+    public SelectBuilder addReturnColumn(List<ColumnMeta> toAddReturnColumnList) {
+        List<ColumnMeta> _toReturnColumnList = new ArrayList<>();
+        _toReturnColumnList.addAll(this.toReturnColumnList);
+        _toReturnColumnList.addAll(toAddReturnColumnList);
         return new SelectBuilder<T>(_toReturnColumnList, this.tableNode, this.queryNode, this.orderList);
     }
 
@@ -111,7 +125,7 @@ public class SelectBuilder<T> implements SQLBuilder<T> {
         }
         this.tableNode.toSql(builder, withAlias);
 
-        if (null != this.queryNode && this.queryNode.enabled(value)) {
+        if (null != this.queryNode && QueryNodeEnableType.DISABLED != this.queryNode.enabled(value)) {
             NodeRelation.WHERE.toSql(builder, withAlias);
             queryNode.toSql(builder, withAlias, value);
         }

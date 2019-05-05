@@ -33,26 +33,8 @@ public class IsNull<T> extends AbstractQueryNode<T> {
     }
 
     @Override
-    public void toSql(StringBuilder builder, boolean withAlias, T value) {
-        if (!enabled(value)) {
-            return;
-        }
-
-        boolean complex = (null != this.siblingList && this.siblingList.size() > 0);
-        if (complex) {
-            builder.append("(");
-        }
-
+    protected void selfBuild(StringBuilder builder, boolean withAlias, T value) {
         this.column.toSql(builder, withAlias);
         compareRelation.toSql(builder, withAlias);
-
-        if (complex) {
-            siblingList.forEach(sibling -> {
-                sibling.getNodeRelation().toSql(builder, withAlias);
-                sibling.getNode().toSql(builder, withAlias);
-            });
-
-            builder.append(")");
-        }
     }
 }

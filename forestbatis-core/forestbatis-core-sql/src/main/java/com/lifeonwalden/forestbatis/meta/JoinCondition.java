@@ -27,7 +27,7 @@ public class JoinCondition implements SqlNode {
      * @param column 表字段
      * @param anthoerTableColumn 另一表的字段
      */
-    private JoinCondition(ColumnMeta column, ColumnMeta anthoerTableColumn) {
+    public JoinCondition(ColumnMeta column, ColumnMeta anthoerTableColumn) {
         this.column = column;
         this.anotherTableColumn = anthoerTableColumn;
     }
@@ -38,7 +38,7 @@ public class JoinCondition implements SqlNode {
      * @param column 表字段
      * @param property 值属性
      */
-    private JoinCondition(ColumnMeta column, PropertyMeta property) {
+    public JoinCondition(ColumnMeta column, PropertyMeta property) {
         this.column = column;
         this.property = property;
     }
