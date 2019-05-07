@@ -7,37 +7,45 @@ import com.lifeonwalden.forestbatis.meta.ColumnMeta;
 import com.lifeonwalden.forestbatis.meta.Order;
 import com.lifeonwalden.forestbatis.meta.QueryNode;
 import com.lifeonwalden.forestbatis.meta.TableNode;
-import com.lifeonwalden.forestbatis.sql.SQLBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * SQL构建参数
+ * 查询语句构建器
  */
-public class SelectBuilder<T> implements SQLBuilder<T> {
+public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.SelectBuilder<T> {
     protected List<ColumnMeta> toReturnColumnList;
     private QueryNode queryNode;
     private TableNode tableNode;
     private List<Order> orderList;
+    private boolean runtimeChangeable;
 
-    public SelectBuilder(List<ColumnMeta> toReturnColumnList, TableNode tableNode) {
-        this(toReturnColumnList, tableNode, null, null);
+    private volatile String cachedStatement;
+
+    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList) {
+        this(tableNode, toReturnColumnList, null, null);
     }
 
-    public SelectBuilder(List<ColumnMeta> toReturnColumnList, TableNode tableNode, QueryNode queryNode) {
-        this(toReturnColumnList, tableNode, queryNode, null);
+    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, QueryNode queryNode) {
+        this(tableNode, toReturnColumnList, queryNode, null);
     }
 
-    public SelectBuilder(List<ColumnMeta> toReturnColumnList, TableNode tableNode, List<Order> orderList) {
-        this(toReturnColumnList, tableNode, null, orderList);
+    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, List<Order> orderList) {
+        this(tableNode, toReturnColumnList, null, orderList);
     }
 
-    public SelectBuilder(List<ColumnMeta> toReturnColumnList, TableNode tableNode, QueryNode queryNode, List<Order> orderList) {
-        this.toReturnColumnList = toReturnColumnList;
+    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, QueryNode queryNode, List<Order> orderList) {
         this.tableNode = tableNode;
+        this.toReturnColumnList = toReturnColumnList;
         this.queryNode = queryNode;
         this.orderList = orderList;
+
+        if (null == this.queryNode) {
+            this.runtimeChangeable = false;
+        } else {
+            this.runtimeChangeable = this.queryNode.isRuntimeChangeable();
+        }
     }
 
     /**
@@ -47,7 +55,7 @@ public class SelectBuilder<T> implements SQLBuilder<T> {
      * @return
      */
     public SelectBuilder overrideReturnColumn(List<ColumnMeta> toReturnColumnList) {
-        return new SelectBuilder<T>(toReturnColumnList, this.tableNode, this.queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, toReturnColumnList, this.queryNode, this.orderList);
     }
 
     /**
@@ -63,7 +71,7 @@ public class SelectBuilder<T> implements SQLBuilder<T> {
                 _toReturnColumnList.add(columnMeta);
             }
         });
-        return new SelectBuilder<T>(_toReturnColumnList, this.tableNode, this.queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList);
     }
 
     /**
@@ -76,7 +84,7 @@ public class SelectBuilder<T> implements SQLBuilder<T> {
         List<ColumnMeta> _toReturnColumnList = new ArrayList<>();
         _toReturnColumnList.addAll(this.toReturnColumnList);
         _toReturnColumnList.addAll(toAddReturnColumnList);
-        return new SelectBuilder<T>(_toReturnColumnList, this.tableNode, this.queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList);
     }
 
     /**
@@ -86,7 +94,7 @@ public class SelectBuilder<T> implements SQLBuilder<T> {
      * @return
      */
     public SelectBuilder overrideOrder(List<Order> orderList) {
-        return new SelectBuilder<T>(this.toReturnColumnList, this.tableNode, this.queryNode, orderList);
+        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, this.queryNode, orderList);
     }
 
     /**
@@ -96,15 +104,20 @@ public class SelectBuilder<T> implements SQLBuilder<T> {
      * @return
      */
     public SelectBuilder overrideQuery(QueryNode queryNode) {
-        return new SelectBuilder<T>(this.toReturnColumnList, this.tableNode, queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, queryNode, this.orderList);
     }
 
     @Override
     public String build(T value) {
+        if (this.isRuntimeChangeable() == false && this.cachedStatement != null) {
+            return this.cachedStatement;
+        }
+
         StringBuilder builder = new StringBuilder();
         boolean withAlias = this.tableNode.isJoined() || this.queryNode.isJoined();
 
         SqlCommandType.SELECT.toSql(builder, withAlias);
+        builder.append(" ");
 
         if (null == this.toReturnColumnList || this.toReturnColumnList.isEmpty()) {
             builder.append(1);
@@ -140,11 +153,21 @@ public class SelectBuilder<T> implements SQLBuilder<T> {
             }
         }
 
-        return builder.toString();
+        if (false == this.isRuntimeChangeable()) {
+            this.cachedStatement = builder.toString();
+            return this.cachedStatement;
+        } else {
+            return builder.toString();
+        }
     }
 
     @Override
     public String build() {
         return build(null);
+    }
+
+    @Override
+    public boolean isRuntimeChangeable() {
+        return this.runtimeChangeable;
     }
 }

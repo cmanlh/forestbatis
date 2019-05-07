@@ -121,7 +121,7 @@ public abstract class AbstractColumnMeta implements ColumnMeta {
 
         if (o instanceof AbstractColumnMeta) {
             AbstractColumnMeta _o = (AbstractColumnMeta) o;
-            return this.label.equals(_o.label) && this.table == _o.table;
+            return this.label.equals(_o.label) && this.table.equals(_o.table);
         }
 
         return false;

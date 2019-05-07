@@ -1,11 +1,6 @@
 package com.lifeonwalden.forestbatis.sql;
 
-/**
- * sql语句构建类
- *
- * @param <T> 值对象类型
- */
-public interface SQLBuilder<T> {
+public interface StatementBuilder<T> {
 
     /**
      * 构建sql
@@ -21,4 +16,11 @@ public interface SQLBuilder<T> {
      * @return
      */
     String build();
+
+    /**
+     * 运行时构建的SQL语句是否可变
+     *
+     * @return
+     */
+    boolean isRuntimeChangeable();
 }

@@ -1,7 +1,8 @@
 package com.lifeonwalden.forestbatis.mapper;
 
-import com.lifeonwalden.forestbatis.sql.SelectSQLBuilder;
-import com.lifeonwalden.forestbatis.sql.UpdateSQLBuilder;
+
+import com.lifeonwalden.forestbatis.sql.SelectBuilder;
+import com.lifeonwalden.forestbatis.sql.UpdateBuilder;
 
 import java.util.List;
 
@@ -18,11 +19,11 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
     /**
      * 根据主键与SQL生成参数共同决定如何更新对应记录
      *
-     * @param value            指定对象
-     * @param selectSqlBuilder SQL生成
+     * @param value         指定对象
+     * @param selectBuilder SQL生成
      * @return
      */
-    Integer update(P value, SelectSQLBuilder selectSqlBuilder);
+    Integer update(P value, SelectBuilder selectBuilder);
 
     /**
      * 批量根据主键严格更新为指定对象对应的值
@@ -38,11 +39,11 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      * 批量根据主键与SQL生成参数共同决定如何更新对应记录
      * 指定对象与返回结果按照下标一一对应
      *
-     * @param valueList        指定对象
-     * @param updateSQLBuilder SQL生成
+     * @param valueList     指定对象
+     * @param updateBuilder SQL生成
      * @return
      */
-    List<Integer> update(List<P> valueList, UpdateSQLBuilder updateSQLBuilder);
+    List<Integer> update(List<P> valueList, UpdateBuilder updateBuilder);
 
     /**
      * 根据主键删除记录

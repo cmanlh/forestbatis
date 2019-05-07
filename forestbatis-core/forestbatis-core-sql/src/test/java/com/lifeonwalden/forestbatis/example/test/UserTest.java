@@ -179,8 +179,9 @@ public class UserTest {
         List<ColumnMeta> toReturnColumnList = new ArrayList<>();
         toReturnColumnList.addAll(UserTableInfo.TABLE.getColumn().get());
         toReturnColumnList.add(AccountTableInfo.Balance);
-        String sql = new SelectBuilder<User>(toReturnColumnList,
+        String sql = new SelectBuilder<User>(
                 new TableNode(UserTableInfo.TABLE).leftJoin(new JoinNode(AccountTableInfo.TABLE, new JoinCondition(UserTableInfo.Id, AccountTableInfo.UserId))),
+                toReturnColumnList,
                 new Eq(UserTableInfo.Id)).build();
         Assert.assertTrue(sql,
                 "select u.id, u.name, u.age, u.birthday, a.balance from User u left join Account a on u.id = a.userId where u.id = #{id, JdbcType=VARCHAR}".equals(sql));
@@ -191,8 +192,9 @@ public class UserTest {
         List<ColumnMeta> toReturnColumnList = new ArrayList<>();
         toReturnColumnList.addAll(UserTableInfo.TABLE.getColumn().get());
         toReturnColumnList.add(AccountTableInfo.Balance);
-        String sql = new SelectBuilder<User>(toReturnColumnList,
+        String sql = new SelectBuilder<User>(
                 new TableNode(UserTableInfo.TABLE).rightJoin(new JoinNode(AccountTableInfo.TABLE, new JoinCondition(UserTableInfo.Id, AccountTableInfo.UserId))),
+                toReturnColumnList,
                 new Eq(UserTableInfo.Id)).build();
         Assert.assertTrue(sql,
                 "select u.id, u.name, u.age, u.birthday, a.balance from User u right join Account a on u.id = a.userId where u.id = #{id, JdbcType=VARCHAR}".equals(sql));
@@ -203,8 +205,9 @@ public class UserTest {
         List<ColumnMeta> toReturnColumnList = new ArrayList<>();
         toReturnColumnList.addAll(UserTableInfo.TABLE.getColumn().get());
         toReturnColumnList.add(AccountTableInfo.Balance);
-        String sql = new SelectBuilder<User>(toReturnColumnList,
+        String sql = new SelectBuilder<User>(
                 new TableNode(UserTableInfo.TABLE).innerJoin(new JoinNode(AccountTableInfo.TABLE, new JoinCondition(UserTableInfo.Id, AccountTableInfo.UserId))),
+                toReturnColumnList,
                 new Eq(UserTableInfo.Id)).build();
         Assert.assertTrue(sql,
                 "select u.id, u.name, u.age, u.birthday, a.balance from User u inner join Account a on u.id = a.userId where u.id = #{id, JdbcType=VARCHAR}".equals(sql));
@@ -216,11 +219,12 @@ public class UserTest {
         toReturnColumnList.addAll(UserTableInfo.TABLE.getColumn().get());
         toReturnColumnList.add(AccountTableInfo.Balance);
         toReturnColumnList.add(UserCreditTableInfo.Level);
-        String sql = new SelectBuilder<User>(toReturnColumnList,
+        String sql = new SelectBuilder<User>(
                 new TableNode(UserTableInfo.TABLE)
                         .leftJoin(new JoinNode(AccountTableInfo.TABLE, new JoinCondition(UserTableInfo.Id, AccountTableInfo.UserId)))
-                        .rightJoin(new JoinNode(UserCreditTableInfo.TABLE, new JoinCondition(UserTableInfo.Id, UserCreditTableInfo.UserId)))
-                , new Eq(UserTableInfo.Id)).build();
+                        .rightJoin(new JoinNode(UserCreditTableInfo.TABLE, new JoinCondition(UserTableInfo.Id, UserCreditTableInfo.UserId))),
+                toReturnColumnList,
+                new Eq(UserTableInfo.Id)).build();
         Assert.assertTrue(sql,
                 "select u.id, u.name, u.age, u.birthday, a.balance, uc.level from User u left join Account a on u.id = a.userId right join UserCredit uc on u.id = uc.userId where u.id = #{id, JdbcType=VARCHAR}".equals(sql));
     }
@@ -281,5 +285,75 @@ public class UserTest {
         String sql = UserBuilder.SELECT.overrideQuery(new NotIn(UserTableInfo.Sex)).build(user);
         Assert.assertTrue(sql,
                 "select id, name, age, birthday from User where sex not in #{sex, JdbcType=INTEGER, ListSize=2}".equals(sql));
+    }
+
+    @Test
+    public void insert() {
+        String sql = UserBuilder.INSERT.build();
+        Assert.assertTrue(sql,
+                "insert into User (id, name, age, birthday) values(#{id, JdbcType=VARCHAR}, #{name, JdbcType=VARCHAR}, #{age, JdbcType=INTEGER}, #{birthday, JdbcType=DATE})".equals(sql));
+    }
+
+    @Test
+    public void insert_withNull() {
+        String sql = UserBuilder.INSERT.build(new User());
+        Assert.assertTrue(sql,
+                "insert into User (id, name, age, birthday) values(#{id, JdbcType=VARCHAR}, #{name, JdbcType=VARCHAR}, #{age, JdbcType=INTEGER}, #{birthday, JdbcType=DATE})".equals(sql));
+    }
+
+    @Test
+    public void insert_withNull_notInsertNull() {
+        String sql = UserBuilder.INSERT.addInsertColumn(Arrays.asList(), false).build(new User().setId("id").setName("Tom"));
+        Assert.assertTrue(sql,
+                "insert into User (id, name) values(#{id, JdbcType=VARCHAR}, #{name, JdbcType=VARCHAR})".equals(sql));
+    }
+
+    @Test
+    public void insert_withExcludeColumn() {
+        String sql = UserBuilder.INSERT.excludeInsertColumn(Arrays.asList(UserTableInfo.Name)).build(new User().setId("id").setName("Tom"));
+        Assert.assertTrue(sql,
+                "insert into User (id, age, birthday) values(#{id, JdbcType=VARCHAR}, #{age, JdbcType=INTEGER}, #{birthday, JdbcType=DATE})".equals(sql));
+    }
+
+    @Test
+    public void delete() {
+        String sql = UserBuilder.DELETE.build();
+        Assert.assertTrue(sql,
+                "delete from User where id = #{id, JdbcType=VARCHAR}".equals(sql));
+    }
+
+    @Test
+    public void delete_withQuery() {
+        String sql = UserBuilder.DELETE.overrideQuery(new Eq(UserTableInfo.Name)).build();
+        Assert.assertTrue(sql,
+                "delete from User where name = #{name, JdbcType=VARCHAR}".equals(sql));
+    }
+
+    @Test
+    public void update() {
+        String sql = UserBuilder.UPDATE.build();
+        Assert.assertTrue(sql,
+                "update User set name = #{name, JdbcType=VARCHAR}, age = #{age, JdbcType=INTEGER}, birthday = #{birthday, JdbcType=DATE} where id = #{id, JdbcType=VARCHAR}".equals(sql));
+    }
+
+    @Test
+    public void update_withNull() {
+        String sql = UserBuilder.UPDATE.build(new User());
+        Assert.assertTrue(sql,
+                "update User set name = #{name, JdbcType=VARCHAR}, age = #{age, JdbcType=INTEGER}, birthday = #{birthday, JdbcType=DATE} where id = #{id, JdbcType=VARCHAR}".equals(sql));
+    }
+
+    @Test
+    public void update_withNull_NotUpdateNull() {
+        String sql = UserBuilder.UPDATE.addUpdateColumn(Arrays.asList(), false).build(new User().setId("id").setName("Tom"));
+        Assert.assertTrue(sql,
+                "update User set name = #{name, JdbcType=VARCHAR} where id = #{id, JdbcType=VARCHAR}".equals(sql));
+    }
+
+    @Test
+    public void update_withQuery() {
+        String sql = UserBuilder.UPDATE.overrideQuery(new Like(UserTableInfo.Name)).build(new User().setId("id").setName("Tom"));
+        Assert.assertTrue(sql,
+                "update User set name = #{name, JdbcType=VARCHAR}, age = #{age, JdbcType=INTEGER}, birthday = #{birthday, JdbcType=DATE} where name like #{name, JdbcType=VARCHAR}".equals(sql));
     }
 }

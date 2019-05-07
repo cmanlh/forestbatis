@@ -55,6 +55,7 @@ public class SubSelect<T> implements ValueBindingSqlNode<T> {
     @Override
     public void toSql(StringBuilder builder, boolean withAlias, T value) {
         SqlCommandType.SELECT.toSql(builder, withAlias);
+        builder.append(" ");
 
         if (null == this.toReturnColumnList || this.toReturnColumnList.isEmpty()) {
             builder.append(1);
@@ -94,5 +95,13 @@ public class SubSelect<T> implements ValueBindingSqlNode<T> {
     @Override
     public void toSql(StringBuilder builder, T value) {
         toSql(builder, false, value);
+    }
+
+    public boolean isRuntimeChangeable() {
+        if (null == this.queryNode) {
+            return false;
+        }
+
+        return this.queryNode.isRuntimeChangeable();
     }
 }

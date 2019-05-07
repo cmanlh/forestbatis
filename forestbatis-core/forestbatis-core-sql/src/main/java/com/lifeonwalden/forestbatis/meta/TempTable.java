@@ -52,4 +52,8 @@ public class TempTable<T> implements TableMeta, ValueBindingSqlNode<T> {
     public void toSql(StringBuilder builder, T value) {
         toSql(builder, true, value);
     }
+
+    public boolean isRuntimeChangeable() {
+        return this.subSelect.isRuntimeChangeable();
+    }
 }

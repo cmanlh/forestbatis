@@ -60,4 +60,11 @@ public interface QueryNode<T> extends ValueBindingSqlNode<T> {
      * 是否构成多表组合
      */
     boolean isJoined();
+
+    /**
+     * 运行时构建的SQL语句是否可变
+     *
+     * @return
+     */
+    boolean isRuntimeChangeable();
 }

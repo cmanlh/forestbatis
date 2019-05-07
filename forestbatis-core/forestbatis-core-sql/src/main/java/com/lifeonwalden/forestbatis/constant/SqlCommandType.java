@@ -6,7 +6,7 @@ import com.lifeonwalden.forestbatis.meta.SqlNode;
  * SQL DML type
  */
 public enum SqlCommandType implements SqlNode {
-    SELECT("select"), UPDATE("update"), INSERT("insert"), DELETE("delete");
+    SELECT("select"), UPDATE("update"), INSERT("insert into"), DELETE("delete");
 
     private String sign;
 
@@ -14,7 +14,7 @@ public enum SqlCommandType implements SqlNode {
 
     SqlCommandType(String sign) {
         this.sign = sign;
-        this.SQL_FRAGMENT = this.sign.concat(" ");
+        this.SQL_FRAGMENT = this.sign;
     }
 
     @Override
@@ -24,6 +24,6 @@ public enum SqlCommandType implements SqlNode {
 
     @Override
     public void toSql(StringBuilder builder) {
-        toSql(builder);
+        toSql(builder, false);
     }
 }

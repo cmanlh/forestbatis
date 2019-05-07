@@ -125,7 +125,7 @@ public class TableNode implements SqlNode {
 
     @Override
     public void toSql(StringBuilder builder) {
-        toSql(builder, true);
+        toSql(builder, false);
     }
 
     private List<RelationNode<JoinNode>> setupJoinList() {

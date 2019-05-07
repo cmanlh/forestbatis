@@ -126,7 +126,7 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
                     }
                     case SIBLING_ONLY: {
                         nodeCount++;
-                        queryNode.toSql(innerBuilder, withAlias, value,hadLeadNode);
+                        queryNode.toSql(innerBuilder, withAlias, value, hadLeadNode);
                         hadLeadNode = true;
 
                         break;
@@ -162,5 +162,22 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
         this.column.toSql(builder, withAlias);
         compareRelation.toSql(builder, withAlias);
         this.property.toSql(builder, withAlias);
+    }
+
+    @Override
+    public boolean isRuntimeChangeable() {
+        if (null != this.enableCheck) {
+            return true;
+        }
+
+        if (null != this.siblingList && !this.siblingList.isEmpty()) {
+            for (RelationNode<QueryNode> node : this.siblingList) {
+                if (node.getNode().isRuntimeChangeable()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

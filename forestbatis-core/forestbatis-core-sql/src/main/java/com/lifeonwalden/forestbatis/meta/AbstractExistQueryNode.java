@@ -16,5 +16,10 @@ public class AbstractExistQueryNode<T> extends AbstractQueryNode<T> {
         this.tempTable.toSql(builder, withAlias, value);
         builder.append(")");
     }
+
+    @Override
+    public boolean isRuntimeChangeable() {
+        return this.tempTable.isRuntimeChangeable();
+    }
 }
 

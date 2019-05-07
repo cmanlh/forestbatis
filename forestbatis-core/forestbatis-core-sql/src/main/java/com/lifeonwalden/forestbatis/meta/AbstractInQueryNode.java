@@ -43,4 +43,9 @@ public class AbstractInQueryNode<T> extends AbstractQueryNode<T> {
 
         return 0;
     }
+
+    @Override
+    public boolean isRuntimeChangeable() {
+        return true;
+    }
 }

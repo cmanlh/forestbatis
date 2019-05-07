@@ -51,4 +51,18 @@ public abstract class AbstractTableMeta implements TableMeta {
     public void toSql(StringBuilder builder) {
         toSql(builder, false);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else {
+            if (obj instanceof AbstractTableMeta) {
+                AbstractTableMeta _obj = (AbstractTableMeta) obj;
+                return this.name.equals(_obj.name);
+            }
+
+            return false;
+        }
+    }
 }
