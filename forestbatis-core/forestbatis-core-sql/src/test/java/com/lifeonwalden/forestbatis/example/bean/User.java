@@ -1,10 +1,11 @@
 package com.lifeonwalden.forestbatis.example.bean;
 
+import com.lifeonwalden.forestbatis.bean.AbstractMapBean;
 import com.lifeonwalden.forestbatis.example.meta.UserTableInfo;
 
 import java.util.Date;
 
-public class User extends AbstractDTOMapBean {
+public class User extends AbstractMapBean {
     public String getId() {
         return (String) this.dataMap.get(UserTableInfo.id.getName());
     }

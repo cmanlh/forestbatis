@@ -215,4 +215,5 @@ public interface CommonMapper<P> {
      * @return
      */
     Integer truncate();
+
 }

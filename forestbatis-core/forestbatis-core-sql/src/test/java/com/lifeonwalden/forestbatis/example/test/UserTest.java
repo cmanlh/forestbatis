@@ -275,7 +275,7 @@ public class UserTest {
         user.put(UserTableInfo.sex.getName(), Arrays.asList(1, 2));
         String sql = UserBuilder.SELECT.overrideQuery(new In(UserTableInfo.Sex)).build(user);
         Assert.assertTrue(sql,
-                "select id, name, age, birthday from User where sex in #{sex, JdbcType=INTEGER, ListSize=2}".equals(sql));
+                "select id, name, age, birthday from User where sex in (#{sex, JdbcType=INTEGER, ListSize=2})".equals(sql));
     }
 
     @Test
@@ -284,7 +284,7 @@ public class UserTest {
         user.put(UserTableInfo.sex.getName(), Arrays.asList(1, 2));
         String sql = UserBuilder.SELECT.overrideQuery(new NotIn(UserTableInfo.Sex)).build(user);
         Assert.assertTrue(sql,
-                "select id, name, age, birthday from User where sex not in #{sex, JdbcType=INTEGER, ListSize=2}".equals(sql));
+                "select id, name, age, birthday from User where sex not in (#{sex, JdbcType=INTEGER, ListSize=2})".equals(sql));
     }
 
     @Test

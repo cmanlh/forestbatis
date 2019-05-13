@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>com.lifeonwalden</groupId>
-            <artifactId>forestbatis-core-common</artifactId>
+            <artifactId>forestbatis-core-sql</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

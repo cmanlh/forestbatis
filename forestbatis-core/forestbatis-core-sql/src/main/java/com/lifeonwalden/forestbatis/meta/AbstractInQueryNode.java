@@ -30,7 +30,9 @@ public class AbstractInQueryNode<T> extends AbstractQueryNode<T> {
     protected void selfBuild(StringBuilder builder, boolean withAlias, T value) {
         this.column.toSql(builder, withAlias);
         this.compareRelation.toSql(builder);
+        builder.append("(");
         ((AbstractPropertyMeta) this.property).toSql(builder, withAlias, fetchListSize(value));
+        builder.append(")");
     }
 
     private int fetchListSize(T value) {
