@@ -1,19 +1,20 @@
 package com.lifeonwalden.forestbatis.bean;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ParameterInfo {
-    private Optional<PropertyInfo[]> props;
+    private Optional<List<PropertyInfo>> props;
 
     private String sql;
 
     private String debugSql;
 
-    public Optional<PropertyInfo[]> getProps() {
+    public Optional<List<PropertyInfo>> getProps() {
         return props;
     }
 
-    public ParameterInfo setProps(Optional<PropertyInfo[]> props) {
+    public ParameterInfo setProps(Optional<List<PropertyInfo>> props) {
         this.props = props;
 
         return this;

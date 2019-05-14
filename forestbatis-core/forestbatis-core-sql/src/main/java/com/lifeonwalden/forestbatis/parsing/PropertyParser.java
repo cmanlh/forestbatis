@@ -2,9 +2,12 @@ package com.lifeonwalden.forestbatis.parsing;
 
 import com.lifeonwalden.forestbatis.bean.ParameterInfo;
 import com.lifeonwalden.forestbatis.bean.PropertyInfo;
+import com.lifeonwalden.forestbatis.constant.JdbcType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public interface PropertyParser {
@@ -35,13 +38,16 @@ public interface PropertyParser {
         int otherSplitterIndex;
         int equalSplitterIndex;
         char[] src = sql.toCharArray();
+        String propValue;
+        StringBuilder sqlBuilder = new StringBuilder();
+        List<PropertyInfo> propertyInfoList = new ArrayList<>();
+        int parameterIndex = 0;
 
         if (logger.isDebugEnabled()) {
             if (-1 == tokenStartIndex) {
                 return new ParameterInfo().setProps(Optional.empty()).setSql(sql).setDebugSql(sql);
             }
 
-            StringBuilder sqlBuilder = new StringBuilder();
             StringBuilder debugSqlBuilder = new StringBuilder();
             while (tokenStartIndex > -1) {
                 sqlBuilder.append(src, searchFromIndex, tokenStartIndex - searchFromIndex);
@@ -56,23 +62,69 @@ public interface PropertyParser {
                 }
 
                 nameSplitterIndex = sql.indexOf(SIGN_SPLITTER, tokenSearchStartIndex);
-                if (-1 == nameSplitterIndex) {
+                if (-1 == nameSplitterIndex || nameSplitterIndex > tokenEndIndex) {
                     throw new RuntimeException("Invalid sql statement. At least set the JdbcType for the property.");
                 }
                 propertyInfo.setName(sql.substring(tokenSearchStartIndex, nameSplitterIndex).trim());
 
                 tokenSearchStartIndex = nameSplitterIndex + 1;
-                otherSplitterIndex = sql.indexOf(SIGN_SPLITTER, tokenSearchStartIndex);
-                if (-1 == otherSplitterIndex) {
-                    equalSplitterIndex = sql.indexOf(SIGN_EQUAL, tokenSearchStartIndex);
-                    if (-1 == equalSplitterIndex) {
-                        throw new RuntimeException("Invalid sql statement. No = for property expression.");
-                    }
-                    switch (sql.substring(tokenSearchStartIndex, equalSplitterIndex)) {
-                        case PROP_JDBC_TYPE:
-                            break;
-                        case PROP_LIST_SIZE:
-                            break;
+                int listSize = -1;
+                while (true) {
+                    otherSplitterIndex = sql.indexOf(SIGN_SPLITTER, tokenSearchStartIndex);
+                    if (-1 == otherSplitterIndex || otherSplitterIndex > tokenEndIndex) {
+                        equalSplitterIndex = sql.indexOf(SIGN_EQUAL, tokenSearchStartIndex);
+                        if (-1 == equalSplitterIndex || equalSplitterIndex > tokenEndIndex) {
+                            throw new RuntimeException("Invalid sql statement. No = for property expression.");
+                        }
+                        propValue = sql.substring(equalSplitterIndex + 1, tokenEndIndex).trim();
+                        switch (sql.substring(tokenSearchStartIndex, equalSplitterIndex).trim()) {
+                            case PROP_JDBC_TYPE: {
+                                if (null != propertyInfo.getJdbcType()) {
+                                    throw new RuntimeException("Duplicated JdbcType configuration for parameter : ".concat(propertyInfo.getName()));
+                                }
+                                propertyInfo.setJdbcType(JdbcType.nameOf(propValue));
+                                if (null == propertyInfo.getJdbcType()) {
+                                    throw new RuntimeException("Not a valid jdbc type : ".concat(propValue));
+                                }
+                                break;
+                            }
+                            case PROP_LIST_SIZE: {
+                                if (-1 != listSize) {
+                                    throw new RuntimeException("Duplicated ListSize configuration for parameter : ".concat(propertyInfo.getName()));
+                                }
+                                listSize = Integer.parseInt(propValue);
+                                break;
+                            }
+                        }
+
+                        break;
+                    } else {
+                        equalSplitterIndex = sql.indexOf(SIGN_EQUAL, tokenSearchStartIndex);
+                        if (-1 == equalSplitterIndex || equalSplitterIndex > otherSplitterIndex) {
+                            throw new RuntimeException("Invalid sql statement. No = for property expression.");
+                        }
+                        propValue = sql.substring(equalSplitterIndex + 1, otherSplitterIndex).trim();
+                        switch (sql.substring(tokenSearchStartIndex, equalSplitterIndex).trim()) {
+                            case PROP_JDBC_TYPE: {
+                                if (null != propertyInfo.getJdbcType()) {
+                                    throw new RuntimeException("Duplicated JdbcType configuration for parameter : ".concat(propertyInfo.getName()));
+                                }
+                                propertyInfo.setJdbcType(JdbcType.nameOf(propValue));
+                                if (null == propertyInfo.getJdbcType()) {
+                                    throw new RuntimeException("Not a valid jdbc type : ".concat(propValue));
+                                }
+                                break;
+                            }
+                            case PROP_LIST_SIZE: {
+                                if (-1 != listSize) {
+                                    throw new RuntimeException("Duplicated ListSize configuration for parameter : ".concat(propertyInfo.getName()));
+                                }
+                                listSize = Integer.parseInt(propValue);
+                                break;
+                            }
+                        }
+
+                        tokenSearchStartIndex = otherSplitterIndex + 1;
                     }
                 }
             }
