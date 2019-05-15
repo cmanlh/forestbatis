@@ -62,4 +62,15 @@ public class PropertyInfo {
 
         return this;
     }
+
+    public PropertyInfo newListSibling(int index, int listIndex) {
+        PropertyInfo prop = new PropertyInfo();
+        prop.name = this.name;
+        prop.jdbcType = this.jdbcType;
+        prop.listProperty = this.listProperty;
+        prop.index = index;
+        prop.listIndex = listIndex;
+
+        return prop;
+    }
 }
