@@ -4,6 +4,7 @@ package com.lifeonwalden.forestbatis.mapper;
 import com.lifeonwalden.forestbatis.meta.ColumnMeta;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface KeyBasedMapper<P> extends CommonMapper<P> {
 
@@ -13,7 +14,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      * @param param 查询条件
      * @return
      */
-    P get(P param);
+    Optional<P> get(P param);
 
     /**
      * 基于主键查询，返回excludeReturnColumnList之外的字段
@@ -22,7 +23,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      * @param excludeReturnColumnList SQL生成
      * @return
      */
-    P get(P param, List<ColumnMeta> excludeReturnColumnList);
+    Optional<P> get(P param, List<ColumnMeta> excludeReturnColumnList);
 
     /**
      * 根据主键更新记录，当value中某属性为null时，对应记录字段也将被更新为null

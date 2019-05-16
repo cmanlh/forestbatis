@@ -1,7 +1,7 @@
 package com.lifeonwalden.forestbatis.parsing;
 
-import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.bean.PropertyInfo;
+import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.constant.JdbcType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public interface PropertyParser {
         String propValue;
         StringBuilder sqlBuilder = new StringBuilder();
         List<PropertyInfo> propertyInfoList = new ArrayList<>();
-        int parameterIndex = 0;
+        int parameterIndex = 1;
 
         if (logger.isDebugEnabled()) {
             if (-1 == tokenStartIndex) {
@@ -143,6 +143,9 @@ public interface PropertyParser {
                         case CHAR:
                         case MEDIUMTEXT:
                         case NVARCHAR:
+                        case DATE:
+                        case DATETIME:
+                        case TIMESTAMP:
                             debugSqlBuilder.append("'#".concat(String.valueOf(parameterIndex)).concat("'"));
                             break;
                         default:
@@ -164,6 +167,9 @@ public interface PropertyParser {
                         case CHAR:
                         case MEDIUMTEXT:
                         case NVARCHAR:
+                        case DATE:
+                        case DATETIME:
+                        case TIMESTAMP:
                             debugSqlBuilder.append("'#".concat(String.valueOf(parameterIndex)).concat("'"));
                             break;
                         default:
@@ -187,6 +193,9 @@ public interface PropertyParser {
                             case CHAR:
                             case MEDIUMTEXT:
                             case NVARCHAR:
+                            case DATE:
+                            case DATETIME:
+                            case TIMESTAMP:
                                 debugSqlBuilder.append(", '#".concat(String.valueOf(parameterIndex)).concat("'"));
                                 break;
                             default:
