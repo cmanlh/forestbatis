@@ -1,4 +1,4 @@
-package com.lifeonwalden.forestbatis.meta;
+package com.lifeonwalden.forestbatis.bean;
 
 import java.util.List;
 

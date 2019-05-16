@@ -1,5 +1,7 @@
 package com.lifeonwalden.forestbatis.sql;
 
+import com.lifeonwalden.forestbatis.bean.StatementInfo;
+
 public interface StatementBuilder<T> {
 
     /**
@@ -8,14 +10,14 @@ public interface StatementBuilder<T> {
      * @param value 值对象
      * @return
      */
-    String build(T value);
+    StatementInfo build(T value);
 
     /**
      * 构建sql
      *
      * @return
      */
-    String build();
+    StatementInfo build();
 
     /**
      * 运行时构建的SQL语句是否可变

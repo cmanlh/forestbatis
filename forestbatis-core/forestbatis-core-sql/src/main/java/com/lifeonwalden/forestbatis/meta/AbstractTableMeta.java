@@ -7,17 +7,38 @@ import java.util.Optional;
 public abstract class AbstractTableMeta implements TableMeta {
     protected String name;
     protected String alias;
+    protected boolean beWithSchema;
+    protected String schema;
     protected List<ColumnMeta> columnList;
 
     public AbstractTableMeta(String name, String alias) {
-        this.name = name;
-        this.alias = alias;
+        this(name, alias, false, null, null);
+    }
+
+    public AbstractTableMeta(String name, String alias, boolean beWithSchema, String schema) {
+        this(name, alias, beWithSchema, schema, null);
     }
 
     public AbstractTableMeta(String name, String alias, List<ColumnMeta> columnList) {
+        this(name, alias, false, null, columnList);
+    }
+
+    public AbstractTableMeta(String name, String alias, boolean beWithSchema, String schema, List<ColumnMeta> columnList) {
         this.name = name;
         this.alias = alias;
+        this.beWithSchema = beWithSchema;
+        this.schema = schema;
         this.columnList = Collections.unmodifiableList(columnList);
+    }
+
+    @Override
+    public boolean beWithSchema() {
+        return this.beWithSchema;
+    }
+
+    @Override
+    public String getSchema() {
+        return this.schema;
     }
 
     @Override
@@ -41,7 +62,11 @@ public abstract class AbstractTableMeta implements TableMeta {
 
     @Override
     public void toSql(StringBuilder builder, boolean withAlias) {
-        builder.append(this.name);
+        if (this.beWithSchema) {
+            builder.append(this.schema).append(".").append(this.name);
+        } else {
+            builder.append(this.name);
+        }
         if (withAlias) {
             builder.append(" ").append(this.alias);
         }

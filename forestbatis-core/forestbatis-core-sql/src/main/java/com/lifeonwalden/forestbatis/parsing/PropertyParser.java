@@ -1,6 +1,6 @@
 package com.lifeonwalden.forestbatis.parsing;
 
-import com.lifeonwalden.forestbatis.bean.ParameterInfo;
+import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.bean.PropertyInfo;
 import com.lifeonwalden.forestbatis.constant.JdbcType;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public interface PropertyParser {
     int OPEN_TOKEN_SIZE = OPEN_TOKEN.length();
     int CLOSE_TOKEN_SIZE = CLOSE_TOKEN.length();
 
-    static ParameterInfo parse(String sql) {
+    static StatementInfo parse(String sql) {
         if (null == sql || sql.isEmpty()) {
             throw new RuntimeException("Invalid SQL statement");
         }
@@ -49,7 +49,7 @@ public interface PropertyParser {
 
         if (logger.isDebugEnabled()) {
             if (-1 == tokenStartIndex) {
-                return new ParameterInfo().setProps(Optional.empty()).setSql(sql).setDebugSql(sql);
+                return new StatementInfo().setProps(Optional.empty()).setSql(sql).setDebugSql(sql);
             }
 
             StringBuilder debugSqlBuilder = new StringBuilder();
@@ -204,10 +204,10 @@ public interface PropertyParser {
             debugSqlBuilder.append(src, searchFromIndex, src.length - searchFromIndex);
             sqlBuilder.append(src, searchFromIndex, src.length - searchFromIndex);
 
-            return new ParameterInfo().setDebugSql(debugSqlBuilder.toString()).setSql(sqlBuilder.toString()).setProps(Optional.of(propertyInfoList));
+            return new StatementInfo().setDebugSql(debugSqlBuilder.toString()).setSql(sqlBuilder.toString()).setProps(Optional.of(propertyInfoList));
         } else {
             if (-1 == tokenStartIndex) {
-                return new ParameterInfo().setProps(Optional.empty()).setSql(sql);
+                return new StatementInfo().setProps(Optional.empty()).setSql(sql);
             }
 
             while (tokenStartIndex > -1) {
@@ -314,7 +314,7 @@ public interface PropertyParser {
             }
             sqlBuilder.append(src, searchFromIndex, src.length - searchFromIndex);
 
-            return new ParameterInfo().setSql(sqlBuilder.toString()).setProps(Optional.of(propertyInfoList));
+            return new StatementInfo().setSql(sqlBuilder.toString()).setProps(Optional.of(propertyInfoList));
         }
     }
 }

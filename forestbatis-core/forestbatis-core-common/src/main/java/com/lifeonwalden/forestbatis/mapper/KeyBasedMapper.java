@@ -1,15 +1,31 @@
 package com.lifeonwalden.forestbatis.mapper;
 
 
-import com.lifeonwalden.forestbatis.sql.SelectBuilder;
-import com.lifeonwalden.forestbatis.sql.UpdateBuilder;
+import com.lifeonwalden.forestbatis.meta.ColumnMeta;
 
 import java.util.List;
 
 public interface KeyBasedMapper<P> extends CommonMapper<P> {
+
     /**
-     * 根据主键严格更新为指定对象对应的值
-     * 如指定对象对应值为null，则表字段也将更新为null
+     * 基于主键查询，全字段返回
+     *
+     * @param param 查询条件
+     * @return
+     */
+    P get(P param);
+
+    /**
+     * 基于主键查询，返回excludeReturnColumnList之外的字段
+     *
+     * @param param                   查询条件
+     * @param excludeReturnColumnList SQL生成
+     * @return
+     */
+    P get(P param, List<ColumnMeta> excludeReturnColumnList);
+
+    /**
+     * 根据主键更新记录，当value中某属性为null时，对应记录字段也将被更新为null
      *
      * @param value 指定对象
      * @return
@@ -17,33 +33,67 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
     Integer update(P value);
 
     /**
-     * 根据主键与SQL生成参数共同决定如何更新对应记录
+     * 根据主键更新记录，当value中某属性为null时，对应记录字段将不进行更新
      *
-     * @param value         指定对象
-     * @param selectBuilder SQL生成
+     * @param value 指定对象
      * @return
      */
-    Integer update(P value, SelectBuilder selectBuilder);
+    Integer updateWithoutNull(P value);
 
     /**
-     * 批量根据主键严格更新为指定对象对应的值
-     * 如指定对象对应值为null，则表字段也将更新为null
-     * 指定对象与返回结果按照下标一一对应
+     * 根据主键更新记录，且仅更新toUpdateColumnList指定的列
+     * 当value中某属性为null时，对应记录字段也将被更新为null
+     *
+     * @param value              指定对象
+     * @param toUpdateColumnList 指定要更新的列
+     * @return
+     */
+    Integer update(P value, List<ColumnMeta> toUpdateColumnList);
+
+    /**
+     * 根据主键更新记录，且仅更新toUpdateColumnList指定的列
+     * 当value中某属性为null时，对应记录字段将不进行更新
+     *
+     * @param value 指定对象
+     * @return
+     */
+    Integer updateWithoutNull(P value, List<ColumnMeta> toUpdateColumnList);
+
+    /**
+     * 根据主键更新记录，当value中某属性为null时，对应记录字段也将被更新为null
      *
      * @param valueList 指定对象
      * @return
      */
-    List<Integer> update(List<P> valueList);
+    int[] update(List<P> valueList);
 
     /**
-     * 批量根据主键与SQL生成参数共同决定如何更新对应记录
-     * 指定对象与返回结果按照下标一一对应
+     * 根据主键更新记录，当value中某属性为null时，对应记录字段将不进行更新
      *
-     * @param valueList     指定对象
-     * @param updateBuilder SQL生成
+     * @param valueList 指定对象
      * @return
      */
-    List<Integer> update(List<P> valueList, UpdateBuilder updateBuilder);
+    int[] updateWithoutNull(List<P> valueList);
+
+    /**
+     * 根据主键更新记录，且仅更新toUpdateColumnList指定的列
+     * 当value中某属性为null时，对应记录字段也将被更新为null
+     *
+     * @param valueList          指定对象
+     * @param toUpdateColumnList 指定要更新的列
+     * @return
+     */
+    int[] update(List<P> valueList, List<ColumnMeta> toUpdateColumnList);
+
+    /**
+     * 根据主键更新记录，且仅更新toUpdateColumnList指定的列
+     * 当value中某属性为null时，对应记录字段将不进行更新
+     *
+     * @param valueList          指定对象
+     * @param toUpdateColumnList 指定要更新的列
+     * @return
+     */
+    int[] updateWithoutNull(List<P> valueList, List<ColumnMeta> toUpdateColumnList);
 
     /**
      * 根据主键删除记录
@@ -60,5 +110,5 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      * @param paramList 查询参数
      * @return
      */
-    List<Integer> delete(List<P> paramList);
+    int[] delete(List<P> paramList);
 }

@@ -1,11 +1,13 @@
 package com.lifeonwalden.forestbatis.builder;
 
+import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
 import com.lifeonwalden.forestbatis.constant.SqlCommandType;
 import com.lifeonwalden.forestbatis.meta.ColumnMeta;
 import com.lifeonwalden.forestbatis.meta.QueryNode;
 import com.lifeonwalden.forestbatis.meta.TableNode;
+import com.lifeonwalden.forestbatis.parsing.PropertyParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,7 @@ public class UpdateBuilder<T> implements com.lifeonwalden.forestbatis.sql.Update
     private boolean updateNull;
     private boolean runtimeChangeable;
 
-    private volatile String cachedStatement;
+    private volatile StatementInfo cachedStatement;
 
     public UpdateBuilder(TableNode tableNode, List<ColumnMeta> toUpdateColumnList) {
         this(tableNode, toUpdateColumnList, null, true);
@@ -61,6 +63,16 @@ public class UpdateBuilder<T> implements com.lifeonwalden.forestbatis.sql.Update
      */
     public UpdateBuilder overrideUpdateColumn(List<ColumnMeta> toUpdateColumnList) {
         return new UpdateBuilder<T>(this.tableNode, toUpdateColumnList, this.queryNode, this.updateNull);
+    }
+
+    /**
+     * 覆盖插入列并构造一个新的SQL构建器
+     *
+     * @param updateNull
+     * @return
+     */
+    public UpdateBuilder overrideUpdateColumn(boolean updateNull) {
+        return new UpdateBuilder<T>(this.tableNode, this.toUpdateColumnList, this.queryNode, updateNull);
     }
 
     /**
@@ -155,7 +167,7 @@ public class UpdateBuilder<T> implements com.lifeonwalden.forestbatis.sql.Update
     }
 
     @Override
-    public String build(T value) {
+    public StatementInfo build(T value) {
         if (this.isRuntimeChangeable() == false && this.cachedStatement != null) {
             return this.cachedStatement;
         }
@@ -210,15 +222,15 @@ public class UpdateBuilder<T> implements com.lifeonwalden.forestbatis.sql.Update
         }
 
         if (false == this.isRuntimeChangeable()) {
-            this.cachedStatement = builder.toString();
+            this.cachedStatement = PropertyParser.parse(builder.toString());
             return this.cachedStatement;
         } else {
-            return builder.toString();
+            return PropertyParser.parse(builder.toString());
         }
     }
 
     @Override
-    public String build() {
+    public StatementInfo build() {
         return build(null);
     }
 

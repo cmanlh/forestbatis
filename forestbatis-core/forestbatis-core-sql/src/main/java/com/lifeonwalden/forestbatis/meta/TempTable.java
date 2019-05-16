@@ -19,6 +19,16 @@ public class TempTable<T> implements TableMeta, ValueBindingSqlNode<T> {
     }
 
     @Override
+    public boolean beWithSchema() {
+        return false;
+    }
+
+    @Override
+    public String getSchema() {
+        return null;
+    }
+
+    @Override
     public String getName() {
         return this.alias;
     }

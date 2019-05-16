@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.builder;
 
+import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
 import com.lifeonwalden.forestbatis.constant.SqlCommandType;
@@ -7,6 +8,7 @@ import com.lifeonwalden.forestbatis.meta.ColumnMeta;
 import com.lifeonwalden.forestbatis.meta.Order;
 import com.lifeonwalden.forestbatis.meta.QueryNode;
 import com.lifeonwalden.forestbatis.meta.TableNode;
+import com.lifeonwalden.forestbatis.parsing.PropertyParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,7 @@ public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.Select
     private List<Order> orderList;
     private boolean runtimeChangeable;
 
-    private volatile String cachedStatement;
+    private volatile StatementInfo cachedStatement;
 
     public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList) {
         this(tableNode, toReturnColumnList, null, null);
@@ -108,7 +110,7 @@ public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.Select
     }
 
     @Override
-    public String build(T value) {
+    public StatementInfo build(T value) {
         if (this.isRuntimeChangeable() == false && this.cachedStatement != null) {
             return this.cachedStatement;
         }
@@ -154,15 +156,15 @@ public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.Select
         }
 
         if (false == this.isRuntimeChangeable()) {
-            this.cachedStatement = builder.toString();
+            this.cachedStatement = PropertyParser.parse(builder.toString());
             return this.cachedStatement;
         } else {
-            return builder.toString();
+            return PropertyParser.parse(builder.toString());
         }
     }
 
     @Override
-    public String build() {
+    public StatementInfo build() {
         return build(null);
     }
 

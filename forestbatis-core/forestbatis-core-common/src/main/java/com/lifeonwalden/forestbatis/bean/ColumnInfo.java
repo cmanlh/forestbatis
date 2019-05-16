@@ -1,4 +1,6 @@
-package com.lifeonwalden.forestbatis.meta;
+package com.lifeonwalden.forestbatis.bean;
+
+import com.lifeonwalden.forestbatis.constant.JdbcType;
 
 /**
  * 表格字段信息
@@ -7,7 +9,7 @@ public class ColumnInfo {
     // 字段在所处执行语句上下文中的下标值
     private int index;
     // 字段的jdbc类型
-    private int JdbcType;
+    private JdbcType jdbcType;
     // 字段名
     private String label;
     // 字段对应的java数据类型
@@ -25,12 +27,12 @@ public class ColumnInfo {
         return this;
     }
 
-    public int getJdbcType() {
-        return JdbcType;
+    public JdbcType getJdbcType() {
+        return jdbcType;
     }
 
-    public ColumnInfo setJdbcType(int jdbcType) {
-        JdbcType = jdbcType;
+    public ColumnInfo setJdbcType(JdbcType jdbcType) {
+        this.jdbcType = jdbcType;
 
         return this;
     }

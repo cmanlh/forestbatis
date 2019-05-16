@@ -1,8 +1,10 @@
 package com.lifeonwalden.forestbatis.builder;
 
+import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.constant.SqlCommandType;
 import com.lifeonwalden.forestbatis.meta.ColumnMeta;
 import com.lifeonwalden.forestbatis.meta.TableNode;
+import com.lifeonwalden.forestbatis.parsing.PropertyParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +19,7 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
     // 是否将null字段插入数据库
     private boolean insertNull;
 
-    private volatile String cachedStatement;
+    private volatile StatementInfo cachedStatement;
 
     public InsertBuilder(TableNode tableNode, List<ColumnMeta> toInsertColumnList) {
         this(tableNode, toInsertColumnList, true);
@@ -111,7 +113,7 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
     }
 
     @Override
-    public String build(T value) {
+    public StatementInfo build(T value) {
         if (this.isRuntimeChangeable() == false && this.cachedStatement != null) {
             return this.cachedStatement;
         }
@@ -166,15 +168,15 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
             builder.append(" values(").append(innerbuilder.toString()).append(")");
         }
         if (false == this.isRuntimeChangeable()) {
-            this.cachedStatement = builder.toString();
+            this.cachedStatement = PropertyParser.parse(builder.toString());
             return this.cachedStatement;
         } else {
-            return builder.toString();
+            return PropertyParser.parse(builder.toString());
         }
     }
 
     @Override
-    public String build() {
+    public StatementInfo build() {
         return build(null);
     }
 

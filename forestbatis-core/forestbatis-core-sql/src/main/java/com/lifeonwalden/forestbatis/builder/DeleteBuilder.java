@@ -1,10 +1,12 @@
 package com.lifeonwalden.forestbatis.builder;
 
+import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
 import com.lifeonwalden.forestbatis.constant.SqlCommandType;
 import com.lifeonwalden.forestbatis.meta.QueryNode;
 import com.lifeonwalden.forestbatis.meta.TableNode;
+import com.lifeonwalden.forestbatis.parsing.PropertyParser;
 
 /**
  * 删除语句构建器
@@ -14,7 +16,7 @@ public class DeleteBuilder<T> implements com.lifeonwalden.forestbatis.sql.Delete
     private TableNode tableNode;
     private boolean runtimeChangeable;
 
-    private volatile String cachedStatement;
+    private volatile StatementInfo cachedStatement;
 
     public DeleteBuilder(TableNode tableNode) {
         this(tableNode, null);
@@ -41,7 +43,7 @@ public class DeleteBuilder<T> implements com.lifeonwalden.forestbatis.sql.Delete
     }
 
     @Override
-    public String build(T value) {
+    public StatementInfo build(T value) {
         if (this.isRuntimeChangeable() == false && this.cachedStatement != null) {
             return this.cachedStatement;
         }
@@ -59,15 +61,15 @@ public class DeleteBuilder<T> implements com.lifeonwalden.forestbatis.sql.Delete
         }
 
         if (false == this.isRuntimeChangeable()) {
-            this.cachedStatement = builder.toString();
+            this.cachedStatement = PropertyParser.parse(builder.toString());
             return this.cachedStatement;
         } else {
-            return builder.toString();
+            return PropertyParser.parse(builder.toString());
         }
     }
 
     @Override
-    public String build() {
+    public StatementInfo build() {
         return build(null);
     }
 
