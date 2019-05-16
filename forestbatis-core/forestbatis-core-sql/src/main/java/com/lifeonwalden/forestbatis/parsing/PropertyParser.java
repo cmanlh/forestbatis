@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 丑陋的代码
+ * 代码有些丑陋，请先无视这点
  */
 public interface PropertyParser {
     Logger logger = LoggerFactory.getLogger(PropertyParser.class);
@@ -143,14 +143,13 @@ public interface PropertyParser {
                         case CHAR:
                         case MEDIUMTEXT:
                         case NVARCHAR:
-                            sqlBuilder.append("'?'");
                             debugSqlBuilder.append("'#".concat(String.valueOf(parameterIndex)).concat("'"));
                             break;
                         default:
-                            sqlBuilder.append("?");
                             debugSqlBuilder.append("#".concat(String.valueOf(parameterIndex)));
 
                     }
+                    sqlBuilder.append("?");
                     propertyInfo.setListProperty(false);
                     propertyInfo.setIndex(parameterIndex);
                     propertyInfoList.add(propertyInfo);
@@ -165,14 +164,13 @@ public interface PropertyParser {
                         case CHAR:
                         case MEDIUMTEXT:
                         case NVARCHAR:
-                            sqlBuilder.append("'?'");
                             debugSqlBuilder.append("'#".concat(String.valueOf(parameterIndex)).concat("'"));
                             break;
                         default:
-                            sqlBuilder.append("?");
                             debugSqlBuilder.append("#".concat(String.valueOf(parameterIndex)));
 
                     }
+                    sqlBuilder.append("?");
                     propertyInfo.setListProperty(true);
                     propertyInfo.setIndex(parameterIndex++);
                     propertyInfo.setListIndex(0);
@@ -189,14 +187,13 @@ public interface PropertyParser {
                             case CHAR:
                             case MEDIUMTEXT:
                             case NVARCHAR:
-                                sqlBuilder.append(", '?'");
                                 debugSqlBuilder.append(", '#".concat(String.valueOf(parameterIndex)).concat("'"));
                                 break;
                             default:
-                                sqlBuilder.append(", ?");
                                 debugSqlBuilder.append(", #".concat(String.valueOf(parameterIndex)));
 
                         }
+                        sqlBuilder.append(", ?");
                         parameterIndex++;
                     }
                 }
@@ -293,41 +290,13 @@ public interface PropertyParser {
                 }
 
                 if (-1 == listSize) {
-                    switch (propertyInfo.getJdbcType()) {
-                        case VARCHAR:
-                        case LONGVARCHAR:
-                        case TEXT:
-                        case LONGTEXT:
-                        case NCHAR:
-                        case CHAR:
-                        case MEDIUMTEXT:
-                        case NVARCHAR:
-                            sqlBuilder.append("'?'");
-                            break;
-                        default:
-                            sqlBuilder.append("?");
-
-                    }
+                    sqlBuilder.append("?");
                     propertyInfo.setListProperty(false);
                     propertyInfo.setIndex(parameterIndex);
                     propertyInfoList.add(propertyInfo);
                     parameterIndex++;
                 } else {
-                    switch (propertyInfo.getJdbcType()) {
-                        case VARCHAR:
-                        case LONGVARCHAR:
-                        case TEXT:
-                        case LONGTEXT:
-                        case NCHAR:
-                        case CHAR:
-                        case MEDIUMTEXT:
-                        case NVARCHAR:
-                            sqlBuilder.append("'?'");
-                            break;
-                        default:
-                            sqlBuilder.append("?");
-
-                    }
+                    sqlBuilder.append("?");
                     propertyInfo.setListProperty(true);
                     propertyInfo.setIndex(parameterIndex++);
                     propertyInfo.setListIndex(0);
@@ -335,21 +304,7 @@ public interface PropertyParser {
 
                     for (int i = 1; i < listSize; i++) {
                         propertyInfoList.add(propertyInfo.newListSibling(parameterIndex, i));
-                        switch (propertyInfo.getJdbcType()) {
-                            case VARCHAR:
-                            case LONGVARCHAR:
-                            case TEXT:
-                            case LONGTEXT:
-                            case NCHAR:
-                            case CHAR:
-                            case MEDIUMTEXT:
-                            case NVARCHAR:
-                                sqlBuilder.append(", '?'");
-                                break;
-                            default:
-                                sqlBuilder.append(", ?");
-
-                        }
+                        sqlBuilder.append(", ?");
                         parameterIndex++;
                     }
                 }
