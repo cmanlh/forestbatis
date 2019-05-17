@@ -6,7 +6,9 @@ import com.lifeonwalden.forestbatis.builder.SelectBuilder;
 import com.lifeonwalden.forestbatis.builder.UpdateBuilder;
 import com.lifeonwalden.forestbatis.example.bean.User;
 import com.lifeonwalden.forestbatis.example.meta.UserTableInfo;
+import com.lifeonwalden.forestbatis.meta.CompoundQuery;
 import com.lifeonwalden.forestbatis.meta.Eq;
+import com.lifeonwalden.forestbatis.meta.Lt;
 import com.lifeonwalden.forestbatis.meta.TableNode;
 
 import java.util.Arrays;
@@ -23,7 +25,7 @@ public class UserBuilder {
 
     public final static DeleteBuilder DELETE = new DeleteBuilder<User>(
             new TableNode(UserTableInfo.TABLE),
-            new Eq(UserTableInfo.Id)
+            new Eq(UserTableInfo.Id).and(new CompoundQuery(new Eq(UserTableInfo.Name).or(new Eq(UserTableInfo.Age))))
     );
 
     public final static UpdateBuilder UPDATE = new UpdateBuilder<User>(
