@@ -12,11 +12,11 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
-public abstract class AbstractParameterhandler<T> implements ParameterHandler<T> {
-    private static Logger logger = LoggerFactory.getLogger(AbstractParameterhandler.class);
+public class DefaultParameterhandler implements ParameterHandler {
+    private static Logger logger = LoggerFactory.getLogger(DefaultParameterhandler.class);
 
     @Override
-    public void set(StatementInfo statementInfo, PreparedStatement preparedStatement, T param) throws SQLException {
+    public <T> void set(StatementInfo statementInfo, PreparedStatement preparedStatement, T param) throws SQLException {
         List<PropertyInfo> propertyInfoList = statementInfo.getProps().get();
 
         if (logger.isDebugEnabled()) {
@@ -25,6 +25,8 @@ public abstract class AbstractParameterhandler<T> implements ParameterHandler<T>
             for (PropertyInfo propertyInfo : statementInfo.getProps().get()) {
                 debugSql = fillDebugSql(debugSql, propertyInfo, param);
             }
+
+            logger.debug(debugSql);
         }
 
         for (PropertyInfo propertyInfo : statementInfo.getProps().get()) {
@@ -47,11 +49,11 @@ public abstract class AbstractParameterhandler<T> implements ParameterHandler<T>
                     preparedStatement.setBigDecimal(propertyInfo.getIndex(), fetchValue(propertyInfo, param));
                     break;
                 case DATE:
-                    preparedStatement.setDate(propertyInfo.getIndex(), new Date((this.<java.util.Date>fetchValue(propertyInfo, param)).getTime()));
+                    preparedStatement.setDate(propertyInfo.getIndex(), new Date((this.<java.util.Date, T>fetchValue(propertyInfo, param)).getTime()));
                     break;
                 case TIMESTAMP:
                 case DATETIME:
-                    preparedStatement.setTimestamp(propertyInfo.getIndex(), new Timestamp((this.<java.util.Date>fetchValue(propertyInfo, param)).getTime()));
+                    preparedStatement.setTimestamp(propertyInfo.getIndex(), new Timestamp((this.<java.util.Date, T>fetchValue(propertyInfo, param)).getTime()));
                     break;
                 case BIGINT:
                     preparedStatement.setLong(propertyInfo.getIndex(), fetchValue(propertyInfo, param));
@@ -62,11 +64,11 @@ public abstract class AbstractParameterhandler<T> implements ParameterHandler<T>
         }
     }
 
-    protected String fillDebugSql(String sql, PropertyInfo propertyInfo, T param) {
+    protected <T> String fillDebugSql(String sql, PropertyInfo propertyInfo, T param) {
         return sql.replace("#".concat(String.valueOf(propertyInfo.getIndex())), fetchValue(propertyInfo, param));
     }
 
-    protected <P> P fetchValue(PropertyInfo propertyInfo, T param) {
+    protected <P, T> P fetchValue(PropertyInfo propertyInfo, T param) {
         AbstractDTOMapBean bean = (AbstractDTOMapBean) param;
         if (propertyInfo.isListProperty()) {
             List list = (List) bean.get(propertyInfo.getName());
