@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class User extends AbstractMapBean {
+
     public String getId() {
         return (String) this.dataMap.get(UserMetaInfo.id);
     }

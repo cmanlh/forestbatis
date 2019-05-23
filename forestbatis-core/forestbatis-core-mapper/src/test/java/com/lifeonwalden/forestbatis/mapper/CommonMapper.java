@@ -1,11 +1,19 @@
 package com.lifeonwalden.forestbatis.mapper;
 
+import com.lifeonwalden.forestbatis.example.bean.User;
+import com.lifeonwalden.forestbatis.result.AbstractRecordHandler;
+import com.lifeonwalden.forestbatis.util.IndependentBeanSingletonFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
-import java.sql.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class CommonMapper {
     protected static final String CONNECTION_STRING = "jdbc:hsqldb:mem:testdb;shutdown=false";
@@ -23,6 +31,14 @@ public class CommonMapper {
 
         Connection connection = getConnection();
 
+        System.out.println(new AbstractRecordHandler<User>() {
+            @Override
+            public User newBeanInstance() {
+                return new User();
+            }
+        }.getClass().getTypeName());
+
+        System.out.println(IndependentBeanSingletonFactory.class.getName());
     }
 
     private void reset() {

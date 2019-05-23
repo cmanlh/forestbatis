@@ -17,8 +17,6 @@ public class DefaultParameterhandler implements ParameterHandler {
 
     private static DefaultParameterhandler singleton;
 
-    private static Object lock = new Object();
-
     private DefaultParameterhandler() {
     }
 
@@ -27,7 +25,7 @@ public class DefaultParameterhandler implements ParameterHandler {
             return singleton;
         }
 
-        synchronized (lock) {
+        synchronized (DefaultParameterhandler.class) {
             if (null == singleton) {
                 singleton = new DefaultParameterhandler();
             }

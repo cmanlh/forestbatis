@@ -7,10 +7,7 @@ import com.lifeonwalden.forestbatis.example.bean.User;
 import com.lifeonwalden.forestbatis.example.builder.UserBuilder;
 import com.lifeonwalden.forestbatis.mapper.AbstractKeyMapper;
 import com.lifeonwalden.forestbatis.meta.TableMeta;
-import com.lifeonwalden.forestbatis.result.DefaultParameterhandler;
-import com.lifeonwalden.forestbatis.result.ParameterHandler;
-import com.lifeonwalden.forestbatis.result.RecordHandler;
-import com.lifeonwalden.forestbatis.result.ReturnColumnHanlder;
+import com.lifeonwalden.forestbatis.result.*;
 import com.lifeonwalden.forestbatis.sql.InsertBuilder;
 
 import java.sql.Connection;
@@ -69,12 +66,17 @@ public class UserMapper extends AbstractKeyMapper<User> {
 
     @Override
     protected SelectBuilder<User> getBaseSelectBuilder() {
-        return null;
+        return UserBuilder.SELECT;
     }
 
     @Override
     protected RecordHandler getBaseRecordHandler() {
-        return null;
+        return new AbstractRecordHandler() {
+            @Override
+            public Object newBeanInstance() {
+                return new User();
+            }
+        };
     }
 
     @Override
