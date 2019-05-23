@@ -12,7 +12,7 @@ public abstract class AbstractKeyMapper<T> extends AbstractCommonMapper<T> imple
 
     protected abstract DeleteBuilder<T> getKeyDeleteBuilder();
 
-    protected abstract UpdateBuilder<T> getKeyUpdateBuilder();
+    protected abstract UpdateBuilder<T> getKeyUpdateBuilder(boolean withNull);
 
     protected abstract SelectBuilder<T> getGetBuilder();
 
@@ -38,42 +38,42 @@ public abstract class AbstractKeyMapper<T> extends AbstractCommonMapper<T> imple
 
     @Override
     public Integer update(T value) {
-        return updateWithQuery(value, getKeyUpdateBuilder());
+        return updateWithQuery(value, getKeyUpdateBuilder(true));
     }
 
     @Override
     public Integer updateWithoutNull(T value) {
-        return updateWithQuery(value, getKeyUpdateBuilder().overrideUpdateColumn(false));
+        return updateWithQuery(value, getKeyUpdateBuilder(false));
     }
 
     @Override
     public Integer update(T value, List<ColumnMeta> toUpdateColumnList) {
-        return updateWithQuery(value, getKeyUpdateBuilder().overrideUpdateColumn(toUpdateColumnList));
+        return updateWithQuery(value, getKeyUpdateBuilder(true).overrideUpdateColumn(toUpdateColumnList));
     }
 
     @Override
     public Integer updateWithoutNull(T value, List<ColumnMeta> toUpdateColumnList) {
-        return updateWithQuery(value, getKeyUpdateBuilder().overrideUpdateColumn(toUpdateColumnList, false));
+        return updateWithQuery(value, getKeyUpdateBuilder(false).overrideUpdateColumn(toUpdateColumnList, false));
     }
 
     @Override
     public int[] update(List<T> valueList) {
-        return updateWithQuery(valueList, getKeyUpdateBuilder());
+        return updateWithQuery(valueList, getKeyUpdateBuilder(true));
     }
 
     @Override
     public int[] updateWithoutNull(List<T> valueList) {
-        return updateWithQuery(valueList, getKeyUpdateBuilder().overrideUpdateColumn(false));
+        return updateWithQuery(valueList, getKeyUpdateBuilder(false));
     }
 
     @Override
     public int[] update(List<T> valueList, List<ColumnMeta> toUpdateColumnList) {
-        return updateWithQuery(valueList, getKeyUpdateBuilder().overrideUpdateColumn(toUpdateColumnList));
+        return updateWithQuery(valueList, getKeyUpdateBuilder(true).overrideUpdateColumn(toUpdateColumnList));
     }
 
     @Override
     public int[] updateWithoutNull(List<T> valueList, List<ColumnMeta> toUpdateColumnList) {
-        return updateWithQuery(valueList, getKeyUpdateBuilder().overrideUpdateColumn(toUpdateColumnList, false));
+        return updateWithQuery(valueList, getKeyUpdateBuilder(false).overrideUpdateColumn(toUpdateColumnList, false));
     }
 
     @Override

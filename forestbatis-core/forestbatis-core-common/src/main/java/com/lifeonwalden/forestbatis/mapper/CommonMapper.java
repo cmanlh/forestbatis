@@ -35,6 +35,16 @@ public interface CommonMapper<P> {
     void select(P param, StreamResultSetCallback<P> streamResultSetCallback);
 
     /**
+     * 基于条件查询
+     * 且采用回调的方式来应对大结果集的场景
+     *
+     * @param param                   查询条件
+     * @param streamResultSetCallback 流式结果处理callback
+     * @param fetchSize               查询缓存区大小
+     */
+    void select(P param, StreamResultSetCallback<P> streamResultSetCallback, int fetchSize);
+
+    /**
      * 基于条件查询，并可在默认SQL生成的基础上根据定制参数动态生成SQL语句
      *
      * @param param         查询条件
@@ -52,6 +62,17 @@ public interface CommonMapper<P> {
      * @param streamResultSetCallback 流式结果处理callback
      */
     void select(P param, SelectBuilder<P> selectBuilder, StreamResultSetCallback<P> streamResultSetCallback);
+
+    /**
+     * 基于条件查询，并可在默认SQL生成的基础上根据定制参数动态生成SQL语句
+     * 且采用回调的方式来应对大结果集的场景
+     *
+     * @param param                   查询条件
+     * @param selectBuilder           SQL生成
+     * @param streamResultSetCallback 流式结果处理callback
+     * @param fetchSize               查询缓存区大小
+     */
+    void select(P param, SelectBuilder<P> selectBuilder, StreamResultSetCallback<P> streamResultSetCallback, int fetchSize);
 
     /**
      * 基于条件查询，自定义结果解析
@@ -73,6 +94,17 @@ public interface CommonMapper<P> {
     void select(P param, RecordHandler<P> recordHandler, StreamResultSetCallback<P> streamResultSetCallback);
 
     /**
+     * 基于条件查询，自定义结果解析
+     * 且采用回调的方式来应对大结果集的场景
+     *
+     * @param param                   查询条件
+     * @param recordHandler           结果解析
+     * @param streamResultSetCallback 流式结果处理callback
+     * @param fetchSize               查询缓存区大小
+     */
+    void select(P param, RecordHandler<P> recordHandler, StreamResultSetCallback<P> streamResultSetCallback, int fetchSize);
+
+    /**
      * 基于条件查询，并可在默认SQL生成的基础上根据定制参数动态生成SQL语句和自定义结果解析
      *
      * @param param         查询条件
@@ -92,6 +124,18 @@ public interface CommonMapper<P> {
      * @param streamResultSetCallback 流式结果处理callback
      */
     void select(P param, SelectBuilder<P> selectBuilder, RecordHandler<P> recordHandler, StreamResultSetCallback<P> streamResultSetCallback);
+
+    /**
+     * 基于条件查询，并可在默认SQL生成的基础上根据定制参数动态生成SQL语句和自定义结果解析
+     * 且采用回调的方式来应对大结果集的场景
+     *
+     * @param param                   查询条件
+     * @param selectBuilder           SQL生成
+     * @param recordHandler           结果解析
+     * @param streamResultSetCallback 流式结果处理callback
+     * @param fetchSize               查询缓存区大小
+     */
+    void select(P param, SelectBuilder<P> selectBuilder, RecordHandler<P> recordHandler, StreamResultSetCallback<P> streamResultSetCallback, int fetchSize);
 
     /**
      * 根据查询参数将结果数据集严格更新为指定对象对应的值，其中主键不在更新范围内

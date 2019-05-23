@@ -53,6 +53,16 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
     }
 
     /**
+     * 覆盖插入列并构造一个新的SQL构建器
+     *
+     * @param insertNull
+     * @return
+     */
+    public InsertBuilder overrideInsertColumn(boolean insertNull) {
+        return new InsertBuilder<T>(this.tableNode, this.toInsertColumnList, insertNull);
+    }
+
+    /**
      * 在当前插入列基础上剔除指定列并构造一个新的SQL构建器
      *
      * @param excludeInsertColumnList

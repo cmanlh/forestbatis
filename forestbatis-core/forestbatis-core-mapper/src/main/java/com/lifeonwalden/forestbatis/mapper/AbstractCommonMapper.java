@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
+    private final int FETCH_SIZE = 2048;
 
     protected abstract Connection getConnection();
 
@@ -51,7 +52,12 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
     @Override
     public void select(T param, StreamResultSetCallback<T> streamResultSetCallback) {
-        select(param, getBaseSelectBuilder(), getBaseRecordHandler(), streamResultSetCallback);
+        select(param, getBaseSelectBuilder(), getBaseRecordHandler(), streamResultSetCallback, FETCH_SIZE);
+    }
+
+    @Override
+    public void select(T param, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize) {
+        select(param, getBaseSelectBuilder(), getBaseRecordHandler(), streamResultSetCallback, fetchSize);
     }
 
     @Override
@@ -61,7 +67,12 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
     @Override
     public void select(T param, SelectBuilder<T> selectBuilder, StreamResultSetCallback<T> streamResultSetCallback) {
-        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback);
+        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, FETCH_SIZE);
+    }
+
+    @Override
+    public void select(T param, SelectBuilder<T> selectBuilder, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize) {
+        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, fetchSize);
     }
 
     @Override
@@ -71,7 +82,12 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
     @Override
     public void select(T param, RecordHandler<T> recordHandler, StreamResultSetCallback<T> streamResultSetCallback) {
-        select(param, getBaseSelectBuilder(), recordHandler, streamResultSetCallback);
+        select(param, getBaseSelectBuilder(), recordHandler, streamResultSetCallback, FETCH_SIZE);
+    }
+
+    @Override
+    public void select(T param, RecordHandler<T> recordHandler, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize) {
+        select(param, getBaseSelectBuilder(), recordHandler, streamResultSetCallback, fetchSize);
     }
 
     @Override
@@ -115,10 +131,16 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
     @Override
     public void select(T param, SelectBuilder<T> selectBuilder, RecordHandler<T> recordHandler, StreamResultSetCallback<T> streamResultSetCallback) {
+        select(param, selectBuilder, recordHandler, streamResultSetCallback, FETCH_SIZE);
+    }
+
+    @Override
+    public void select(T param, SelectBuilder<T> selectBuilder, RecordHandler<T> recordHandler, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize) {
         Connection connection = getConnection();
         StatementInfo statementInfo = selectBuilder.build(param);
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
+            preparedStatement.setFetchSize(fetchSize);
             if (statementInfo.getProps().isPresent()) {
                 getParameterHandler().set(statementInfo, preparedStatement, param);
             }
