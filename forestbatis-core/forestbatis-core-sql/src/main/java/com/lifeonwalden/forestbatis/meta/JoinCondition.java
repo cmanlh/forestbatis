@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class JoinCondition implements SqlNode {
     /**
      * 基于两表字段构建表联合条件
      *
-     * @param column 表字段
+     * @param column             表字段
      * @param anthoerTableColumn 另一表的字段
      */
     public JoinCondition(ColumnMeta column, ColumnMeta anthoerTableColumn) {
@@ -35,7 +36,7 @@ public class JoinCondition implements SqlNode {
     /**
      * 基于表字段与值构建表联合条件
      *
-     * @param column 表字段
+     * @param column   表字段
      * @param property 值属性
      */
     public JoinCondition(ColumnMeta column, PropertyMeta property) {
@@ -98,7 +99,7 @@ public class JoinCondition implements SqlNode {
     }
 
     @Override
-    public void toSql(StringBuilder builder, boolean withAlias) {
+    public void toSql(StringBuilder builder, Config config, boolean withAlias) {
         if (null == anotherTableColumn && null == property) {
             throw new RuntimeException("Join condition has to have two side object.");
         }
@@ -108,18 +109,18 @@ public class JoinCondition implements SqlNode {
             builder.append("(");
         }
 
-        this.column.toSql(builder, true);
-        NodeRelation.EQ.toSql(builder, false);
+        this.column.toSql(builder, config, true);
+        NodeRelation.EQ.toSql(builder, config, false);
         if (null != this.anotherTableColumn) {
-            this.anotherTableColumn.toSql(builder, true);
+            this.anotherTableColumn.toSql(builder, config, true);
         } else {
-            this.property.toSql(builder, true);
+            this.property.toSql(builder, config, true);
         }
 
         if (complex) {
             siblingList.forEach(sibling -> {
-                sibling.getNodeRelation().toSql(builder, false);
-                sibling.getNode().toSql(builder, true);
+                sibling.getNodeRelation().toSql(builder, config, false);
+                sibling.getNode().toSql(builder, config, true);
             });
 
             builder.append(")");
@@ -127,8 +128,8 @@ public class JoinCondition implements SqlNode {
     }
 
     @Override
-    public void toSql(StringBuilder builder) {
-        toSql(builder, true);
+    public void toSql(StringBuilder builder, Config config) {
+        toSql(builder, config, true);
     }
 
     private List<RelationNode<JoinCondition>> setupSiblingList() {

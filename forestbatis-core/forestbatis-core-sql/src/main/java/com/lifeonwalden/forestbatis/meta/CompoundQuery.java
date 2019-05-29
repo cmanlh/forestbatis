@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
 
 import java.util.Optional;
@@ -44,9 +45,9 @@ public class CompoundQuery<T> extends AbstractQueryNode<T> {
         }
     }
 
-    protected void selfBuild(StringBuilder builder, boolean withAlias, T value) {
+    protected void selfBuild(StringBuilder builder, Config config, boolean withAlias, T value) {
         builder.append("(");
-        this.compoundQuery.toSql(builder, withAlias, value);
+        this.compoundQuery.toSql(builder, config, withAlias, value);
         builder.append(")");
     }
 }

@@ -4,8 +4,9 @@ import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.builder.DeleteBuilder;
 import com.lifeonwalden.forestbatis.builder.SelectBuilder;
 import com.lifeonwalden.forestbatis.builder.UpdateBuilder;
-import com.lifeonwalden.forestbatis.example.bean.User;
-import com.lifeonwalden.forestbatis.example.builder.UserBuilder;
+import com.lifeonwalden.forestbatis.example.bean.Book;
+import com.lifeonwalden.forestbatis.example.bean.Book;
+import com.lifeonwalden.forestbatis.example.builder.BookBuilder;
 import com.lifeonwalden.forestbatis.mapper.AbstractKeyMapper;
 import com.lifeonwalden.forestbatis.meta.TableMeta;
 import com.lifeonwalden.forestbatis.result.*;
@@ -17,28 +18,28 @@ import com.lifeonwalden.forestbatis.util.SingletonReturnColumnHandlerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class UserMapper extends AbstractKeyMapper<User> {
+public class BookMapper extends AbstractKeyMapper<Book> {
     private Connection connection;
     private Config config;
 
-    public UserMapper(Config config, Connection connection) {
+    public BookMapper(Config config, Connection connection) {
         this.config = config;
         this.connection = connection;
     }
 
     @Override
-    protected DeleteBuilder<User> getKeyDeleteBuilder() {
-        return UserBuilder.DELETE;
+    protected DeleteBuilder<Book> getKeyDeleteBuilder() {
+        return BookBuilder.DELETE;
     }
 
     @Override
-    protected UpdateBuilder<User> getKeyUpdateBuilder(boolean withNull) {
-        return withNull ? UserBuilder.UPDATE : UserBuilder.UPDATE_WITHOUT_NULL;
+    protected UpdateBuilder<Book> getKeyUpdateBuilder(boolean withNull) {
+        return withNull ? BookBuilder.UPDATE : BookBuilder.UPDATE_WITHOUT_NULL;
     }
 
     @Override
-    protected SelectBuilder<User> getGetBuilder() {
-        return UserBuilder.GET;
+    protected SelectBuilder<Book> getGetBuilder() {
+        return BookBuilder.GET;
     }
 
     @Override
@@ -61,31 +62,31 @@ public class UserMapper extends AbstractKeyMapper<User> {
     }
 
     @Override
-    protected InsertBuilder<User> getBaseInsertBuilder() {
-        return UserBuilder.INSERT;
+    protected InsertBuilder<Book> getBaseInsertBuilder() {
+        return BookBuilder.INSERT;
     }
 
     @Override
-    protected DeleteBuilder<User> getBaseDeleteBuilder() {
-        return UserBuilder.DELETE;
+    protected DeleteBuilder<Book> getBaseDeleteBuilder() {
+        return BookBuilder.DELETE;
     }
 
     @Override
-    protected UpdateBuilder<User> getBaseUpdateBuilder() {
-        return UserBuilder.UPDATE_QUERY;
+    protected UpdateBuilder<Book> getBaseUpdateBuilder() {
+        return BookBuilder.UPDATE_QUERY;
     }
 
     @Override
-    protected SelectBuilder<User> getBaseSelectBuilder() {
-        return UserBuilder.SELECT;
+    protected SelectBuilder<Book> getBaseSelectBuilder() {
+        return BookBuilder.SELECT;
     }
 
     @Override
     protected RecordHandler getBaseRecordHandler() {
-        return SingletonRecordHandlerFactory.<UserMapper, AbstractRecordHandler<User>>getOrCreate(UserMapper.class, handler -> new AbstractRecordHandler<User>() {
+        return SingletonRecordHandlerFactory.<BookMapper, AbstractRecordHandler<Book>>getOrCreate(BookMapper.class, handler -> new AbstractRecordHandler<Book>() {
             @Override
-            public User newBeanInstance() {
-                return new User();
+            public Book newBeanInstance() {
+                return new Book();
             }
         });
     }
@@ -102,6 +103,6 @@ public class UserMapper extends AbstractKeyMapper<User> {
 
     @Override
     protected TableMeta getTable() {
-        return UserBuilder.TABLE;
+        return BookBuilder.TABLE;
     }
 }

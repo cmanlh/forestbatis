@@ -1,5 +1,7 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -7,38 +9,16 @@ import java.util.Optional;
 public abstract class AbstractTableMeta implements TableMeta {
     protected String name;
     protected String alias;
-    protected boolean beWithSchema;
-    protected String schema;
     protected List<ColumnMeta> columnList;
 
     public AbstractTableMeta(String name, String alias) {
-        this(name, alias, false, null, null);
-    }
-
-    public AbstractTableMeta(String name, String alias, boolean beWithSchema, String schema) {
-        this(name, alias, beWithSchema, schema, null);
+        this(name, alias, null);
     }
 
     public AbstractTableMeta(String name, String alias, List<ColumnMeta> columnList) {
-        this(name, alias, false, null, columnList);
-    }
-
-    public AbstractTableMeta(String name, String alias, boolean beWithSchema, String schema, List<ColumnMeta> columnList) {
         this.name = name;
         this.alias = alias;
-        this.beWithSchema = beWithSchema;
-        this.schema = schema;
         this.columnList = Collections.unmodifiableList(columnList);
-    }
-
-    @Override
-    public boolean beWithSchema() {
-        return this.beWithSchema;
-    }
-
-    @Override
-    public String getSchema() {
-        return this.schema;
     }
 
     @Override
@@ -61,11 +41,13 @@ public abstract class AbstractTableMeta implements TableMeta {
     }
 
     @Override
-    public void toSql(StringBuilder builder, boolean withAlias) {
-        if (this.beWithSchema) {
-            builder.append(this.schema).append(".").append(this.name);
+    public void toSql(StringBuilder builder, Config config, boolean withAlias) {
+        String caseSensitiveSign = config.isCaseSensitive() ? config.getSensitiveSign() : "";
+
+        if (config.isWithSchema()) {
+            builder.append(config.getSchema()).append(".").append(caseSensitiveSign).append(this.name).append(caseSensitiveSign);
         } else {
-            builder.append(this.name);
+            builder.append(caseSensitiveSign).append(this.name).append(caseSensitiveSign);
         }
         if (withAlias) {
             builder.append(" ").append(this.alias);
@@ -73,8 +55,8 @@ public abstract class AbstractTableMeta implements TableMeta {
     }
 
     @Override
-    public void toSql(StringBuilder builder) {
-        toSql(builder, false);
+    public void toSql(StringBuilder builder, Config config) {
+        toSql(builder, config, false);
     }
 
     @Override

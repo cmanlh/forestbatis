@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
 /**
@@ -36,14 +37,14 @@ public class JoinNode implements SqlNode {
     }
 
     @Override
-    public void toSql(StringBuilder builder, boolean withAlias) {
-        this.tableMeta.toSql(builder, true);
-        NodeRelation.ON.toSql(builder, false);
-        this.joinCondition.toSql(builder, true);
+    public void toSql(StringBuilder builder, Config config, boolean withAlias) {
+        this.tableMeta.toSql(builder, config, true);
+        NodeRelation.ON.toSql(builder, config, false);
+        this.joinCondition.toSql(builder, config, true);
     }
 
     @Override
-    public void toSql(StringBuilder builder) {
-        toSql(builder, true);
+    public void toSql(StringBuilder builder, Config config) {
+        toSql(builder, config, true);
     }
 }

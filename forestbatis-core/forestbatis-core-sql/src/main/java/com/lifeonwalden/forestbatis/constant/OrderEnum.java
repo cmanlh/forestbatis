@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.constant;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.meta.SqlNode;
 
 public enum OrderEnum implements SqlNode {
@@ -11,12 +12,12 @@ public enum OrderEnum implements SqlNode {
     }
 
     @Override
-    public void toSql(StringBuilder builder, boolean withAlias) {
+    public void toSql(StringBuilder builder, Config config, boolean withAlias) {
         builder.append(this.order);
     }
 
     @Override
-    public void toSql(StringBuilder builder) {
-        toSql(builder);
+    public void toSql(StringBuilder builder, Config config) {
+        toSql(builder, config);
     }
 }

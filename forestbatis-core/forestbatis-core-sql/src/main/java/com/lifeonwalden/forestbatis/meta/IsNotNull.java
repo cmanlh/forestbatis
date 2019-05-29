@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
 import java.util.Optional;
@@ -33,8 +34,8 @@ public class IsNotNull<T> extends AbstractQueryNode<T> {
     }
 
     @Override
-    protected void selfBuild(StringBuilder builder, boolean withAlias, T value) {
-        this.column.toSql(builder, withAlias);
-        compareRelation.toSql(builder, withAlias);
+    protected void selfBuild(StringBuilder builder, Config config, boolean withAlias, T value) {
+        this.column.toSql(builder, config, withAlias);
+        compareRelation.toSql(builder, config, withAlias);
     }
 }

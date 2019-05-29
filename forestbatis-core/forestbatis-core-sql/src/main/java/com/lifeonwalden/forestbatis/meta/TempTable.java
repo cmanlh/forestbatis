@@ -1,5 +1,7 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -19,16 +21,6 @@ public class TempTable<T> implements TableMeta, ValueBindingSqlNode<T> {
     }
 
     @Override
-    public boolean beWithSchema() {
-        return false;
-    }
-
-    @Override
-    public String getSchema() {
-        return null;
-    }
-
-    @Override
     public String getName() {
         return this.alias;
     }
@@ -44,23 +36,23 @@ public class TempTable<T> implements TableMeta, ValueBindingSqlNode<T> {
     }
 
     @Override
-    public void toSql(StringBuilder builder, boolean withAlias) {
-        toSql(builder, withAlias, null);
+    public void toSql(StringBuilder builder, Config config, boolean withAlias) {
+        toSql(builder, config, withAlias, null);
     }
 
     @Override
-    public void toSql(StringBuilder builder) {
-        toSql(builder, true, null);
+    public void toSql(StringBuilder builder, Config config) {
+        toSql(builder, config, true, null);
     }
 
     @Override
-    public void toSql(StringBuilder builder, boolean withAlias, T value) {
-        this.subSelect.toSql(builder, withAlias, value);
+    public void toSql(StringBuilder builder, Config config, boolean withAlias, T value) {
+        this.subSelect.toSql(builder, config, withAlias, value);
     }
 
     @Override
-    public void toSql(StringBuilder builder, T value) {
-        toSql(builder, true, value);
+    public void toSql(StringBuilder builder, Config config, T value) {
+        toSql(builder, config, true, value);
     }
 
     public boolean isRuntimeChangeable() {

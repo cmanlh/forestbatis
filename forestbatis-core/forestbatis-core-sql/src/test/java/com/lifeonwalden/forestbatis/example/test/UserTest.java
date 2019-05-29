@@ -182,6 +182,7 @@ public class UserTest {
         toReturnColumnList.add(AccountTableInfo.Balance);
         String sql = new SelectBuilder<User>(
                 new TableNode(UserTableInfo.TABLE).leftJoin(new JoinNode(AccountTableInfo.TABLE, new JoinCondition(UserTableInfo.Id, AccountTableInfo.UserId))),
+                DBConfig.config,
                 toReturnColumnList,
                 new Eq(UserTableInfo.Id)).build().getSql();
         Assert.assertTrue(sql,
@@ -195,6 +196,7 @@ public class UserTest {
         toReturnColumnList.add(AccountTableInfo.Balance);
         String sql = new SelectBuilder<User>(
                 new TableNode(UserTableInfo.TABLE).rightJoin(new JoinNode(AccountTableInfo.TABLE, new JoinCondition(UserTableInfo.Id, AccountTableInfo.UserId))),
+                DBConfig.config,
                 toReturnColumnList,
                 new Eq(UserTableInfo.Id)).build().getSql();
         Assert.assertTrue(sql,
@@ -208,6 +210,7 @@ public class UserTest {
         toReturnColumnList.add(AccountTableInfo.Balance);
         String sql = new SelectBuilder<User>(
                 new TableNode(UserTableInfo.TABLE).innerJoin(new JoinNode(AccountTableInfo.TABLE, new JoinCondition(UserTableInfo.Id, AccountTableInfo.UserId))),
+                DBConfig.config,
                 toReturnColumnList,
                 new Eq(UserTableInfo.Id)).build().getSql();
         Assert.assertTrue(sql,
@@ -224,6 +227,7 @@ public class UserTest {
                 new TableNode(UserTableInfo.TABLE)
                         .leftJoin(new JoinNode(AccountTableInfo.TABLE, new JoinCondition(UserTableInfo.Id, AccountTableInfo.UserId)))
                         .rightJoin(new JoinNode(UserCreditTableInfo.TABLE, new JoinCondition(UserTableInfo.Id, UserCreditTableInfo.UserId))),
+                DBConfig.config,
                 toReturnColumnList,
                 new Eq(UserTableInfo.Id)).build().getSql();
         Assert.assertTrue(sql,

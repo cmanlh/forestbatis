@@ -1,12 +1,12 @@
 package com.lifeonwalden.forestbatis.example.bean;
 
-import com.lifeonwalden.forestbatis.bean.AbstractMapBean;
+import com.lifeonwalden.forestbatis.bean.AbstractDTOMapBean;
 import com.lifeonwalden.forestbatis.example.meta.UserMetaInfo;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class User extends AbstractMapBean {
+public class User extends AbstractDTOMapBean {
 
     public String getId() {
         return (String) this.dataMap.get(UserMetaInfo.id);

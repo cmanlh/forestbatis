@@ -7,17 +7,17 @@ import java.util.Set;
 public class StatementInfo {
     private Optional<List<PropertyInfo>> props = Optional.empty();
 
-    private Optional<Set<ColumnInfo>> returnColumns = Optional.empty();
+    private Optional<List<ColumnInfo>> returnColumns = Optional.empty();
 
     private String sql;
 
     private String debugSql;
 
-    public Optional<Set<ColumnInfo>> getReturnColumns() {
+    public Optional<List<ColumnInfo>> getReturnColumns() {
         return returnColumns;
     }
 
-    public StatementInfo setReturnColumns(Optional<Set<ColumnInfo>> returnColumns) {
+    public StatementInfo setReturnColumns(Optional<List<ColumnInfo>> returnColumns) {
         this.returnColumns = returnColumns;
 
         return this;

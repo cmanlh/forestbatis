@@ -5,6 +5,7 @@ import com.lifeonwalden.forestbatis.builder.InsertBuilder;
 import com.lifeonwalden.forestbatis.builder.SelectBuilder;
 import com.lifeonwalden.forestbatis.builder.UpdateBuilder;
 import com.lifeonwalden.forestbatis.constant.JdbcType;
+import com.lifeonwalden.forestbatis.example.DBConfig;
 import com.lifeonwalden.forestbatis.example.bean.User;
 import com.lifeonwalden.forestbatis.example.meta.UserMetaInfo;
 import com.lifeonwalden.forestbatis.meta.*;
@@ -56,6 +57,7 @@ public class UserBuilder {
 
     public final static SelectBuilder SELECT = new SelectBuilder<User>(
             new TableNode(TABLE),
+            DBConfig.config,
             TABLE.getColumn().get(),
             FULL_WITHOUT_NULL_QUERY
     );
@@ -64,6 +66,7 @@ public class UserBuilder {
 
     public final static DeleteBuilder REMOVE = new DeleteBuilder<User>(
             new TableNode(TABLE),
+            DBConfig.config,
             FULL_WITHOUT_NULL_QUERY
     );
 
@@ -71,6 +74,7 @@ public class UserBuilder {
 
     public final static UpdateBuilder UPDATE_QUERY = new UpdateBuilder<User>(
             new TableNode(TABLE),
+            DBConfig.config,
             TABLE.getColumn().get(),
             FULL_WITHOUT_NULL_QUERY
     ).excludeUpdateColumn(Arrays.asList(Id));
@@ -83,6 +87,7 @@ public class UserBuilder {
 
     public final static InsertBuilder INSERT = new InsertBuilder<User>(
             new TableNode(TABLE),
+            DBConfig.config,
             TABLE.getColumn().get()
     );
 

@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.constant.JdbcType;
 
 import java.util.Optional;
@@ -96,21 +97,28 @@ public abstract class AbstractColumnMeta implements ColumnMeta {
     }
 
     @Override
-    public void toSql(StringBuilder builder, boolean withAlias) {
+    public void toSql(StringBuilder builder, Config config, boolean withAlias) {
+        String caseSensitiveSign = config.isCaseSensitive() ? config.getSensitiveSign() : "";
         if (withAlias) {
             if (this.getAlias().isPresent()) {
-                builder.append(this.getAlias().get()).append(".").append(this.getLabel());
+                builder.append(this.getAlias().get()).append(".").append(caseSensitiveSign).append(this.getLabel()).append(caseSensitiveSign);
             } else {
                 throw new RuntimeException("Don't bind to a table");
             }
         } else {
-            builder.append(this.getLabel());
+            builder.append(caseSensitiveSign).append(this.getLabel()).append(caseSensitiveSign);
+        }
+
+        if (null != this.javaProperty) {
+            if (!this.getLabel().equals(this.javaProperty.getName())) {
+                builder.append(" as ").append(caseSensitiveSign).append(this.javaProperty.getName()).append(caseSensitiveSign);
+            }
         }
     }
 
     @Override
-    public void toSql(StringBuilder builder) {
-        this.toSql(builder, false);
+    public void toSql(StringBuilder builder, Config config) {
+        this.toSql(builder, config, false);
     }
 
     @Override

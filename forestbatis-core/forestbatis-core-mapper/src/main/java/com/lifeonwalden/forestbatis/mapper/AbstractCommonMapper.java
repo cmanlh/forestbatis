@@ -1,6 +1,7 @@
 package com.lifeonwalden.forestbatis.mapper;
 
 import com.lifeonwalden.forestbatis.bean.ColumnInfo;
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.exception.DataAccessException;
 import com.lifeonwalden.forestbatis.meta.TableMeta;
@@ -20,10 +21,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     private final int FETCH_SIZE = 2048;
+
+    protected abstract Config getConfig();
 
     protected abstract Connection getConnection();
 
@@ -102,22 +104,22 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
             ResultSet rs = preparedStatement.executeQuery();
 
-            Set<ColumnInfo> columnInfoSet;
+            List<ColumnInfo> columnInfoList;
             if (!selectBuilder.isRuntimeChangeable()) {
-                Optional<Set<ColumnInfo>> _columnInfoSet = statementInfo.getReturnColumns();
+                Optional<List<ColumnInfo>> _columnInfoSet = statementInfo.getReturnColumns();
                 if (_columnInfoSet.isPresent()) {
-                    columnInfoSet = _columnInfoSet.get();
+                    columnInfoList = _columnInfoSet.get();
                 } else {
-                    columnInfoSet = getReturnColumnHandler().setupReturnColumn(rs);
-                    statementInfo.setReturnColumns(Optional.of(columnInfoSet));
+                    columnInfoList = getReturnColumnHandler().setupReturnColumn(rs);
+                    statementInfo.setReturnColumns(Optional.of(columnInfoList));
                 }
             } else {
-                columnInfoSet = getReturnColumnHandler().setupReturnColumn(rs);
+                columnInfoList = getReturnColumnHandler().setupReturnColumn(rs);
             }
 
             List<T> resultList = new ArrayList<>();
             while (rs.next()) {
-                resultList.add(recordHandler.convert(rs, columnInfoSet));
+                resultList.add(recordHandler.convert(rs, columnInfoList));
             }
 
             return resultList;
@@ -147,21 +149,21 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
             ResultSet rs = preparedStatement.executeQuery();
 
-            Set<ColumnInfo> columnInfoSet;
+            List<ColumnInfo> columnInfoList;
             if (!selectBuilder.isRuntimeChangeable()) {
-                Optional<Set<ColumnInfo>> _columnInfoSet = statementInfo.getReturnColumns();
-                if (_columnInfoSet.isPresent()) {
-                    columnInfoSet = _columnInfoSet.get();
+                Optional<List<ColumnInfo>> _columnInfoList = statementInfo.getReturnColumns();
+                if (_columnInfoList.isPresent()) {
+                    columnInfoList = _columnInfoList.get();
                 } else {
-                    columnInfoSet = getReturnColumnHandler().setupReturnColumn(rs);
-                    statementInfo.setReturnColumns(Optional.of(columnInfoSet));
+                    columnInfoList = getReturnColumnHandler().setupReturnColumn(rs);
+                    statementInfo.setReturnColumns(Optional.of(columnInfoList));
                 }
             } else {
-                columnInfoSet = getReturnColumnHandler().setupReturnColumn(rs);
+                columnInfoList = getReturnColumnHandler().setupReturnColumn(rs);
             }
 
             while (rs.next()) {
-                streamResultSetCallback.process(recordHandler.convert(rs, columnInfoSet));
+                streamResultSetCallback.process(recordHandler.convert(rs, columnInfoList));
             }
         } catch (SQLException e) {
             releaseConnection();
@@ -341,8 +343,8 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
         Connection connection = getConnection();
         TableMeta tableMeta = getTable();
         try {
-            if (tableMeta.beWithSchema()) {
-                return connection.createStatement().executeUpdate("truncate table ".concat(tableMeta.getSchema()).concat(".").concat(tableMeta.getName()));
+            if (getConfig().isWithSchema()) {
+                return connection.createStatement().executeUpdate("truncate table ".concat(getConfig().getSchema()).concat(".").concat(tableMeta.getName()));
             } else {
                 return connection.createStatement().executeUpdate("truncate table ".concat(tableMeta.getName()));
             }

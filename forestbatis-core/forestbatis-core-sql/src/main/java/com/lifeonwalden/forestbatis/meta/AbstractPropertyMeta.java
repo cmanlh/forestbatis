@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.constant.JdbcType;
 
 import java.util.Optional;
@@ -35,7 +36,7 @@ public abstract class AbstractPropertyMeta implements PropertyMeta {
     }
 
     @Override
-    public void toSql(StringBuilder builder, boolean withAlias) {
+    public void toSql(StringBuilder builder, Config config, boolean withAlias) {
         if (null == this.jdbcType) {
             throw new RuntimeException("Has to specify JdbcType for a Property.");
         }
@@ -44,11 +45,11 @@ public abstract class AbstractPropertyMeta implements PropertyMeta {
     }
 
     @Override
-    public void toSql(StringBuilder builder) {
-        this.toSql(builder, false);
+    public void toSql(StringBuilder builder, Config config) {
+        this.toSql(builder, config, false);
     }
 
-    protected void toSql(StringBuilder builder, boolean withAlias, int listPropertySize) {
+    protected void toSql(StringBuilder builder, Config config, boolean withAlias, int listPropertySize) {
         if (null == this.jdbcType) {
             throw new RuntimeException("Has to specify JdbcType for a Property.");
         }

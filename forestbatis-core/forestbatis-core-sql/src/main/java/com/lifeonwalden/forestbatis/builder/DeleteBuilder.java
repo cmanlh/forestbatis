@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.builder;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
@@ -15,15 +16,17 @@ public class DeleteBuilder<T> implements com.lifeonwalden.forestbatis.sql.Delete
     private QueryNode queryNode;
     private TableNode tableNode;
     private boolean runtimeChangeable;
+    private Config config;
 
     private volatile StatementInfo cachedStatement;
 
-    public DeleteBuilder(TableNode tableNode) {
-        this(tableNode, null);
+    public DeleteBuilder(TableNode tableNode, Config config) {
+        this(tableNode, config, null);
     }
 
-    public DeleteBuilder(TableNode tableNode, QueryNode queryNode) {
+    public DeleteBuilder(TableNode tableNode, Config config, QueryNode queryNode) {
         this.tableNode = tableNode;
+        this.config = config;
         this.queryNode = queryNode;
         if (null == queryNode) {
             this.runtimeChangeable = false;
@@ -39,7 +42,7 @@ public class DeleteBuilder<T> implements com.lifeonwalden.forestbatis.sql.Delete
      * @return
      */
     public DeleteBuilder overrideQuery(QueryNode queryNode) {
-        return new DeleteBuilder<T>(this.tableNode, queryNode);
+        return new DeleteBuilder<T>(this.tableNode, this.config, queryNode);
     }
 
     @Override
@@ -51,13 +54,13 @@ public class DeleteBuilder<T> implements com.lifeonwalden.forestbatis.sql.Delete
         StringBuilder builder = new StringBuilder();
         boolean withAlias = this.tableNode.isJoined() || this.queryNode.isJoined();
 
-        SqlCommandType.DELETE.toSql(builder, withAlias);
-        NodeRelation.FORM.toSql(builder, withAlias);
-        this.tableNode.toSql(builder, withAlias);
+        SqlCommandType.DELETE.toSql(builder,config, withAlias);
+        NodeRelation.FORM.toSql(builder,config, withAlias);
+        this.tableNode.toSql(builder,config, withAlias);
 
         if (null != this.queryNode && QueryNodeEnableType.DISABLED != this.queryNode.enabled(value)) {
-            NodeRelation.WHERE.toSql(builder, withAlias);
-            queryNode.toSql(builder, withAlias, value);
+            NodeRelation.WHERE.toSql(builder,config, withAlias);
+            queryNode.toSql(builder, this.config, withAlias, value);
         }
 
         if (false == this.isRuntimeChangeable()) {

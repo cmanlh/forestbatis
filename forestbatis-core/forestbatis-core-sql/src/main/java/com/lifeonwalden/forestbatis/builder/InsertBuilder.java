@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.builder;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.constant.SqlCommandType;
 import com.lifeonwalden.forestbatis.meta.ColumnMeta;
@@ -18,15 +19,17 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
     private TableNode tableNode;
     // 是否将null字段插入数据库
     private boolean insertNull;
+    private Config config;
 
     private volatile StatementInfo cachedStatement;
 
-    public InsertBuilder(TableNode tableNode, List<ColumnMeta> toInsertColumnList) {
-        this(tableNode, toInsertColumnList, true);
+    public InsertBuilder(TableNode tableNode, Config config, List<ColumnMeta> toInsertColumnList) {
+        this(tableNode, config, toInsertColumnList, true);
     }
 
-    public InsertBuilder(TableNode tableNode, List<ColumnMeta> toInsertColumnList, boolean insertNull) {
+    public InsertBuilder(TableNode tableNode, Config config, List<ColumnMeta> toInsertColumnList, boolean insertNull) {
         this.tableNode = tableNode;
+        this.config = config;
         this.toInsertColumnList = toInsertColumnList;
         this.insertNull = insertNull;
     }
@@ -38,7 +41,7 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
      * @return
      */
     public InsertBuilder overrideInsertColumn(List<ColumnMeta> toInsertColumnList) {
-        return new InsertBuilder<T>(this.tableNode, toInsertColumnList, this.insertNull);
+        return new InsertBuilder<T>(this.tableNode, this.config, toInsertColumnList, this.insertNull);
     }
 
     /**
@@ -49,7 +52,7 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
      * @return
      */
     public InsertBuilder overrideInsertColumn(List<ColumnMeta> toInsertColumnList, boolean insertNull) {
-        return new InsertBuilder<T>(this.tableNode, toInsertColumnList, insertNull);
+        return new InsertBuilder<T>(this.tableNode, this.config, toInsertColumnList, insertNull);
     }
 
     /**
@@ -59,7 +62,7 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
      * @return
      */
     public InsertBuilder overrideInsertColumn(boolean insertNull) {
-        return new InsertBuilder<T>(this.tableNode, this.toInsertColumnList, insertNull);
+        return new InsertBuilder<T>(this.tableNode, this.config, this.toInsertColumnList, insertNull);
     }
 
     /**
@@ -75,7 +78,7 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
                 _toInsertColumnList.add(columnMeta);
             }
         });
-        return new InsertBuilder<T>(this.tableNode, _toInsertColumnList, this.insertNull);
+        return new InsertBuilder<T>(this.tableNode, this.config, _toInsertColumnList, this.insertNull);
     }
 
     /**
@@ -92,7 +95,7 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
                 _toInsertColumnList.add(columnMeta);
             }
         });
-        return new InsertBuilder<T>(this.tableNode, _toInsertColumnList, insertNull);
+        return new InsertBuilder<T>(this.tableNode, this.config, _toInsertColumnList, insertNull);
     }
 
     /**
@@ -105,7 +108,7 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
         List<ColumnMeta> _toInsertColumnList = new ArrayList<>();
         _toInsertColumnList.addAll(this.toInsertColumnList);
         _toInsertColumnList.addAll(toAddInsertColumnList);
-        return new InsertBuilder<T>(this.tableNode, _toInsertColumnList, this.insertNull);
+        return new InsertBuilder<T>(this.tableNode, this.config, _toInsertColumnList, this.insertNull);
     }
 
     /**
@@ -119,7 +122,7 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
         List<ColumnMeta> _toInsertColumnList = new ArrayList<>();
         _toInsertColumnList.addAll(this.toInsertColumnList);
         _toInsertColumnList.addAll(toAddInsertColumnList);
-        return new InsertBuilder<T>(this.tableNode, _toInsertColumnList, insertNull);
+        return new InsertBuilder<T>(this.tableNode, this.config, _toInsertColumnList, insertNull);
     }
 
     @Override
@@ -130,9 +133,9 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
 
         StringBuilder builder = new StringBuilder();
 
-        SqlCommandType.INSERT.toSql(builder);
+        SqlCommandType.INSERT.toSql(builder,config);
         builder.append(" ");
-        this.tableNode.toSql(builder);
+        this.tableNode.toSql(builder,config);
         builder.append(" ");
 
         if (this.isRuntimeChangeable()) {
@@ -151,7 +154,7 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
                         innerbuilder.append(", ");
                     }
                     builder.append(columnMeta.getLabel());
-                    columnMeta.getJavaProperty().get().toSql(innerbuilder);
+                    columnMeta.getJavaProperty().get().toSql(innerbuilder, this.config);
 
                     notFirstOne = true;
                 }
@@ -165,13 +168,13 @@ public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.Insert
             int idx = 0;
             ColumnMeta columnMeta = this.toInsertColumnList.get(idx);
             builder.append(columnMeta.getLabel());
-            columnMeta.getJavaProperty().get().toSql(innerbuilder);
+            columnMeta.getJavaProperty().get().toSql(innerbuilder, this.config);
             for (idx = 1; idx < this.toInsertColumnList.size(); idx++) {
                 columnMeta = this.toInsertColumnList.get(idx);
                 builder.append(", ").append(columnMeta.getLabel());
 
                 innerbuilder.append(", ");
-                columnMeta.getJavaProperty().get().toSql(innerbuilder);
+                columnMeta.getJavaProperty().get().toSql(innerbuilder, this.config);
             }
             builder.append(")");
 

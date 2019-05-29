@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.builder;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
@@ -19,26 +20,28 @@ import java.util.List;
 public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.SelectBuilder<T> {
     protected List<ColumnMeta> toReturnColumnList;
     private QueryNode queryNode;
+    private Config config;
     private TableNode tableNode;
     private List<Order> orderList;
     private boolean runtimeChangeable;
 
     private volatile StatementInfo cachedStatement;
 
-    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList) {
-        this(tableNode, toReturnColumnList, null, null);
+    public SelectBuilder(TableNode tableNode, Config config, List<ColumnMeta> toReturnColumnList) {
+        this(tableNode, config, toReturnColumnList, null, null);
     }
 
-    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, QueryNode queryNode) {
-        this(tableNode, toReturnColumnList, queryNode, null);
+    public SelectBuilder(TableNode tableNode, Config config, List<ColumnMeta> toReturnColumnList, QueryNode queryNode) {
+        this(tableNode, config, toReturnColumnList, queryNode, null);
     }
 
-    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, List<Order> orderList) {
-        this(tableNode, toReturnColumnList, null, orderList);
+    public SelectBuilder(TableNode tableNode, Config config, List<ColumnMeta> toReturnColumnList, List<Order> orderList) {
+        this(tableNode, config, toReturnColumnList, null, orderList);
     }
 
-    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, QueryNode queryNode, List<Order> orderList) {
+    public SelectBuilder(TableNode tableNode, Config config, List<ColumnMeta> toReturnColumnList, QueryNode queryNode, List<Order> orderList) {
         this.tableNode = tableNode;
+        this.config = config;
         this.toReturnColumnList = toReturnColumnList;
         this.queryNode = queryNode;
         this.orderList = orderList;
@@ -57,7 +60,7 @@ public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.Select
      * @return
      */
     public SelectBuilder overrideReturnColumn(List<ColumnMeta> toReturnColumnList) {
-        return new SelectBuilder<T>(this.tableNode, toReturnColumnList, this.queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, this.config, toReturnColumnList, this.queryNode, this.orderList);
     }
 
     /**
@@ -73,7 +76,7 @@ public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.Select
                 _toReturnColumnList.add(columnMeta);
             }
         });
-        return new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, this.config, _toReturnColumnList, this.queryNode, this.orderList);
     }
 
     /**
@@ -86,7 +89,7 @@ public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.Select
         List<ColumnMeta> _toReturnColumnList = new ArrayList<>();
         _toReturnColumnList.addAll(this.toReturnColumnList);
         _toReturnColumnList.addAll(toAddReturnColumnList);
-        return new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, this.config, _toReturnColumnList, this.queryNode, this.orderList);
     }
 
     /**
@@ -96,7 +99,7 @@ public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.Select
      * @return
      */
     public SelectBuilder overrideOrder(List<Order> orderList) {
-        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, this.queryNode, orderList);
+        return new SelectBuilder<T>(this.tableNode, this.config, this.toReturnColumnList, this.queryNode, orderList);
     }
 
     /**
@@ -106,7 +109,7 @@ public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.Select
      * @return
      */
     public SelectBuilder overrideQuery(QueryNode queryNode) {
-        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, this.config, this.toReturnColumnList, queryNode, this.orderList);
     }
 
     @Override
@@ -118,7 +121,7 @@ public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.Select
         StringBuilder builder = new StringBuilder();
         boolean withAlias = this.tableNode.isJoined() || this.queryNode.isJoined();
 
-        SqlCommandType.SELECT.toSql(builder, withAlias);
+        SqlCommandType.SELECT.toSql(builder, config, withAlias);
         builder.append(" ");
 
         if (null == this.toReturnColumnList || this.toReturnColumnList.isEmpty()) {
@@ -126,32 +129,32 @@ public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.Select
         } else {
             int index = 0;
             ColumnMeta column = this.toReturnColumnList.get(index);
-            column.toSql(builder, withAlias);
+            column.toSql(builder, this.config, withAlias);
             for (index = 1; index < this.toReturnColumnList.size(); index++) {
                 builder.append(", ");
-                this.toReturnColumnList.get(index).toSql(builder, withAlias);
+                this.toReturnColumnList.get(index).toSql(builder, this.config, withAlias);
             }
         }
 
-        NodeRelation.FORM.toSql(builder, withAlias);
+        NodeRelation.FORM.toSql(builder, this.config, withAlias);
 
         if (null == this.tableNode) {
             throw new RuntimeException("Has to specify a table or join table list for query");
         }
-        this.tableNode.toSql(builder, withAlias);
+        this.tableNode.toSql(builder, config, withAlias);
 
         if (null != this.queryNode && QueryNodeEnableType.DISABLED != this.queryNode.enabled(value)) {
-            NodeRelation.WHERE.toSql(builder, withAlias);
-            queryNode.toSql(builder, withAlias, value);
+            NodeRelation.WHERE.toSql(builder, this.config, withAlias);
+            queryNode.toSql(builder, this.config, withAlias, value);
         }
 
         if (null != this.orderList && this.orderList.size() > 0) {
-            NodeRelation.ORDER_BY.toSql(builder, withAlias);
+            NodeRelation.ORDER_BY.toSql(builder, this.config, withAlias);
             int index = 0;
-            this.orderList.get(index).toSql(builder, withAlias);
+            this.orderList.get(index).toSql(builder, config, withAlias);
             for (index = 1; index < this.orderList.size(); index++) {
                 builder.append(", ");
-                this.orderList.get(index).toSql(builder, withAlias);
+                this.orderList.get(index).toSql(builder, this.config, withAlias);
             }
         }
 

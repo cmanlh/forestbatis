@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
 import com.lifeonwalden.forestbatis.constant.SqlCommandType;
@@ -53,8 +54,8 @@ public class SubSelect<T> implements ValueBindingSqlNode<T> {
     }
 
     @Override
-    public void toSql(StringBuilder builder, boolean withAlias, T value) {
-        SqlCommandType.SELECT.toSql(builder, withAlias);
+    public void toSql(StringBuilder builder, Config config, boolean withAlias, T value) {
+        SqlCommandType.SELECT.toSql(builder, config, withAlias);
         builder.append(" ");
 
         if (null == this.toReturnColumnList || this.toReturnColumnList.isEmpty()) {
@@ -62,39 +63,39 @@ public class SubSelect<T> implements ValueBindingSqlNode<T> {
         } else {
             int index = 0;
             ColumnMeta column = this.toReturnColumnList.get(index);
-            column.toSql(builder, withAlias);
+            column.toSql(builder, config, withAlias);
             for (index = 1; index < this.toReturnColumnList.size(); index++) {
                 builder.append(", ");
-                this.toReturnColumnList.get(index).toSql(builder, withAlias);
+                this.toReturnColumnList.get(index).toSql(builder, config, withAlias);
             }
         }
 
-        NodeRelation.FORM.toSql(builder, withAlias);
+        NodeRelation.FORM.toSql(builder, config, withAlias);
 
         if (null == this.tableNode) {
             throw new RuntimeException("Has to specify a table or join table list for query");
         }
-        this.tableNode.toSql(builder, withAlias);
+        this.tableNode.toSql(builder, config, withAlias);
 
         if (null != this.queryNode && QueryNodeEnableType.DISABLED != this.queryNode.enabled(value)) {
-            NodeRelation.WHERE.toSql(builder, withAlias);
-            queryNode.toSql(builder, withAlias, value);
+            NodeRelation.WHERE.toSql(builder, config, withAlias);
+            queryNode.toSql(builder, config, withAlias, value);
         }
 
         if (null != this.orderList && this.orderList.size() > 0) {
-            NodeRelation.ORDER_BY.toSql(builder, withAlias);
+            NodeRelation.ORDER_BY.toSql(builder, config, withAlias);
             int index = 0;
-            this.orderList.get(index).toSql(builder, withAlias);
+            this.orderList.get(index).toSql(builder, config, withAlias);
             for (index = 1; index < this.orderList.size(); index++) {
                 builder.append(", ");
-                this.orderList.get(index).toSql(builder, withAlias);
+                this.orderList.get(index).toSql(builder, config, withAlias);
             }
         }
     }
 
     @Override
-    public void toSql(StringBuilder builder, T value) {
-        toSql(builder, false, value);
+    public void toSql(StringBuilder builder, Config config, T value) {
+        toSql(builder, config, false, value);
     }
 
     public boolean isRuntimeChangeable() {

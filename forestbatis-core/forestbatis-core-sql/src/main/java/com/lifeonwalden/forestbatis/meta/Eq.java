@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
 import java.util.Optional;
@@ -83,13 +84,13 @@ public class Eq<T> extends AbstractQueryNode<T> {
     }
 
     @Override
-    protected void selfBuild(StringBuilder builder, boolean withAlias, T value) {
+    protected void selfBuild(StringBuilder builder, Config config, boolean withAlias, T value) {
         if (null != this.anotherTableColumn) {
-            this.column.toSql(builder, withAlias);
-            compareRelation.toSql(builder, withAlias);
-            this.anotherTableColumn.toSql(builder, withAlias);
+            this.column.toSql(builder, config, withAlias);
+            compareRelation.toSql(builder, config, withAlias);
+            this.anotherTableColumn.toSql(builder, config, withAlias);
         } else {
-            super.selfBuild(builder, withAlias, value);
+            super.selfBuild(builder, config, withAlias, value);
         }
     }
 }

@@ -3,6 +3,7 @@ package com.lifeonwalden.forestbatis.result;
 import com.lifeonwalden.forestbatis.bean.ColumnInfo;
 
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -11,8 +12,8 @@ import java.util.Set;
 public interface RecordHandler<P> {
     /**
      * @param resultSet
-     * @param columnSet
+     * @param columnList
      * @return
      */
-    P convert(ResultSet resultSet, Set<ColumnInfo> columnSet);
+    P convert(ResultSet resultSet, List<ColumnInfo> columnList);
 }

@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
 
 import java.util.List;
@@ -27,11 +28,11 @@ public class AbstractInQueryNode<T> extends AbstractQueryNode<T> {
     }
 
     @Override
-    protected void selfBuild(StringBuilder builder, boolean withAlias, T value) {
-        this.column.toSql(builder, withAlias);
-        this.compareRelation.toSql(builder);
+    protected void selfBuild(StringBuilder builder, Config config, boolean withAlias, T value) {
+        this.column.toSql(builder, config, withAlias);
+        this.compareRelation.toSql(builder, config);
         builder.append("(");
-        ((AbstractPropertyMeta) this.property).toSql(builder, withAlias, fetchListSize(value));
+        ((AbstractPropertyMeta) this.property).toSql(builder, config, withAlias, fetchListSize(value));
         builder.append(")");
     }
 

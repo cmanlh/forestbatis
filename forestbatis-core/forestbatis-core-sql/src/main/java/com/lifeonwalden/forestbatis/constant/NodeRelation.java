@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.constant;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.meta.SqlNode;
 
 /**
@@ -19,12 +20,12 @@ public enum NodeRelation implements SqlNode {
     }
 
     @Override
-    public void toSql(StringBuilder builder, boolean withAlias) {
+    public void toSql(StringBuilder builder, Config config, boolean withAlias) {
         builder.append(this.SQL_FRAGMENT);
     }
 
     @Override
-    public void toSql(StringBuilder builder) {
-        toSql(builder, false);
+    public void toSql(StringBuilder builder, Config config) {
+        toSql(builder, config, false);
     }
 }

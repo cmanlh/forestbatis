@@ -6,18 +6,18 @@ import com.lifeonwalden.forestbatis.exception.DataAccessException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Set;
+import java.util.List;
 
 public abstract class AbstractRecordHandler<T> implements RecordHandler<T> {
 
     public abstract T newBeanInstance();
 
     @Override
-    public T convert(ResultSet resultSet, Set<ColumnInfo> columnSet) {
+    public T convert(ResultSet resultSet, List<ColumnInfo> columnInfoList) {
         T t = newBeanInstance();
         AbstractDTOMapBean bean = (AbstractDTOMapBean) t;
         try {
-            for (ColumnInfo columnInfo : columnSet) {
+            for (ColumnInfo columnInfo : columnInfoList) {
                 switch (columnInfo.getJdbcType()) {
                     case VARCHAR:
                     case NVARCHAR:

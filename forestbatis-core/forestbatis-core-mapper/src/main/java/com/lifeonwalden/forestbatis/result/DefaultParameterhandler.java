@@ -15,25 +15,6 @@ import java.util.List;
 public class DefaultParameterhandler implements ParameterHandler {
     private static Logger logger = LoggerFactory.getLogger(DefaultParameterhandler.class);
 
-    private static DefaultParameterhandler singleton;
-
-    private DefaultParameterhandler() {
-    }
-
-    public static DefaultParameterhandler getInstance() {
-        if (null != singleton) {
-            return singleton;
-        }
-
-        synchronized (DefaultParameterhandler.class) {
-            if (null == singleton) {
-                singleton = new DefaultParameterhandler();
-            }
-
-            return singleton;
-        }
-    }
-
     @Override
     public <T> void set(StatementInfo statementInfo, PreparedStatement preparedStatement, T param) throws SQLException {
         List<PropertyInfo> propertyInfoList = statementInfo.getProps().get();

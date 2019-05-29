@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
 
@@ -99,12 +100,12 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
         }
     }
 
-    protected void toSql(StringBuilder builder, boolean withAlias, T value, boolean hasLeadNode) {
+    protected void toSql(StringBuilder builder, Config config, boolean withAlias, T value, boolean hasLeadNode) {
         boolean hadLeadNode = hasLeadNode;
         int nodeCount = 0;
         StringBuilder innerBuilder = new StringBuilder();
         if (QueryNodeEnableType.NODE == enabled(value)) {
-            selfBuild(innerBuilder, withAlias, value);
+            selfBuild(innerBuilder, config, withAlias, value);
 
             hadLeadNode = true;
             nodeCount++;
@@ -117,16 +118,16 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
                     case NODE: {
                         nodeCount++;
                         if (hadLeadNode) {
-                            sibling.getNodeRelation().toSql(innerBuilder, withAlias);
+                            sibling.getNodeRelation().toSql(innerBuilder, config, withAlias);
                         }
-                        queryNode.toSql(innerBuilder, withAlias, value, hadLeadNode);
+                        queryNode.toSql(innerBuilder, config, withAlias, value, hadLeadNode);
                         hadLeadNode = true;
 
                         break;
                     }
                     case SIBLING_ONLY: {
                         nodeCount++;
-                        queryNode.toSql(innerBuilder, withAlias, value, hadLeadNode);
+                        queryNode.toSql(innerBuilder, config, withAlias, value, hadLeadNode);
                         hadLeadNode = true;
 
                         break;
@@ -141,13 +142,13 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
     }
 
     @Override
-    public void toSql(StringBuilder builder, boolean withAlias, T value) {
-        toSql(builder, withAlias, value, false);
+    public void toSql(StringBuilder builder, Config config, boolean withAlias, T value) {
+        toSql(builder, config, withAlias, value, false);
     }
 
     @Override
-    public void toSql(StringBuilder builder, T value) {
-        toSql(builder, false, value);
+    public void toSql(StringBuilder builder, Config config, T value) {
+        toSql(builder, config, false, value);
     }
 
     protected List<RelationNode<QueryNode>> setupSiblingList() {
@@ -158,10 +159,10 @@ public abstract class AbstractQueryNode<T> implements QueryNode<T> {
         return this.siblingList;
     }
 
-    protected void selfBuild(StringBuilder builder, boolean withAlias, T value) {
-        this.column.toSql(builder, withAlias);
-        compareRelation.toSql(builder, withAlias);
-        this.property.toSql(builder, withAlias);
+    protected void selfBuild(StringBuilder builder, Config config, boolean withAlias, T value) {
+        this.column.toSql(builder, config, withAlias);
+        compareRelation.toSql(builder, config, withAlias);
+        this.property.toSql(builder, config, withAlias);
     }
 
     @Override

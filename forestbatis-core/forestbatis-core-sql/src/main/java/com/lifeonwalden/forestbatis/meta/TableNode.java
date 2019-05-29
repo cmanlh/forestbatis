@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 
 import java.util.ArrayList;
@@ -111,21 +112,21 @@ public class TableNode implements SqlNode {
     }
 
     @Override
-    public void toSql(StringBuilder builder, boolean withAlias) {
+    public void toSql(StringBuilder builder, Config config, boolean withAlias) {
         if (null == this.joinList || this.joinList.isEmpty()) {
-            this.tableMeta.toSql(builder, withAlias);
+            this.tableMeta.toSql(builder, config, withAlias);
         } else {
-            this.tableMeta.toSql(builder, true);
+            this.tableMeta.toSql(builder, config, true);
             this.joinList.forEach(join -> {
-                join.getNodeRelation().toSql(builder, false);
-                join.getNode().toSql(builder, true);
+                join.getNodeRelation().toSql(builder, config, false);
+                join.getNode().toSql(builder, config, true);
             });
         }
     }
 
     @Override
-    public void toSql(StringBuilder builder) {
-        toSql(builder, false);
+    public void toSql(StringBuilder builder, Config config) {
+        toSql(builder, config, false);
     }
 
     private List<RelationNode<JoinNode>> setupJoinList() {

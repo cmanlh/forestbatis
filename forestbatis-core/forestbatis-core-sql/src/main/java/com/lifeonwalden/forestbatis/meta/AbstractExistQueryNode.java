@@ -1,5 +1,7 @@
 package com.lifeonwalden.forestbatis.meta;
 
+import com.lifeonwalden.forestbatis.bean.Config;
+
 public class AbstractExistQueryNode<T> extends AbstractQueryNode<T> {
     // 子查询临时表
     protected TempTable tempTable;
@@ -10,10 +12,10 @@ public class AbstractExistQueryNode<T> extends AbstractQueryNode<T> {
     }
 
     @Override
-    protected void selfBuild(StringBuilder builder, boolean withAlias, T value) {
-        this.compareRelation.toSql(builder);
+    protected void selfBuild(StringBuilder builder, Config config, boolean withAlias, T value) {
+        this.compareRelation.toSql(builder, config);
         builder.append("(");
-        this.tempTable.toSql(builder, withAlias, value);
+        this.tempTable.toSql(builder, config, withAlias, value);
         builder.append(")");
     }
 
