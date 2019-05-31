@@ -23,7 +23,7 @@ public class BookBuilder {
     };
     public final static PropertyMeta publisher = new AbstractPropertyMeta(BookMetaInfo.publisher, JdbcType.VARCHAR) {
     };
-    public final static PropertyMeta publishTime = new AbstractPropertyMeta(BookMetaInfo.publishTime, JdbcType.DATE) {
+    public final static PropertyMeta publishTime = new AbstractPropertyMeta(BookMetaInfo.publishTime, JdbcType.DATETIME) {
     };
     private final static List<ColumnMeta> columnList = new ArrayList<>();
     public final static TableMeta TABLE = new AbstractTableMeta(TABLE_NAME, ALIAS_NAME, columnList) {
@@ -34,7 +34,7 @@ public class BookBuilder {
     };
     public final static ColumnMeta Publisher = new AbstractColumnMeta(BookMetaInfo.publisher, JdbcType.VARCHAR, TABLE, publisher) {
     };
-    public final static ColumnMeta PublishTime = new AbstractColumnMeta(BookMetaInfo.publishTime, JdbcType.DATE, TABLE, publishTime) {
+    public final static ColumnMeta PublishTime = new AbstractColumnMeta(BookMetaInfo.publishTime, JdbcType.DATETIME, TABLE, publishTime) {
     };
 
     static {

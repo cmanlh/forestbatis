@@ -69,14 +69,6 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
     int[] update(List<P> valueList);
 
     /**
-     * 根据主键更新记录，当value中某属性为null时，对应记录字段将不进行更新
-     *
-     * @param valueList 指定对象
-     * @return
-     */
-    int[] updateWithoutNull(List<P> valueList);
-
-    /**
      * 根据主键更新记录，且仅更新toUpdateColumnList指定的列
      * 当value中某属性为null时，对应记录字段也将被更新为null
      *
@@ -85,16 +77,6 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      * @return
      */
     int[] update(List<P> valueList, List<ColumnMeta> toUpdateColumnList);
-
-    /**
-     * 根据主键更新记录，且仅更新toUpdateColumnList指定的列
-     * 当value中某属性为null时，对应记录字段将不进行更新
-     *
-     * @param valueList          指定对象
-     * @param toUpdateColumnList 指定要更新的列
-     * @return
-     */
-    int[] updateWithoutNull(List<P> valueList, List<ColumnMeta> toUpdateColumnList);
 
     /**
      * 根据主键删除记录

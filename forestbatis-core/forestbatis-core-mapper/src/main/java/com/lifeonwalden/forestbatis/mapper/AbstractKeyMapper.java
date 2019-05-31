@@ -62,18 +62,8 @@ public abstract class AbstractKeyMapper<T> extends AbstractCommonMapper<T> imple
     }
 
     @Override
-    public int[] updateWithoutNull(List<T> valueList) {
-        return updateWithQuery(valueList, getKeyUpdateBuilder(false));
-    }
-
-    @Override
     public int[] update(List<T> valueList, List<ColumnMeta> toUpdateColumnList) {
         return updateWithQuery(valueList, getKeyUpdateBuilder(true).overrideUpdateColumn(toUpdateColumnList));
-    }
-
-    @Override
-    public int[] updateWithoutNull(List<T> valueList, List<ColumnMeta> toUpdateColumnList) {
-        return updateWithQuery(valueList, getKeyUpdateBuilder(false).overrideUpdateColumn(toUpdateColumnList, false));
     }
 
     @Override

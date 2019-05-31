@@ -3,13 +3,15 @@ package com.lifeonwalden.forestbatis.result;
 import com.lifeonwalden.forestbatis.bean.AbstractDTOMapBean;
 import com.lifeonwalden.forestbatis.bean.PropertyInfo;
 import com.lifeonwalden.forestbatis.bean.StatementInfo;
+import com.lifeonwalden.forestbatis.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Date;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 public class DefaultParameterhandler implements ParameterHandler {
@@ -38,26 +40,62 @@ public class DefaultParameterhandler implements ParameterHandler {
                 case MEDIUMTEXT:
                 case LONGTEXT:
                 case CHAR:
-                case NCHAR:
-                    preparedStatement.setString(propertyInfo.getIndex(), fetchValue(propertyInfo, param));
+                case NCHAR: {
+                    String value = fetchValue(propertyInfo, param);
+                    if (null == value) {
+                        preparedStatement.setNull(propertyInfo.getIndex(), propertyInfo.getJdbcType().getValue());
+                    } else {
+                        preparedStatement.setString(propertyInfo.getIndex(), value);
+                    }
                     break;
+                }
                 case INTEGER:
-                case INT:
-                    preparedStatement.setInt(propertyInfo.getIndex(), fetchValue(propertyInfo, param));
+                case INT: {
+                    Integer value = fetchValue(propertyInfo, param);
+                    if (null == value) {
+                        preparedStatement.setNull(propertyInfo.getIndex(), propertyInfo.getJdbcType().getValue());
+                    } else {
+                        preparedStatement.setInt(propertyInfo.getIndex(), value);
+                    }
                     break;
-                case DECIMAL:
-                    preparedStatement.setBigDecimal(propertyInfo.getIndex(), fetchValue(propertyInfo, param));
+                }
+                case DECIMAL: {
+                    BigDecimal value = fetchValue(propertyInfo, param);
+                    if (null == value) {
+                        preparedStatement.setNull(propertyInfo.getIndex(), propertyInfo.getJdbcType().getValue());
+                    } else {
+                        preparedStatement.setBigDecimal(propertyInfo.getIndex(), value);
+                    }
                     break;
-                case DATE:
-                    preparedStatement.setDate(propertyInfo.getIndex(), new Date((this.<java.util.Date, T>fetchValue(propertyInfo, param)).getTime()));
+                }
+                case DATE: {
+                    Date value = fetchValue(propertyInfo, param);
+                    if (null == value) {
+                        preparedStatement.setNull(propertyInfo.getIndex(), propertyInfo.getJdbcType().getValue());
+                    } else {
+                        preparedStatement.setDate(propertyInfo.getIndex(), new java.sql.Date(value.getTime()));
+                    }
                     break;
+                }
                 case TIMESTAMP:
-                case DATETIME:
-                    preparedStatement.setTimestamp(propertyInfo.getIndex(), new Timestamp((this.<java.util.Date, T>fetchValue(propertyInfo, param)).getTime()));
+                case DATETIME: {
+                    Date value = fetchValue(propertyInfo, param);
+                    if (null == value) {
+                        preparedStatement.setNull(propertyInfo.getIndex(), propertyInfo.getJdbcType().getValue());
+                    } else {
+                        preparedStatement.setTimestamp(propertyInfo.getIndex(), new Timestamp(value.getTime()));
+                    }
                     break;
-                case BIGINT:
-                    preparedStatement.setLong(propertyInfo.getIndex(), fetchValue(propertyInfo, param));
+                }
+                case BIGINT: {
+                    Long value = fetchValue(propertyInfo, param);
+                    if (null == value) {
+                        preparedStatement.setNull(propertyInfo.getIndex(), propertyInfo.getJdbcType().getValue());
+                    } else {
+                        preparedStatement.setLong(propertyInfo.getIndex(), value);
+                    }
                     break;
+                }
                 default:
                     throw new RuntimeException("Not supported Jdbc Type.");
             }
@@ -65,16 +103,43 @@ public class DefaultParameterhandler implements ParameterHandler {
     }
 
     protected <T> String fillDebugSql(String sql, PropertyInfo propertyInfo, T param) {
-        return sql.replace("#".concat(String.valueOf(propertyInfo.getIndex())), fetchValue(propertyInfo, param));
+        return sql.replace("#".concat(String.valueOf(propertyInfo.getIndex())), fetchString(propertyInfo, param));
     }
 
     protected <P, T> P fetchValue(PropertyInfo propertyInfo, T param) {
         AbstractDTOMapBean bean = (AbstractDTOMapBean) param;
         if (propertyInfo.isListProperty()) {
-            List list = (List) bean.get(propertyInfo.getName());
-            return (P) list.get(propertyInfo.getListIndex());
+            Object _list = bean.get(propertyInfo.getName());
+            if (null == _list) {
+                return null;
+            }
+
+            List list = (List) _list;
+            Object result = list.get(propertyInfo.getListIndex());
+            if (null == result) {
+                return null;
+            }
+            return (P) result;
         } else {
-            return (P) bean.get(propertyInfo.getName());
+            Object result = bean.get(propertyInfo.getName());
+            if (null == result) {
+                return null;
+            }
+            return (P) result;
+        }
+    }
+
+    protected <T> String fetchString(PropertyInfo propertyInfo, T param) {
+        Object value = fetchValue(propertyInfo, param);
+        if (value instanceof java.util.Date) {
+            switch (propertyInfo.getJdbcType()) {
+                case DATE:
+                    return DateUtil.formatDate((java.util.Date) value, DateUtil.DATE);
+                default:
+                    return DateUtil.formatDate((java.util.Date) value, DateUtil.DATE_TIME);
+            }
+        } else {
+            return String.valueOf(value);
         }
     }
 }

@@ -36,6 +36,12 @@ public abstract class AbstractPropertyMeta implements PropertyMeta {
     }
 
     @Override
+    public PropertyMeta overrideName(String name) {
+        return new AbstractPropertyMeta(name, this.jdbcType) {
+        };
+    }
+
+    @Override
     public void toSql(StringBuilder builder, Config config, boolean withAlias) {
         if (null == this.jdbcType) {
             throw new RuntimeException("Has to specify JdbcType for a Property.");

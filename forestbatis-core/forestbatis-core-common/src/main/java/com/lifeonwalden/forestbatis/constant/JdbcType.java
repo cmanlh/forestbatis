@@ -60,7 +60,7 @@ public enum JdbcType {
 
     DATETIME("TIMESTAMP", 94, "", "java.util.Date"),
 
-    INT("INTEGER", 100, "", "java.lang.Integer"),
+    INT("INTEGER", 4, "", "java.lang.Integer"),
 
     OTHER("OTHER", 1111, "", "java.lang.Object"),
 

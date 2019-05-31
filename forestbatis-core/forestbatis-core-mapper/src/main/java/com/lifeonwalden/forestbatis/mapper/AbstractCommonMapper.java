@@ -13,6 +13,8 @@ import com.lifeonwalden.forestbatis.sql.DeleteBuilder;
 import com.lifeonwalden.forestbatis.sql.InsertBuilder;
 import com.lifeonwalden.forestbatis.sql.SelectBuilder;
 import com.lifeonwalden.forestbatis.sql.UpdateBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,13 +25,15 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
+    private static Logger logger = LoggerFactory.getLogger(AbstractCommonMapper.class);
+
     private final int FETCH_SIZE = 2048;
 
     protected abstract Config getConfig();
 
     protected abstract Connection getConnection();
 
-    protected abstract void releaseConnection();
+    protected abstract void releaseConnection(Connection connection);
 
     protected abstract InsertBuilder<T> getBaseInsertBuilder();
 
@@ -100,6 +104,8 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
                 getParameterHandler().set(statementInfo, preparedStatement, param);
+            } else if (logger.isDebugEnabled()) {
+                logger.debug(statementInfo.getSql());
             }
 
             ResultSet rs = preparedStatement.executeQuery();
@@ -124,10 +130,10 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
             return resultList;
         } catch (SQLException e) {
-            releaseConnection();
+            releaseConnection(connection);
             throw new DataAccessException(e);
         } finally {
-            releaseConnection();
+            releaseConnection(connection);
         }
     }
 
@@ -145,6 +151,8 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
             preparedStatement.setFetchSize(fetchSize);
             if (statementInfo.getProps().isPresent()) {
                 getParameterHandler().set(statementInfo, preparedStatement, param);
+            } else if (logger.isDebugEnabled()) {
+                logger.debug(statementInfo.getSql());
             }
 
             ResultSet rs = preparedStatement.executeQuery();
@@ -166,10 +174,10 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
                 streamResultSetCallback.process(recordHandler.convert(rs, columnInfoList));
             }
         } catch (SQLException e) {
-            releaseConnection();
+            releaseConnection(connection);
             throw new DataAccessException(e);
         } finally {
-            releaseConnection();
+            releaseConnection(connection);
         }
     }
 
@@ -186,14 +194,16 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
                 getParameterHandler().set(statementInfo, preparedStatement, value);
+            } else if (logger.isDebugEnabled()) {
+                logger.debug(statementInfo.getSql());
             }
 
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            releaseConnection();
+            releaseConnection(connection);
             throw new DataAccessException(e);
         } finally {
-            releaseConnection();
+            releaseConnection(connection);
         }
     }
 
@@ -217,14 +227,16 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
                     getParameterHandler().set(statementInfo, preparedStatement, value);
                     preparedStatement.addBatch();
                 }
+            } else if (logger.isDebugEnabled()) {
+                logger.debug(statementInfo.getSql());
             }
 
             return preparedStatement.executeBatch();
         } catch (SQLException e) {
-            releaseConnection();
+            releaseConnection(connection);
             throw new DataAccessException(e);
         } finally {
-            releaseConnection();
+            releaseConnection(connection);
         }
     }
 
@@ -241,14 +253,16 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
                 getParameterHandler().set(statementInfo, preparedStatement, param);
+            } else if (logger.isDebugEnabled()) {
+                logger.debug(statementInfo.getSql());
             }
 
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            releaseConnection();
+            releaseConnection(connection);
             throw new DataAccessException(e);
         } finally {
-            releaseConnection();
+            releaseConnection(connection);
         }
     }
 
@@ -272,14 +286,16 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
                     getParameterHandler().set(statementInfo, preparedStatement, param);
                     preparedStatement.addBatch();
                 }
+            } else if (logger.isDebugEnabled()) {
+                logger.debug(statementInfo.getSql());
             }
 
             return preparedStatement.executeBatch();
         } catch (SQLException e) {
-            releaseConnection();
+            releaseConnection(connection);
             throw new DataAccessException(e);
         } finally {
-            releaseConnection();
+            releaseConnection(connection);
         }
     }
 
@@ -296,14 +312,16 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
                 getParameterHandler().set(statementInfo, preparedStatement, value);
+            } else if (logger.isDebugEnabled()) {
+                logger.debug(statementInfo.getSql());
             }
 
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            releaseConnection();
+            releaseConnection(connection);
             throw new DataAccessException(e);
         } finally {
-            releaseConnection();
+            releaseConnection(connection);
         }
     }
 
@@ -327,14 +345,16 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
                     getParameterHandler().set(statementInfo, preparedStatement, value);
                     preparedStatement.addBatch();
                 }
+            } else if (logger.isDebugEnabled()) {
+                logger.debug(statementInfo.getSql());
             }
 
             return preparedStatement.executeBatch();
         } catch (SQLException e) {
-            releaseConnection();
+            releaseConnection(connection);
             throw new DataAccessException(e);
         } finally {
-            releaseConnection();
+            releaseConnection(connection);
         }
     }
 
@@ -349,10 +369,10 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
                 return connection.createStatement().executeUpdate("truncate table ".concat(tableMeta.getName()));
             }
         } catch (SQLException e) {
-            releaseConnection();
+            releaseConnection(connection);
             throw new DataAccessException(e);
         } finally {
-            releaseConnection();
+            releaseConnection(connection);
         }
     }
 }

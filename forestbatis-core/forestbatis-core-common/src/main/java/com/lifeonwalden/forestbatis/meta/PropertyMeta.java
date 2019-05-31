@@ -21,4 +21,12 @@ public interface PropertyMeta extends SqlNode {
      * @return
      */
     Optional<JdbcType> getJdbcType();
+
+    /**
+     * 赋予新的属性名构造一个新的Property
+     *
+     * @param name
+     * @return
+     */
+    PropertyMeta overrideName(String name);
 }

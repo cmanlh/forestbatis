@@ -30,9 +30,15 @@ public abstract class AbstractRecordHandler<T> implements RecordHandler<T> {
                         bean.put(columnInfo.getPropertyName(), resultSet.getString(columnInfo.getIndex()));
                         break;
                     case INTEGER:
-                    case INT:
-                        bean.put(columnInfo.getPropertyName(), resultSet.getInt(columnInfo.getIndex()));
+                    case INT: {
+                        Object value = resultSet.getObject(columnInfo.getIndex());
+                        if (null == value) {
+                            bean.put(columnInfo.getPropertyName(), null);
+                        } else {
+                            bean.put(columnInfo.getPropertyName(), value);
+                        }
                         break;
+                    }
                     case DECIMAL:
                         bean.put(columnInfo.getPropertyName(), resultSet.getBigDecimal(columnInfo.getIndex()));
                         break;
@@ -41,9 +47,15 @@ public abstract class AbstractRecordHandler<T> implements RecordHandler<T> {
                     case DATETIME:
                         bean.put(columnInfo.getPropertyName(), resultSet.getDate(columnInfo.getIndex()));
                         break;
-                    case BIGINT:
-                        bean.put(columnInfo.getPropertyName(), resultSet.getLong(columnInfo.getIndex()));
+                    case BIGINT: {
+                        Object value = resultSet.getObject(columnInfo.getIndex());
+                        if (null == value) {
+                            bean.put(columnInfo.getPropertyName(), null);
+                        } else {
+                            bean.put(columnInfo.getPropertyName(), value);
+                        }
                         break;
+                    }
                     default:
                         throw new RuntimeException("Not supported Jdbc Type.");
                 }

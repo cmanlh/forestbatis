@@ -5,7 +5,6 @@ import com.lifeonwalden.forestbatis.builder.DeleteBuilder;
 import com.lifeonwalden.forestbatis.builder.SelectBuilder;
 import com.lifeonwalden.forestbatis.builder.UpdateBuilder;
 import com.lifeonwalden.forestbatis.example.bean.Book;
-import com.lifeonwalden.forestbatis.example.bean.Book;
 import com.lifeonwalden.forestbatis.example.builder.BookBuilder;
 import com.lifeonwalden.forestbatis.mapper.AbstractKeyMapper;
 import com.lifeonwalden.forestbatis.meta.TableMeta;
@@ -17,14 +16,15 @@ import com.lifeonwalden.forestbatis.util.SingletonReturnColumnHandlerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.function.Function;
 
 public class BookMapper extends AbstractKeyMapper<Book> {
-    private Connection connection;
+    private Function<Void, Connection> connectionCreator;
     private Config config;
 
-    public BookMapper(Config config, Connection connection) {
+    public BookMapper(Config config, Function<Void, Connection> connectionCreator) {
         this.config = config;
-        this.connection = connection;
+        this.connectionCreator = connectionCreator;
     }
 
     @Override
@@ -49,11 +49,11 @@ public class BookMapper extends AbstractKeyMapper<Book> {
 
     @Override
     protected Connection getConnection() {
-        return connection;
+        return connectionCreator.apply(null);
     }
 
     @Override
-    protected void releaseConnection() {
+    protected void releaseConnection(Connection connection) {
         try {
             connection.close();
         } catch (SQLException e) {
