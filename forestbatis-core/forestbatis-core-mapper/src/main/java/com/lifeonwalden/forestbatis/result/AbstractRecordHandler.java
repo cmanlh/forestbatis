@@ -17,7 +17,11 @@ public abstract class AbstractRecordHandler<T> implements RecordHandler<T> {
         T t = newBeanInstance();
         AbstractDTOMapBean bean = (AbstractDTOMapBean) t;
         try {
+            String propertyName;
+            int index;
             for (ColumnInfo columnInfo : columnInfoList) {
+                propertyName = columnInfo.getPropertyName();
+                index = columnInfo.getIndex();
                 switch (columnInfo.getJdbcType()) {
                     case VARCHAR:
                     case NVARCHAR:
@@ -27,32 +31,28 @@ public abstract class AbstractRecordHandler<T> implements RecordHandler<T> {
                     case LONGTEXT:
                     case CHAR:
                     case NCHAR:
-                        bean.put(columnInfo.getPropertyName(), resultSet.getString(columnInfo.getIndex()));
+                        bean.put(propertyName, resultSet.getString(index));
                         break;
                     case INTEGER:
                     case INT: {
-                        Object value = resultSet.getObject(columnInfo.getIndex());
-                        if (null == value) {
-                            bean.put(columnInfo.getPropertyName(), null);
-                        } else {
-                            bean.put(columnInfo.getPropertyName(), value);
+                        int value = resultSet.getInt(index);
+                        if (!resultSet.wasNull()) {
+                            bean.put(propertyName, value);
                         }
                         break;
                     }
                     case DECIMAL:
-                        bean.put(columnInfo.getPropertyName(), resultSet.getBigDecimal(columnInfo.getIndex()));
+                        bean.put(propertyName, resultSet.getBigDecimal(index));
                         break;
                     case DATE:
                     case TIMESTAMP:
                     case DATETIME:
-                        bean.put(columnInfo.getPropertyName(), resultSet.getDate(columnInfo.getIndex()));
+                        bean.put(propertyName, resultSet.getDate(index));
                         break;
                     case BIGINT: {
-                        Object value = resultSet.getObject(columnInfo.getIndex());
-                        if (null == value) {
-                            bean.put(columnInfo.getPropertyName(), null);
-                        } else {
-                            bean.put(columnInfo.getPropertyName(), value);
+                        long value = resultSet.getLong(index);
+                        if (!resultSet.wasNull()) {
+                            bean.put(propertyName, value);
                         }
                         break;
                     }
