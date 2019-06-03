@@ -27,8 +27,6 @@ import java.util.Optional;
 public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     private static Logger logger = LoggerFactory.getLogger(AbstractCommonMapper.class);
 
-    private final int FETCH_SIZE = 2048;
-
     protected abstract Config getConfig();
 
     protected abstract Connection getConnection();
@@ -58,7 +56,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
     @Override
     public void select(T param, StreamResultSetCallback<T> streamResultSetCallback) {
-        select(param, getBaseSelectBuilder(), getBaseRecordHandler(), streamResultSetCallback, FETCH_SIZE);
+        select(param, getBaseSelectBuilder(), getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
     }
 
     @Override
@@ -73,7 +71,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
     @Override
     public void select(T param, SelectBuilder<T> selectBuilder, StreamResultSetCallback<T> streamResultSetCallback) {
-        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, FETCH_SIZE);
+        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
     }
 
     @Override
@@ -88,7 +86,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
     @Override
     public void select(T param, RecordHandler<T> recordHandler, StreamResultSetCallback<T> streamResultSetCallback) {
-        select(param, getBaseSelectBuilder(), recordHandler, streamResultSetCallback, FETCH_SIZE);
+        select(param, getBaseSelectBuilder(), recordHandler, streamResultSetCallback, getConfig().getFetchSize());
     }
 
     @Override
@@ -139,7 +137,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
     @Override
     public void select(T param, SelectBuilder<T> selectBuilder, RecordHandler<T> recordHandler, StreamResultSetCallback<T> streamResultSetCallback) {
-        select(param, selectBuilder, recordHandler, streamResultSetCallback, FETCH_SIZE);
+        select(param, selectBuilder, recordHandler, streamResultSetCallback, getConfig().getFetchSize());
     }
 
     @Override
@@ -171,7 +169,9 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
             }
 
             while (rs.next()) {
-                streamResultSetCallback.process(recordHandler.convert(rs, columnInfoList));
+                if (!streamResultSetCallback.process(recordHandler.convert(rs, columnInfoList))) {
+                    break;
+                }
             }
         } catch (SQLException e) {
             releaseConnection(connection);

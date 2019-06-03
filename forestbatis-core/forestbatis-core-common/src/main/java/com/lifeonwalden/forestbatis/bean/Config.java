@@ -18,6 +18,8 @@ public class Config {
 
     private String sensitiveSign = "\"";
 
+    private int fetchSize = 2048;
+
     public boolean isWithSchema() {
         return withSchema;
     }
@@ -55,6 +57,15 @@ public class Config {
     public Config setCaseSensitive(boolean caseSensitive) {
         this.caseSensitive = caseSensitive;
 
+        return this;
+    }
+
+    public int getFetchSize() {
+        return fetchSize;
+    }
+
+    public Config setFetchSize(int fetchSize) {
+        this.fetchSize = fetchSize;
         return this;
     }
 }
