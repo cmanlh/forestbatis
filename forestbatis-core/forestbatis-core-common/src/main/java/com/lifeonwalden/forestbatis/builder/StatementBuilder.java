@@ -1,4 +1,4 @@
-package com.lifeonwalden.forestbatis.sql;
+package com.lifeonwalden.forestbatis.builder;
 
 import com.lifeonwalden.forestbatis.bean.StatementInfo;
 

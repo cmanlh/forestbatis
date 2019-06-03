@@ -44,24 +44,24 @@ public class BookBuilder {
         columnList.add(PublishTime);
     }
 
-    public final static QueryNode<Book> FULL_WITHOUT_NULL_QUERY =
+    public final static QueryNode<Book> FULL_COLUMN_WITHOUT_NULL_QUERY =
             new Eq<Book>(Name, user -> user.isPresent() && null != user.get().getName())
                     .and(new Eq<Book>(Publisher, user -> user.isPresent() && null != user.get().getPublisher()))
                     .and(new Eq<Book>(PublishTime, user -> user.isPresent() && null != user.get().getPublishTime()));
 
-    public final static SelectBuilder SELECT = new SelectBuilder<Book>(
+    public final static SelectBuilder FULL_SELECT = new SelectBuilder<Book>(
             new TableNode(TABLE),
             DBConfig.config,
-            TABLE.getColumn().get(),
-            FULL_WITHOUT_NULL_QUERY
+            TABLE.getColumn().get()
     );
+    public final static SelectBuilder SELECT = FULL_SELECT.overrideQuery(FULL_COLUMN_WITHOUT_NULL_QUERY);
 
-    public final static SelectBuilder GET = SELECT.overrideQuery(new Eq(Id));
+    public final static SelectBuilder GET = FULL_SELECT.overrideQuery(new Eq(Id));
 
     public final static DeleteBuilder REMOVE = new DeleteBuilder<Book>(
             new TableNode(TABLE),
             DBConfig.config,
-            FULL_WITHOUT_NULL_QUERY
+            FULL_COLUMN_WITHOUT_NULL_QUERY
     );
 
     public final static DeleteBuilder DELETE = REMOVE.overrideQuery(new Eq(Id));
@@ -70,7 +70,7 @@ public class BookBuilder {
             new TableNode(TABLE),
             DBConfig.config,
             TABLE.getColumn().get(),
-            FULL_WITHOUT_NULL_QUERY
+            FULL_COLUMN_WITHOUT_NULL_QUERY
     ).excludeUpdateColumn(Arrays.asList(Id));
 
     public final static UpdateBuilder UPDATE = UPDATE_QUERY.overrideQuery(new Eq(Id));

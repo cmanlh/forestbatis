@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * 插入语句构建器
  */
-public class InsertBuilder<T> implements com.lifeonwalden.forestbatis.sql.InsertBuilder<T> {
+public class InsertBuilder<T> implements InsertSqlBuilder<T> {
     protected List<ColumnMeta> toInsertColumnList;
     private TableNode tableNode;
     // 是否将null字段插入数据库

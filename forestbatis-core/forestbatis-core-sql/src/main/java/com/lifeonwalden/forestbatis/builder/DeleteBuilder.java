@@ -12,7 +12,7 @@ import com.lifeonwalden.forestbatis.parsing.PropertyParser;
 /**
  * 删除语句构建器
  */
-public class DeleteBuilder<T> implements com.lifeonwalden.forestbatis.sql.DeleteBuilder<T> {
+public class DeleteBuilder<T> implements DeleteSqlBuilder<T> {
     private QueryNode queryNode;
     private TableNode tableNode;
     private boolean runtimeChangeable;

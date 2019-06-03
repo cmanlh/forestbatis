@@ -3,16 +3,22 @@ package com.lifeonwalden.forestbatis.mapper;
 import com.lifeonwalden.forestbatis.bean.ColumnInfo;
 import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.bean.StatementInfo;
+import com.lifeonwalden.forestbatis.builder.DeleteBuilder;
+import com.lifeonwalden.forestbatis.builder.InsertBuilder;
+import com.lifeonwalden.forestbatis.builder.SelectBuilder;
+import com.lifeonwalden.forestbatis.builder.UpdateBuilder;
 import com.lifeonwalden.forestbatis.exception.DataAccessException;
+import com.lifeonwalden.forestbatis.meta.ColumnMeta;
+import com.lifeonwalden.forestbatis.meta.OrderBy;
 import com.lifeonwalden.forestbatis.meta.TableMeta;
 import com.lifeonwalden.forestbatis.result.ParameterHandler;
 import com.lifeonwalden.forestbatis.result.RecordHandler;
 import com.lifeonwalden.forestbatis.result.ReturnColumnHanlder;
 import com.lifeonwalden.forestbatis.result.StreamResultSetCallback;
-import com.lifeonwalden.forestbatis.sql.DeleteBuilder;
-import com.lifeonwalden.forestbatis.sql.InsertBuilder;
-import com.lifeonwalden.forestbatis.sql.SelectBuilder;
-import com.lifeonwalden.forestbatis.sql.UpdateBuilder;
+import com.lifeonwalden.forestbatis.builder.DeleteSqlBuilder;
+import com.lifeonwalden.forestbatis.builder.InsertSqlBuilder;
+import com.lifeonwalden.forestbatis.builder.SelectSqlBuilder;
+import com.lifeonwalden.forestbatis.builder.UpdateSqlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +27,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +46,8 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
     protected abstract UpdateBuilder<T> getBaseUpdateBuilder();
 
+    protected abstract SelectBuilder<T> getFullSelectBuilder();
+
     protected abstract SelectBuilder<T> getBaseSelectBuilder();
 
     protected abstract RecordHandler<T> getBaseRecordHandler();
@@ -48,6 +57,41 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     protected abstract ReturnColumnHanlder getReturnColumnHandler();
 
     protected abstract TableMeta getTable();
+
+    @Override
+    public List<T> selectAll() {
+        return select(null, getFullSelectBuilder(), getBaseRecordHandler());
+    }
+
+    @Override
+    public List<T> selectAll(ColumnMeta... excludeReturnColumnList) {
+        if (null != excludeReturnColumnList && excludeReturnColumnList.length > 0) {
+
+            return select(null, getFullSelectBuilder().excludeReturnColumn(Arrays.asList(excludeReturnColumnList)), getBaseRecordHandler());
+        } else {
+            throw new RuntimeException("Invalid parameter. The exclude return column list should not be empty.");
+        }
+    }
+
+    @Override
+    public List<T> selectAll(OrderBy... orderByList) {
+        if (null != orderByList && orderByList.length > 0) {
+
+            return select(null, getFullSelectBuilder().overrideOrder(Arrays.asList(orderByList)), getBaseRecordHandler());
+        } else {
+            throw new RuntimeException("Invalid parameter. The order by list should not be empty.");
+        }
+    }
+
+    @Override
+    public void selectAll(StreamResultSetCallback<T> streamResultSetCallback) {
+
+    }
+
+    @Override
+    public void selectAll(StreamResultSetCallback<T> streamResultSetCallback, int fetchSize) {
+
+    }
 
     @Override
     public List<T> select(T param) {
@@ -65,18 +109,18 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     }
 
     @Override
-    public List<T> select(T param, SelectBuilder<T> selectBuilder) {
-        return select(param, selectBuilder, getBaseRecordHandler());
+    public List<T> select(T param, SelectSqlBuilder<T> selectSqlBuilder) {
+        return select(param, selectSqlBuilder, getBaseRecordHandler());
     }
 
     @Override
-    public void select(T param, SelectBuilder<T> selectBuilder, StreamResultSetCallback<T> streamResultSetCallback) {
-        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
+    public void select(T param, SelectSqlBuilder<T> selectSqlBuilder, StreamResultSetCallback<T> streamResultSetCallback) {
+        select(param, selectSqlBuilder, getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
     }
 
     @Override
-    public void select(T param, SelectBuilder<T> selectBuilder, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize) {
-        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, fetchSize);
+    public void select(T param, SelectSqlBuilder<T> selectSqlBuilder, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize) {
+        select(param, selectSqlBuilder, getBaseRecordHandler(), streamResultSetCallback, fetchSize);
     }
 
     @Override
@@ -95,9 +139,9 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     }
 
     @Override
-    public List<T> select(T param, SelectBuilder<T> selectBuilder, RecordHandler<T> recordHandler) {
+    public List<T> select(T param, SelectSqlBuilder<T> selectSqlBuilder, RecordHandler<T> recordHandler) {
         Connection connection = getConnection();
-        StatementInfo statementInfo = selectBuilder.build(param);
+        StatementInfo statementInfo = selectSqlBuilder.build(param);
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
@@ -109,7 +153,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
             ResultSet rs = preparedStatement.executeQuery();
 
             List<ColumnInfo> columnInfoList;
-            if (!selectBuilder.isRuntimeChangeable()) {
+            if (!selectSqlBuilder.isRuntimeChangeable()) {
                 Optional<List<ColumnInfo>> _columnInfoSet = statementInfo.getReturnColumns();
                 if (_columnInfoSet.isPresent()) {
                     columnInfoList = _columnInfoSet.get();
@@ -136,14 +180,14 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     }
 
     @Override
-    public void select(T param, SelectBuilder<T> selectBuilder, RecordHandler<T> recordHandler, StreamResultSetCallback<T> streamResultSetCallback) {
-        select(param, selectBuilder, recordHandler, streamResultSetCallback, getConfig().getFetchSize());
+    public void select(T param, SelectSqlBuilder<T> selectSqlBuilder, RecordHandler<T> recordHandler, StreamResultSetCallback<T> streamResultSetCallback) {
+        select(param, selectSqlBuilder, recordHandler, streamResultSetCallback, getConfig().getFetchSize());
     }
 
     @Override
-    public void select(T param, SelectBuilder<T> selectBuilder, RecordHandler<T> recordHandler, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize) {
+    public void select(T param, SelectSqlBuilder<T> selectSqlBuilder, RecordHandler<T> recordHandler, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize) {
         Connection connection = getConnection();
-        StatementInfo statementInfo = selectBuilder.build(param);
+        StatementInfo statementInfo = selectSqlBuilder.build(param);
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             preparedStatement.setFetchSize(fetchSize);
@@ -156,7 +200,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
             ResultSet rs = preparedStatement.executeQuery();
 
             List<ColumnInfo> columnInfoList;
-            if (!selectBuilder.isRuntimeChangeable()) {
+            if (!selectSqlBuilder.isRuntimeChangeable()) {
                 Optional<List<ColumnInfo>> _columnInfoList = statementInfo.getReturnColumns();
                 if (_columnInfoList.isPresent()) {
                     columnInfoList = _columnInfoList.get();
@@ -187,9 +231,9 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     }
 
     @Override
-    public Integer updateWithQuery(T value, UpdateBuilder<T> updateBuilder) {
+    public Integer updateWithQuery(T value, UpdateSqlBuilder<T> updateSqlBuilder) {
         Connection connection = getConnection();
-        StatementInfo statementInfo = updateBuilder.build(value);
+        StatementInfo statementInfo = updateSqlBuilder.build(value);
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
@@ -208,19 +252,14 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     }
 
     @Override
-    public int[] updateWithQuery(List<T> valueList) {
-        return updateWithQuery(valueList, getBaseUpdateBuilder());
-    }
-
-    @Override
-    public int[] updateWithQuery(List<T> valueList, UpdateBuilder<T> updateBuilder) {
-        if (updateBuilder.isRuntimeChangeable()) {
+    public int[] updateWithQuery(List<T> valueList, UpdateSqlBuilder<T> updateSqlBuilder) {
+        if (updateSqlBuilder.isRuntimeChangeable()) {
             throw new RuntimeException("Please use static builder for batch operation");
         }
 
         Connection connection = getConnection();
         try {
-            StatementInfo statementInfo = updateBuilder.build();
+            StatementInfo statementInfo = updateSqlBuilder.build();
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
                 for (T value : valueList) {
@@ -246,9 +285,9 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     }
 
     @Override
-    public Integer deleteWithQuery(T param, DeleteBuilder<T> deleteBuilder) {
+    public Integer deleteWithQuery(T param, DeleteSqlBuilder<T> deleteSqlBuilder) {
         Connection connection = getConnection();
-        StatementInfo statementInfo = deleteBuilder.build(param);
+        StatementInfo statementInfo = deleteSqlBuilder.build(param);
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
@@ -267,18 +306,13 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     }
 
     @Override
-    public int[] deleteWithQuery(List<T> paramList) {
-        return deleteWithQuery(paramList, getBaseDeleteBuilder());
-    }
-
-    @Override
-    public int[] deleteWithQuery(List<T> paramList, DeleteBuilder<T> deleteBuilder) {
-        if (deleteBuilder.isRuntimeChangeable()) {
+    public int[] deleteWithQuery(List<T> paramList, DeleteSqlBuilder<T> deleteSqlBuilder) {
+        if (deleteSqlBuilder.isRuntimeChangeable()) {
             throw new RuntimeException("Please use static builder for batch operation");
         }
 
         Connection connection = getConnection();
-        StatementInfo statementInfo = deleteBuilder.build();
+        StatementInfo statementInfo = deleteSqlBuilder.build();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
@@ -305,9 +339,9 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     }
 
     @Override
-    public Integer insert(T value, InsertBuilder<T> insertBuilder) {
+    public Integer insert(T value, InsertSqlBuilder<T> insertSqlBuilder) {
         Connection connection = getConnection();
-        StatementInfo statementInfo = insertBuilder.build(value);
+        StatementInfo statementInfo = insertSqlBuilder.build(value);
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
@@ -331,13 +365,13 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     }
 
     @Override
-    public int[] insert(List<T> valueList, InsertBuilder<T> insertBuilder) {
-        if (insertBuilder.isRuntimeChangeable()) {
+    public int[] insert(List<T> valueList, InsertSqlBuilder<T> insertSqlBuilder) {
+        if (insertSqlBuilder.isRuntimeChangeable()) {
             throw new RuntimeException("Please use static builder for batch operation");
         }
 
         Connection connection = getConnection();
-        StatementInfo statementInfo = insertBuilder.build();
+        StatementInfo statementInfo = insertSqlBuilder.build();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {

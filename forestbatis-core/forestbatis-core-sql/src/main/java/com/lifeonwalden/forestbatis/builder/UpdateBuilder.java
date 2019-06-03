@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * 更新语句构建器
  */
-public class UpdateBuilder<T> implements com.lifeonwalden.forestbatis.sql.UpdateBuilder<T> {
+public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
     protected List<ColumnMeta> toUpdateColumnList;
     private TableNode tableNode;
     private Config config;

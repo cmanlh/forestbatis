@@ -49,25 +49,26 @@ public class UserBuilder {
         columnList.add(Sex);
     }
 
-    public final static QueryNode<User> FULL_WITHOUT_NULL_QUERY =
+    public final static QueryNode<User> FULL_COLUMN_WITHOUT_NULL_QUERY =
             new Eq<User>(Age, user -> user.isPresent() && null != user.get().getAge())
                     .and(new Eq<User>(Birthday, user -> user.isPresent() && null != user.get().getBirthday()))
                     .and(new Eq<User>(Income, user -> user.isPresent() && null != user.get().getIncome()))
                     .and(new Eq<User>(Sex, user -> user.isPresent() && null != user.get().getSex()));
 
-    public final static SelectBuilder SELECT = new SelectBuilder<User>(
+    public final static SelectBuilder FULL_SELECT = new SelectBuilder<User>(
             new TableNode(TABLE),
             DBConfig.config,
-            TABLE.getColumn().get(),
-            FULL_WITHOUT_NULL_QUERY
+            TABLE.getColumn().get()
     );
 
-    public final static SelectBuilder GET = SELECT.overrideQuery(new Eq(Id));
+    public final static SelectBuilder SELECT = FULL_SELECT.overrideQuery(FULL_COLUMN_WITHOUT_NULL_QUERY);
+
+    public final static SelectBuilder GET = FULL_SELECT.overrideQuery(new Eq(Id));
 
     public final static DeleteBuilder REMOVE = new DeleteBuilder<User>(
             new TableNode(TABLE),
             DBConfig.config,
-            FULL_WITHOUT_NULL_QUERY
+            FULL_COLUMN_WITHOUT_NULL_QUERY
     );
 
     public final static DeleteBuilder DELETE = REMOVE.overrideQuery(new Eq(Id));
@@ -76,7 +77,7 @@ public class UserBuilder {
             new TableNode(TABLE),
             DBConfig.config,
             TABLE.getColumn().get(),
-            FULL_WITHOUT_NULL_QUERY
+            FULL_COLUMN_WITHOUT_NULL_QUERY
     ).excludeUpdateColumn(Arrays.asList(Id));
 
     public final static UpdateBuilder UPDATE_QUERY_WITHOUT_NULL = UPDATE_QUERY.overrideUpdateColumn(false);

@@ -5,10 +5,7 @@ import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
 import com.lifeonwalden.forestbatis.constant.SqlCommandType;
-import com.lifeonwalden.forestbatis.meta.ColumnMeta;
-import com.lifeonwalden.forestbatis.meta.Order;
-import com.lifeonwalden.forestbatis.meta.QueryNode;
-import com.lifeonwalden.forestbatis.meta.TableNode;
+import com.lifeonwalden.forestbatis.meta.*;
 import com.lifeonwalden.forestbatis.parsing.PropertyParser;
 
 import java.util.ArrayList;
@@ -17,12 +14,12 @@ import java.util.List;
 /**
  * 查询语句构建器
  */
-public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.SelectBuilder<T> {
+public class SelectBuilder<T> implements SelectSqlBuilder<T> {
     protected List<ColumnMeta> toReturnColumnList;
     private QueryNode queryNode;
     private Config config;
     private TableNode tableNode;
-    private List<Order> orderList;
+    private List<? extends OrderBy> orderList;
     private boolean runtimeChangeable;
 
     private volatile StatementInfo cachedStatement;
@@ -35,11 +32,11 @@ public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.Select
         this(tableNode, config, toReturnColumnList, queryNode, null);
     }
 
-    public SelectBuilder(TableNode tableNode, Config config, List<ColumnMeta> toReturnColumnList, List<Order> orderList) {
+    public SelectBuilder(TableNode tableNode, Config config, List<ColumnMeta> toReturnColumnList, List<? extends OrderBy> orderList) {
         this(tableNode, config, toReturnColumnList, null, orderList);
     }
 
-    public SelectBuilder(TableNode tableNode, Config config, List<ColumnMeta> toReturnColumnList, QueryNode queryNode, List<Order> orderList) {
+    public SelectBuilder(TableNode tableNode, Config config, List<ColumnMeta> toReturnColumnList, QueryNode queryNode, List<? extends OrderBy> orderList) {
         this.tableNode = tableNode;
         this.config = config;
         this.toReturnColumnList = toReturnColumnList;
@@ -98,7 +95,7 @@ public class SelectBuilder<T> implements com.lifeonwalden.forestbatis.sql.Select
      * @param orderList
      * @return
      */
-    public SelectBuilder overrideOrder(List<Order> orderList) {
+    public SelectBuilder overrideOrder(List<? extends OrderBy> orderList) {
         return new SelectBuilder<T>(this.tableNode, this.config, this.toReturnColumnList, this.queryNode, orderList);
     }
 

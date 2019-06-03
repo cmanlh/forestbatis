@@ -2,14 +2,15 @@ package com.lifeonwalden.forestbatis.example.mapper;
 
 import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.builder.DeleteBuilder;
+import com.lifeonwalden.forestbatis.builder.InsertBuilder;
 import com.lifeonwalden.forestbatis.builder.SelectBuilder;
 import com.lifeonwalden.forestbatis.builder.UpdateBuilder;
 import com.lifeonwalden.forestbatis.example.bean.User_Book_Record;
 import com.lifeonwalden.forestbatis.example.builder.BookBuilder;
+import com.lifeonwalden.forestbatis.example.builder.UserBuilder;
 import com.lifeonwalden.forestbatis.mapper.AbstractCommonMapper;
 import com.lifeonwalden.forestbatis.meta.TableMeta;
 import com.lifeonwalden.forestbatis.result.*;
-import com.lifeonwalden.forestbatis.sql.InsertBuilder;
 import com.lifeonwalden.forestbatis.util.SingletonParameterHandlerFactory;
 import com.lifeonwalden.forestbatis.util.SingletonRecordHandlerFactory;
 import com.lifeonwalden.forestbatis.util.SingletonReturnColumnHandlerFactory;
@@ -44,6 +45,11 @@ public class User_Book_RecordMapper extends AbstractCommonMapper<User_Book_Recor
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected SelectBuilder<User_Book_Record> getFullSelectBuilder() {
+        return UserBuilder.FULL_SELECT;
     }
 
     @Override

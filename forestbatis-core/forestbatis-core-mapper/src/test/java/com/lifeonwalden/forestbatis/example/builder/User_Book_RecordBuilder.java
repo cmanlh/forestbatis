@@ -11,7 +11,6 @@ import com.lifeonwalden.forestbatis.example.meta.User_Book_RecordMetaInfo;
 import com.lifeonwalden.forestbatis.meta.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class User_Book_RecordBuilder {
@@ -44,30 +43,30 @@ public class User_Book_RecordBuilder {
         columnList.add(ReturnDate);
     }
 
-    public final static QueryNode<User_Book_Record> FULL_WITHOUT_NULL_QUERY =
+    public final static QueryNode<User_Book_Record> FULL_COLUMN_WITHOUT_NULL_QUERY =
             new Eq<User_Book_Record>(USER_ID, userBookRecord -> userBookRecord.isPresent() && null != userBookRecord.get().getUSER_ID())
                     .and(new Eq<User_Book_Record>(Book_id, userBookRecord -> userBookRecord.isPresent() && null != userBookRecord.get().getBook_id()))
                     .and(new Eq<User_Book_Record>(BorrowDate, userBookRecord -> userBookRecord.isPresent() && null != userBookRecord.get().getBorrowDate()))
                     .and(new Eq<User_Book_Record>(ReturnDate, userBookRecord -> userBookRecord.isPresent() && null != userBookRecord.get().getReturnDate()));
 
-    public final static SelectBuilder SELECT = new SelectBuilder<User_Book_Record>(
+    public final static SelectBuilder FULL_SELECT = new SelectBuilder<User_Book_Record>(
             new TableNode(TABLE),
             DBConfig.config,
-            TABLE.getColumn().get(),
-            FULL_WITHOUT_NULL_QUERY
+            TABLE.getColumn().get()
     );
+    public final static SelectBuilder SELECT = FULL_SELECT.overrideQuery(FULL_COLUMN_WITHOUT_NULL_QUERY);
 
     public final static DeleteBuilder REMOVE = new DeleteBuilder<User_Book_Record>(
             new TableNode(TABLE),
             DBConfig.config,
-            FULL_WITHOUT_NULL_QUERY
+            FULL_COLUMN_WITHOUT_NULL_QUERY
     );
 
     public final static UpdateBuilder UPDATE_QUERY = new UpdateBuilder<User_Book_Record>(
             new TableNode(TABLE),
             DBConfig.config,
             TABLE.getColumn().get(),
-            FULL_WITHOUT_NULL_QUERY
+            FULL_COLUMN_WITHOUT_NULL_QUERY
     );
 
     public final static UpdateBuilder UPDATE_QUERY_WITHOUT_NULL = UPDATE_QUERY.overrideUpdateColumn(false);

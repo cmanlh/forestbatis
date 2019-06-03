@@ -6,7 +6,7 @@ import com.lifeonwalden.forestbatis.constant.OrderEnum;
 /**
  * order by 节点
  */
-public class Order implements SqlNode {
+public class Order implements OrderBy {
 
     // 排序的列
     private ColumnMeta column;

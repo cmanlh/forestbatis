@@ -20,7 +20,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      * 基于主键查询，返回excludeReturnColumnList之外的字段
      *
      * @param param                   查询条件
-     * @param excludeReturnColumnList SQL生成
+     * @param excludeReturnColumnList 要排除的字段
      * @return
      */
     Optional<P> get(P param, List<ColumnMeta> excludeReturnColumnList);
