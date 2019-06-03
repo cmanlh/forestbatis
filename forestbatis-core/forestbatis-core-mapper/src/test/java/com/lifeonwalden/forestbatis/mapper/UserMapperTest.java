@@ -1,5 +1,6 @@
 package com.lifeonwalden.forestbatis.mapper;
 
+import com.lifeonwalden.forestbatis.bean.ColumnInfo;
 import com.lifeonwalden.forestbatis.builder.SelectBuilder;
 import com.lifeonwalden.forestbatis.constant.OrderEnum;
 import com.lifeonwalden.forestbatis.example.DBConfig;
@@ -28,10 +29,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class UserMapperTest {
     protected static final String CONNECTION_STRING = "jdbc:hsqldb:mem:testdb;shutdown=false";
@@ -39,7 +37,7 @@ public class UserMapperTest {
     protected static final String PASSWORD = "";
 
     @Before
-    public void setup() throws SQLException, IOException, ClassNotFoundException {
+    public void setup() throws SQLException, IOException {
         importSql("/setup.sql");
     }
 
@@ -489,6 +487,112 @@ public class UserMapperTest {
         userMapper.delete(Arrays.asList(new User().setId("Tom"), new User().setId("Lucy")));
         List<User> userList = userMapper.select(new User());
         Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+    }
+
+    @Test
+    public void select_stream() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.select(new User(), user -> {
+            userList.add(user);
+            return true;
+        });
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+    }
+
+    @Test
+    public void select_stream_with_break() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.select(new User(), UserBuilder.SELECT.overrideOrder(Arrays.asList(new Order(UserBuilder.Age))),
+                user -> {
+                    if (user.getAge() > 25) {
+                        return false;
+                    }
+                    if (null != user.getIncome()) {
+                        userList.add(user);
+                    }
+                    return true;
+                });
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+    }
+
+    @Test
+    public void select_stream_with_fetchSize() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.select(new User(), user -> {
+            userList.add(user);
+            return true;
+        }, 2);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+    }
+
+    @Test
+    public void select_stream_with_break_fetchSize() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.select(new User(), UserBuilder.SELECT.overrideOrder(Arrays.asList(new Order(UserBuilder.Age))),
+                user -> {
+                    if (user.getAge() > 25) {
+                        return false;
+                    }
+                    if (null != user.getIncome()) {
+                        userList.add(user);
+                    }
+                    return true;
+                }, 2);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+    }
+
+    @Test
+    public void select_recordHandler() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.select(new User(), (rs, columnList) -> {
+            User user = new User();
+            try {
+                for (ColumnInfo columnInfo : columnList) {
+                    int index = columnInfo.getIndex();
+                    switch (columnInfo.getPropertyName()) {
+                        case "age":
+                            int age = rs.getInt(index);
+                            if (!rs.wasNull()) {
+                                user.setAge(age);
+                            }
+                            break;
+                        case "income":
+                            user.setIncome(rs.getBigDecimal(index));
+                            break;
+                        case "id":
+                            user.setId(rs.getString(index));
+                            break;
+                        case "birthday":
+                            user.setBirthday(rs.getDate(index));
+                            break;
+                        case "sex":
+                            int sex = rs.getInt(index);
+                            if (!rs.wasNull()) {
+                                user.setSex(sex);
+                            }
+                            break;
+                        default:
+                            break;
+
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            return user;
+
+        });
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
     }
 
     private void reset() {

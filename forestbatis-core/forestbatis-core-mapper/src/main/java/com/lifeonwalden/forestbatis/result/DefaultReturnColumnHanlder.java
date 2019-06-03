@@ -2,8 +2,7 @@ package com.lifeonwalden.forestbatis.result;
 
 import com.lifeonwalden.forestbatis.bean.ColumnInfo;
 import com.lifeonwalden.forestbatis.constant.JdbcType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.lifeonwalden.forestbatis.exception.DataAccessException;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultReturnColumnHanlder implements ReturnColumnHanlder {
-    private static Logger logger = LoggerFactory.getLogger(DefaultReturnColumnHanlder.class);
 
     @Override
     public List<ColumnInfo> setupReturnColumn(ResultSet rs) {
@@ -28,7 +26,7 @@ public class DefaultReturnColumnHanlder implements ReturnColumnHanlder {
                 columnInfoList.add(columnInfo);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DataAccessException("Failed to fetch meta information of result set.", e);
         }
 
         return columnInfoList;

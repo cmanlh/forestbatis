@@ -13,7 +13,7 @@ public abstract class AbstractMapBean implements Map<String, Object>, BaseBean {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractMapBean.class);
 
-    protected Map<String, Object> dataMap = new HashMap<String, Object>();
+    protected Map<String, Object> dataMap = new HashMap<>();
 
     @Override
     public int size() {

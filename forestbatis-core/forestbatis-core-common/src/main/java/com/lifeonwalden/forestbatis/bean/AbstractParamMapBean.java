@@ -16,10 +16,10 @@ public abstract class AbstractParamMapBean extends AbstractMapBean {
             return dataMap.remove(key);
         }
         Class<?> clazz = _getType(key);
-        Object _value = null;
+        Object _value;
         if (null == clazz || clazz.isInstance(value)) {
             _value = value;
-        } else if (String.class.isInstance(value)) {
+        } else if (value instanceof String) {
             if (Integer.class.equals(clazz)) {
                 _value = Integer.parseInt((String) value);
             } else if (BigDecimal.class.equals(clazz)) {
