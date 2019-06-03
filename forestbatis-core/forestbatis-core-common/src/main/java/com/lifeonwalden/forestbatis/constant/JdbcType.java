@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum JdbcType {
+
     NCHAR("NCHAR", -15, "", "java.lang.String"),
 
     NVARCHAR("NVARCHAR", -9, "", "java.lang.String"),
@@ -22,11 +23,11 @@ public enum JdbcType {
 
     LONGVARCHAR("LONGVARCHAR", -1, "", "java.lang.String"),
 
-    TEXT("TEXT", -1, "", "java.lang.String", LONGVARCHAR.name),
+    TEXT("TEXT", -1, "", "java.lang.String"),
 
-    MEDIUMTEXT("MEDIUMTEXT", -1, "", "java.lang.String", LONGVARCHAR.name),
+    MEDIUMTEXT("MEDIUMTEXT", -1, "", "java.lang.String"),
 
-    LONGTEXT("LONGTEXT", -1, "", "java.lang.String", LONGVARCHAR.name),
+    LONGTEXT("LONGTEXT", -1, "", "java.lang.String"),
 
     NULL("NULL", 0, "", "java.lang.Object"),
 
@@ -37,6 +38,8 @@ public enum JdbcType {
     DECIMAL("DECIMAL", 3, "", "java.math.BigDecimal"),
 
     INTEGER("INTEGER", 4, "", "java.lang.Integer"),
+
+    INT("INTEGER", 4, "", "java.lang.Integer"),
 
     SMALLINT("SMALLINT", 5, "", "java.lang.Short"),
 
@@ -59,8 +62,6 @@ public enum JdbcType {
     TIMESTAMP("TIMESTAMP", 93, "", "java.util.Date"),
 
     DATETIME("TIMESTAMP", 94, "", "java.util.Date"),
-
-    INT("INTEGER", 4, "", "java.lang.Integer"),
 
     OTHER("OTHER", 1111, "", "java.lang.Object"),
 
@@ -100,18 +101,12 @@ public enum JdbcType {
 
     private String javaType;
 
-    private String jdbcType;
 
     JdbcType(String name, int value, String desc, String javaType) {
-        this(name, value, desc, javaType, null);
-    }
-
-    JdbcType(String name, int value, String desc, String javaType, String jdbcType) {
         this.name = name;
         this.value = value;
         this.desc = desc;
         this.javaType = javaType;
-        this.jdbcType = jdbcType;
     }
 
     public static JdbcType valueOf(int value) {
@@ -136,13 +131,5 @@ public enum JdbcType {
 
     public String getJavaType() {
         return javaType;
-    }
-
-    public String getJdbcType() {
-        if (null == jdbcType) {
-            return this.name;
-        } else {
-            return this.jdbcType;
-        }
     }
 }

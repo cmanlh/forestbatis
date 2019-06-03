@@ -47,7 +47,7 @@ public abstract class AbstractPropertyMeta implements PropertyMeta {
             throw new RuntimeException("Has to specify JdbcType for a Property.");
         }
 
-        builder.append("#{").append(this.name).append(", JdbcType=").append(this.jdbcType.getJdbcType()).append("}");
+        builder.append("#{").append(this.name).append(", JdbcType=").append(this.jdbcType.getName()).append("}");
     }
 
     @Override
@@ -61,7 +61,7 @@ public abstract class AbstractPropertyMeta implements PropertyMeta {
         }
 
         builder.append("#{").append(this.name)
-                .append(", JdbcType=").append(this.jdbcType.getJdbcType())
+                .append(", JdbcType=").append(this.jdbcType.getName())
                 .append(", ListSize=").append(listPropertySize)
                 .append("}");
     }
