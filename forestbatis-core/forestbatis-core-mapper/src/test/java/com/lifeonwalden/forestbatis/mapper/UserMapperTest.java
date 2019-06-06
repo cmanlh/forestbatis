@@ -53,7 +53,7 @@ public class UserMapperTest {
     public void get_empty_special_column() {
         reset();
         UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
-        Optional<User> _user = userMapper.get(new User().setId("Chandler"), Arrays.asList(UserBuilder.Income));
+        Optional<User> _user = userMapper.getColumns(new User().setId("Chandler"), UserBuilder.Income);
         Assert.assertTrue(!_user.isPresent());
     }
 
@@ -75,7 +75,21 @@ public class UserMapperTest {
     public void get_with_special_column() {
         reset();
         UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
-        Optional<User> _user = userMapper.get(new User().setId("Tom"), Arrays.asList(UserBuilder.Income));
+        Optional<User> _user = userMapper.getColumns(new User().setId("Tom"), UserBuilder.Income, UserBuilder.Id);
+        User user = _user.get();
+        Assert.assertTrue("Not found Tom", _user.isPresent());
+        Assert.assertTrue("Id : ".concat(user.getId()), "Tom".equals(user.getId()));
+        Assert.assertNull("Age is not null : ".concat(String.valueOf(user.getAge())), user.getAge());
+        Assert.assertTrue("Income is : ".concat(String.valueOf(user.getIncome())), user.getIncome().compareTo(BigDecimal.valueOf(8888.88)) == 0);
+        Assert.assertNull("Birthday is not null : ".concat(String.valueOf(user.getBirthday())), user.getBirthday());
+        Assert.assertNull("Sex is not null : ".concat(String.valueOf(user.getSex())), user.getSex());
+    }
+
+    @Test
+    public void get_without_special_column() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        Optional<User> _user = userMapper.getWithoutColumns(new User().setId("Tom"), UserBuilder.Income);
         User user = _user.get();
         Assert.assertTrue("Not found Tom", _user.isPresent());
         Assert.assertTrue("Id : ".concat(user.getId()), "Tom".equals(user.getId()));
@@ -83,6 +97,144 @@ public class UserMapperTest {
         Assert.assertNull("Income is not null : ".concat(String.valueOf(user.getIncome())), user.getIncome());
         Assert.assertTrue("Birthday : ".concat(String.valueOf(user.getBirthday())), new Date("2000/12/12").getTime() == user.getBirthday().getTime());
         Assert.assertTrue("Sex : ".concat(String.valueOf(user.getSex())), 1 == user.getSex());
+    }
+
+
+    @Test
+    public void update_without_id() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.update(new User().setIncome(BigDecimal.valueOf(1111.11)));
+        List<User> userList = userMapper.select(new User().setIncome(BigDecimal.valueOf(1111.11)));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 0);
+    }
+
+    @Test
+    public void update() {
+        reset();
+        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.update(new User().setId("Tom").setIncome(newIncome));
+        User user = userMapper.get(new User().setId("Tom")).get();
+        Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
+        Assert.assertNull("Tom's age ".concat(String.valueOf(user.getAge())), user.getAge());
+    }
+
+    @Test
+    public void update_without_null() {
+        reset();
+        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.updateWithoutNull(new User().setId("Tom").setIncome(newIncome));
+        User user = userMapper.get(new User().setId("Tom")).get();
+        Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
+        Assert.assertTrue("Tom's age ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
+    }
+
+    @Test
+    public void update_with_special_column() {
+        reset();
+        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.updateColumns(new User().setId("Tom").setIncome(newIncome).setAge(32), UserBuilder.Income);
+        User user = userMapper.get(new User().setId("Tom")).get();
+        Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
+        Assert.assertTrue("Tom's age : ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
+        Assert.assertTrue("Birthday : ".concat(String.valueOf(user.getBirthday())), new Date("2000/12/12").getTime() == user.getBirthday().getTime());
+    }
+
+    @Test
+    public void update_without_special_column() {
+        reset();
+        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.updateWithoutColumns(new User().setId("Tom").setIncome(newIncome).setAge(32), UserBuilder.Age);
+        User user = userMapper.get(new User().setId("Tom")).get();
+        Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
+        Assert.assertTrue("Tom's age : ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
+        Assert.assertNull("Tom's birthday ".concat(String.valueOf(user.getAge())), user.getBirthday());
+    }
+
+    @Test
+    public void update_special_column_without_null() {
+        reset();
+        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.updateColumnsWithoutNull(new User().setId("Tom").setIncome(newIncome), UserBuilder.Age, UserBuilder.Income);
+        User user = userMapper.get(new User().setId("Tom")).get();
+        Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
+        Assert.assertTrue("Tom's age ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
+        Assert.assertTrue("Birthday : ".concat(String.valueOf(user.getBirthday())), new Date("2000/12/12").getTime() == user.getBirthday().getTime());
+    }
+
+    @Test
+    public void update_without_null_and_special_column() {
+        reset();
+        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.updateWithoutColumnsNull(new User().setId("Tom").setIncome(newIncome).setSex(2), UserBuilder.Age, UserBuilder.Sex);
+        User user = userMapper.get(new User().setId("Tom")).get();
+        Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
+        Assert.assertTrue("Tom's age ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
+        Assert.assertTrue("Tom's sex ".concat(String.valueOf(user.getSex())), user.getSex() == 1);
+        Assert.assertTrue("Birthday : ".concat(String.valueOf(user.getBirthday())), new Date("2000/12/12").getTime() == user.getBirthday().getTime());
+    }
+
+    @Test
+    public void update_batch() {
+        reset();
+        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.update(Arrays.asList(new User().setId("Tom").setIncome(newIncome), new User().setId("Jerry").setIncome(newIncome)));
+        List<User> userList = userMapper.select(new User().setIncome(newIncome));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+    }
+
+    @Test
+    public void update_batch_with_special_column() {
+        reset();
+        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.updateColumns(Arrays.asList(new User().setId("Tom").setIncome(newIncome), new User().setId("Jerry").setIncome(newIncome)), UserBuilder.Age, UserBuilder.Income);
+        List<User> userList = userMapper.select(new User().setIncome(newIncome));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(0);
+        Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
+        Assert.assertNull("Tom's age ".concat(String.valueOf(user.getAge())), user.getAge());
+        Assert.assertTrue("Birthday : ".concat(String.valueOf(user.getBirthday())), new Date("2000/12/12").getTime() == user.getBirthday().getTime());
+    }
+
+    @Test
+    public void update_batch_without_special_column() {
+        reset();
+        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.updateWithoutColumns(Arrays.asList(new User().setId("Tom").setIncome(newIncome).setSex(2), new User().setId("Jerry").setIncome(newIncome).setSex(2)), UserBuilder.Age, UserBuilder.Sex);
+        List<User> userList = userMapper.select(new User().setIncome(newIncome), new Order(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(0);
+        Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
+        Assert.assertTrue("Tom's age ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
+        Assert.assertTrue("Tom's sex ".concat(String.valueOf(user.getSex())), user.getSex() == 1);
+        Assert.assertNull("Tom's birthday ".concat(String.valueOf(user.getAge())), user.getBirthday());
+    }
+
+    @Test
+    public void delete() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.delete(new User().setId("Tom"));
+        Optional<User> _user = userMapper.get(new User().setId("Tom"));
+        Assert.assertTrue(!_user.isPresent());
+    }
+
+    @Test
+    public void delete_batch() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.delete(Arrays.asList(new User().setId("Tom"), new User().setId("Lucy")));
+        List<User> userList = userMapper.select(new User());
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
     }
 
     @Test
@@ -393,100 +545,6 @@ public class UserMapperTest {
         BookMapper bookMapper = new BookMapper(DBConfig.config, (Null) -> getConnection());
         List<Book> bookList = bookMapper.select(new Book(), BookBuilder.SELECT.overrideOrder(Arrays.asList(new Order(BookBuilder.PublishTime, OrderEnum.DESC))));
         Assert.assertTrue("The first is : ".concat(bookList.get(0).getName()), "Mao".equals(bookList.get(0).getName()));
-    }
-
-    @Test
-    public void update_without_id() {
-        reset();
-        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
-        userMapper.update(new User().setIncome(BigDecimal.valueOf(1111.11)));
-        List<User> userList = userMapper.select(new User().setIncome(BigDecimal.valueOf(1111.11)));
-        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 0);
-    }
-
-    @Test
-    public void update() {
-        reset();
-        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
-        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
-        userMapper.update(new User().setId("Tom").setIncome(newIncome));
-        User user = userMapper.get(new User().setId("Tom")).get();
-        Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
-        Assert.assertNull("Tom's age ".concat(String.valueOf(user.getAge())), user.getAge());
-    }
-
-    @Test
-    public void update_with_special_column() {
-        reset();
-        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
-        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
-        userMapper.update(new User().setId("Tom").setIncome(newIncome).setAge(32), Arrays.asList(UserBuilder.Income));
-        User user = userMapper.get(new User().setId("Tom")).get();
-        Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
-        Assert.assertTrue("Tom's age : ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
-    }
-
-    @Test
-    public void update_without_null() {
-        reset();
-        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
-        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
-        userMapper.updateWithoutNull(new User().setId("Tom").setIncome(newIncome));
-        User user = userMapper.get(new User().setId("Tom")).get();
-        Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
-        Assert.assertTrue("Tom's age ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
-    }
-
-    @Test
-    public void update_without_null_and_special_column() {
-        reset();
-        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
-        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
-        userMapper.updateWithoutNull(new User().setId("Tom").setIncome(newIncome), Arrays.asList(UserBuilder.Age, UserBuilder.Income));
-        User user = userMapper.get(new User().setId("Tom")).get();
-        Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
-        Assert.assertTrue("Tom's age ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
-    }
-
-    @Test
-    public void update_batch() {
-        reset();
-        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
-        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
-        userMapper.update(Arrays.asList(new User().setId("Tom").setIncome(newIncome), new User().setId("Jerry").setIncome(newIncome)));
-        List<User> userList = userMapper.select(new User().setIncome(newIncome));
-        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
-    }
-
-    @Test
-    public void update_batch_and_special_column() {
-        reset();
-        BigDecimal newIncome = BigDecimal.valueOf(1111.11);
-        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
-        userMapper.update(Arrays.asList(new User().setId("Tom").setIncome(newIncome), new User().setId("Jerry").setIncome(newIncome)), Arrays.asList(UserBuilder.Age, UserBuilder.Income));
-        List<User> userList = userMapper.select(new User().setIncome(newIncome));
-        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
-        User user = userList.get(0);
-        Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
-        Assert.assertNull("Tom's age ".concat(String.valueOf(user.getAge())), user.getAge());
-    }
-
-    @Test
-    public void delete() {
-        reset();
-        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
-        userMapper.delete(new User().setId("Tom"));
-        Optional<User> _user = userMapper.get(new User().setId("Tom"));
-        Assert.assertTrue(!_user.isPresent());
-    }
-
-    @Test
-    public void delete_batch() {
-        reset();
-        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
-        userMapper.delete(Arrays.asList(new User().setId("Tom"), new User().setId("Lucy")));
-        List<User> userList = userMapper.select(new User());
-        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
     }
 
     @Test

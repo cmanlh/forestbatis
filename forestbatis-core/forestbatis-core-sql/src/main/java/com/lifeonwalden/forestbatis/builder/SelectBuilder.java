@@ -5,7 +5,10 @@ import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
 import com.lifeonwalden.forestbatis.constant.SqlCommandType;
-import com.lifeonwalden.forestbatis.meta.*;
+import com.lifeonwalden.forestbatis.meta.ColumnMeta;
+import com.lifeonwalden.forestbatis.meta.OrderBy;
+import com.lifeonwalden.forestbatis.meta.QueryNode;
+import com.lifeonwalden.forestbatis.meta.TableNode;
 import com.lifeonwalden.forestbatis.parsing.PropertyParser;
 
 import java.util.ArrayList;
@@ -116,7 +119,7 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
         }
 
         StringBuilder builder = new StringBuilder();
-        boolean withAlias = this.tableNode.isJoined() || this.queryNode.isJoined();
+        boolean withAlias = this.tableNode.isJoined() || null != this.queryNode ? this.queryNode.isJoined() : true;
 
         SqlCommandType.SELECT.toSql(builder, config, withAlias);
         builder.append(" ");

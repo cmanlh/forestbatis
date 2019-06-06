@@ -80,8 +80,6 @@ public class UserBuilder {
             FULL_COLUMN_WITHOUT_NULL_QUERY
     ).excludeUpdateColumn(Arrays.asList(Id));
 
-    public final static UpdateBuilder UPDATE_QUERY_WITHOUT_NULL = UPDATE_QUERY.overrideUpdateColumn(false);
-
     public final static UpdateBuilder UPDATE = UPDATE_QUERY.overrideQuery(new Eq(Id));
 
     public final static UpdateBuilder UPDATE_WITHOUT_NULL = UPDATE.overrideUpdateColumn(false);
@@ -91,6 +89,4 @@ public class UserBuilder {
             DBConfig.config,
             TABLE.getColumn().get()
     );
-
-    public final static InsertBuilder INSERT_WITHOUT_NULL = INSERT.overrideInsertColumn(false);
 }

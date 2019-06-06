@@ -3,10 +3,7 @@ package com.lifeonwalden.forestbatis.mapper;
 import com.lifeonwalden.forestbatis.bean.ColumnInfo;
 import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.bean.StatementInfo;
-import com.lifeonwalden.forestbatis.builder.DeleteBuilder;
-import com.lifeonwalden.forestbatis.builder.InsertBuilder;
-import com.lifeonwalden.forestbatis.builder.SelectBuilder;
-import com.lifeonwalden.forestbatis.builder.UpdateBuilder;
+import com.lifeonwalden.forestbatis.builder.*;
 import com.lifeonwalden.forestbatis.exception.DataAccessException;
 import com.lifeonwalden.forestbatis.meta.ColumnMeta;
 import com.lifeonwalden.forestbatis.meta.OrderBy;
@@ -15,10 +12,6 @@ import com.lifeonwalden.forestbatis.result.ParameterHandler;
 import com.lifeonwalden.forestbatis.result.RecordHandler;
 import com.lifeonwalden.forestbatis.result.ReturnColumnHanlder;
 import com.lifeonwalden.forestbatis.result.StreamResultSetCallback;
-import com.lifeonwalden.forestbatis.builder.DeleteSqlBuilder;
-import com.lifeonwalden.forestbatis.builder.InsertSqlBuilder;
-import com.lifeonwalden.forestbatis.builder.SelectSqlBuilder;
-import com.lifeonwalden.forestbatis.builder.UpdateSqlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,38 +57,306 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     }
 
     @Override
-    public List<T> selectAll(ColumnMeta... excludeReturnColumnList) {
-        if (null != excludeReturnColumnList && excludeReturnColumnList.length > 0) {
-
-            return select(null, getFullSelectBuilder().excludeReturnColumn(Arrays.asList(excludeReturnColumnList)), getBaseRecordHandler());
-        } else {
-            throw new RuntimeException("Invalid parameter. The exclude return column list should not be empty.");
+    public List<T> selectAll(ColumnMeta... returnColumnList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder();
+        if (null != returnColumnList && returnColumnList.length > 0) {
+            selectBuilder = selectBuilder.overrideReturnColumn(Arrays.asList(returnColumnList));
         }
+
+        return select(null, selectBuilder, getBaseRecordHandler());
     }
 
     @Override
     public List<T> selectAll(OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder();
         if (null != orderByList && orderByList.length > 0) {
-
-            return select(null, getFullSelectBuilder().overrideOrder(Arrays.asList(orderByList)), getBaseRecordHandler());
-        } else {
-            throw new RuntimeException("Invalid parameter. The order by list should not be empty.");
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
         }
+
+        return select(null, selectBuilder, getBaseRecordHandler());
+    }
+
+    @Override
+    public List<T> selectAll(List<ColumnMeta> returnColumnList, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder().overrideReturnColumn(returnColumnList);
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
+        }
+        return select(null, selectBuilder, getBaseRecordHandler());
+    }
+
+    @Override
+    public List<T> selectAllWithoutColumns(ColumnMeta... excludeReturnColumnList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder();
+        if (null != excludeReturnColumnList && excludeReturnColumnList.length > 0) {
+            selectBuilder = selectBuilder.excludeReturnColumn(Arrays.asList(excludeReturnColumnList));
+        }
+
+        return select(null, selectBuilder, getBaseRecordHandler());
+    }
+
+    @Override
+    public List<T> selectAllWithoutColumns(List<ColumnMeta> excludeReturnColumnList, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder().excludeReturnColumn(excludeReturnColumnList);
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
+        }
+        return select(null, selectBuilder, getBaseRecordHandler());
     }
 
     @Override
     public void selectAll(StreamResultSetCallback<T> streamResultSetCallback) {
-
+        select(null, getFullSelectBuilder(), getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
     }
 
     @Override
     public void selectAll(StreamResultSetCallback<T> streamResultSetCallback, int fetchSize) {
+        select(null, getFullSelectBuilder(), getBaseRecordHandler(), streamResultSetCallback, fetchSize);
+    }
 
+    @Override
+    public void selectAll(StreamResultSetCallback<T> streamResultSetCallback, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder();
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = getFullSelectBuilder().overrideOrder(Arrays.asList(orderByList));
+        }
+        select(null, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
+    }
+
+    @Override
+    public void selectAll(StreamResultSetCallback<T> streamResultSetCallback, int fetchSize, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder();
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = getFullSelectBuilder().overrideOrder(Arrays.asList(orderByList));
+        }
+        select(null, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, fetchSize);
+    }
+
+    @Override
+    public void selectAll(StreamResultSetCallback<T> streamResultSetCallback, ColumnMeta... returnColumnList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder();
+        if (null != returnColumnList && returnColumnList.length > 0) {
+            selectBuilder = getFullSelectBuilder().overrideReturnColumn(Arrays.asList(returnColumnList));
+        }
+        select(null, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
+    }
+
+    @Override
+    public void selectAll(StreamResultSetCallback<T> streamResultSetCallback, int fetchSize, ColumnMeta... returnColumnList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder();
+        if (null != returnColumnList && returnColumnList.length > 0) {
+            selectBuilder = getFullSelectBuilder().overrideReturnColumn(Arrays.asList(returnColumnList));
+        }
+        select(null, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, fetchSize);
+    }
+
+    @Override
+    public void selectAll(StreamResultSetCallback<T> streamResultSetCallback, List<ColumnMeta> returnColumnList, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder().overrideReturnColumn(returnColumnList);
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = getFullSelectBuilder().overrideOrder(Arrays.asList(orderByList));
+        }
+        select(null, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
+    }
+
+    @Override
+    public void selectAll(StreamResultSetCallback<T> streamResultSetCallback, int fetchSize, List<ColumnMeta> returnColumnList, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder().overrideReturnColumn(returnColumnList);
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = getFullSelectBuilder().overrideOrder(Arrays.asList(orderByList));
+        }
+        select(null, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, fetchSize);
+    }
+
+    @Override
+    public void selectAllWithoutColumns(StreamResultSetCallback<T> streamResultSetCallback, ColumnMeta... excludeReturnColumnList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder();
+        if (null != excludeReturnColumnList && excludeReturnColumnList.length > 0) {
+            selectBuilder = selectBuilder.excludeReturnColumn(Arrays.asList(excludeReturnColumnList));
+        }
+        select(null, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
+    }
+
+    @Override
+    public void selectAllWithoutColumns(StreamResultSetCallback<T> streamResultSetCallback, int fetchSize, ColumnMeta... excludeReturnColumnList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder();
+        if (null != excludeReturnColumnList && excludeReturnColumnList.length > 0) {
+            selectBuilder = selectBuilder.excludeReturnColumn(Arrays.asList(excludeReturnColumnList));
+        }
+        select(null, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, fetchSize);
+    }
+
+    @Override
+    public void selectAllWithoutColumns(StreamResultSetCallback<T> streamResultSetCallback, List<ColumnMeta> excludeReturnColumnList, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder().excludeReturnColumn(excludeReturnColumnList);
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
+        }
+        select(null, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
+    }
+
+    @Override
+    public void selectAllWithoutColumns(StreamResultSetCallback<T> streamResultSetCallback, int fetchSize, List<ColumnMeta> excludeReturnColumnList, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getFullSelectBuilder().excludeReturnColumn(excludeReturnColumnList);
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
+        }
+        select(null, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, fetchSize);
     }
 
     @Override
     public List<T> select(T param) {
         return select(param, getBaseSelectBuilder(), getBaseRecordHandler());
+    }
+
+    @Override
+    public List<T> select(T param, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder();
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
+        }
+
+        return select(param, selectBuilder, getBaseRecordHandler());
+    }
+
+    @Override
+    public void select(T param, StreamResultSetCallback<T> streamResultSetCallback, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder();
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
+        }
+
+        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
+    }
+
+    @Override
+    public void select(T param, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder();
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
+        }
+
+        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, fetchSize);
+    }
+
+    @Override
+    public List<T> select(T param, ColumnMeta... returnColumnList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder();
+        if (null != returnColumnList && returnColumnList.length > 0) {
+            selectBuilder = selectBuilder.overrideReturnColumn(Arrays.asList(returnColumnList));
+        }
+
+        return select(param, selectBuilder, getBaseRecordHandler());
+    }
+
+    @Override
+    public List<T> select(T param, List<ColumnMeta> returnColumnList, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder().overrideReturnColumn(returnColumnList);
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
+        }
+
+        return select(param, selectBuilder, getBaseRecordHandler());
+    }
+
+    @Override
+    public void select(T param, StreamResultSetCallback<T> streamResultSetCallback, ColumnMeta... returnColumnList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder();
+        if (null != returnColumnList && returnColumnList.length > 0) {
+            selectBuilder = selectBuilder.overrideReturnColumn(Arrays.asList(returnColumnList));
+        }
+
+        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
+    }
+
+    @Override
+    public void select(T param, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize, ColumnMeta... returnColumnList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder();
+        if (null != returnColumnList && returnColumnList.length > 0) {
+            selectBuilder = selectBuilder.overrideReturnColumn(Arrays.asList(returnColumnList));
+        }
+
+        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, fetchSize);
+    }
+
+    @Override
+    public void select(T param, StreamResultSetCallback<T> streamResultSetCallback, List<ColumnMeta> returnColumnList, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder().overrideReturnColumn(returnColumnList);
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
+        }
+
+        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
+    }
+
+    @Override
+    public void select(T param, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize, List<ColumnMeta> returnColumnList, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder().overrideReturnColumn(returnColumnList);
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
+        }
+
+        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, fetchSize);
+    }
+
+    @Override
+    public List<T> selectWithoutColumns(T param, ColumnMeta... excludeReturnColumnList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder();
+        if (null != excludeReturnColumnList && excludeReturnColumnList.length > 0) {
+            selectBuilder = selectBuilder.excludeReturnColumn(Arrays.asList(excludeReturnColumnList));
+        }
+
+        return select(param, selectBuilder, getBaseRecordHandler());
+    }
+
+    @Override
+    public List<T> selectWithoutColumns(T param, List<ColumnMeta> excludeReturnColumnList, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder().excludeReturnColumn(excludeReturnColumnList);
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
+        }
+
+        return select(param, selectBuilder, getBaseRecordHandler());
+    }
+
+    @Override
+    public void selectWithoutColumns(T param, StreamResultSetCallback<T> streamResultSetCallback, ColumnMeta... excludeReturnColumnList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder();
+        if (null != excludeReturnColumnList && excludeReturnColumnList.length > 0) {
+            selectBuilder = selectBuilder.excludeReturnColumn(Arrays.asList(excludeReturnColumnList));
+        }
+
+        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
+    }
+
+    @Override
+    public void selectWithoutColumns(T param, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize, ColumnMeta... excludeReturnColumnList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder();
+        if (null != excludeReturnColumnList && excludeReturnColumnList.length > 0) {
+            selectBuilder = selectBuilder.excludeReturnColumn(Arrays.asList(excludeReturnColumnList));
+        }
+
+        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, fetchSize);
+    }
+
+    @Override
+    public void selectWithoutColumns(T param, StreamResultSetCallback<T> streamResultSetCallback, List<ColumnMeta> excludeReturnColumnList, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder().excludeReturnColumn(excludeReturnColumnList);
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
+        }
+
+        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, getConfig().getFetchSize());
+    }
+
+    @Override
+    public void selectWithoutColumns(T param, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize, List<ColumnMeta> excludeReturnColumnList, OrderBy... orderByList) {
+        SelectBuilder<T> selectBuilder = getBaseSelectBuilder().excludeReturnColumn(excludeReturnColumnList);
+        if (null != orderByList && orderByList.length > 0) {
+            selectBuilder = selectBuilder.overrideOrder(Arrays.asList(orderByList));
+        }
+
+        select(param, selectBuilder, getBaseRecordHandler(), streamResultSetCallback, fetchSize);
     }
 
     @Override
@@ -223,11 +484,6 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
         } finally {
             releaseConnection(connection);
         }
-    }
-
-    @Override
-    public Integer updateWithQuery(T value) {
-        return updateWithQuery(value, getBaseUpdateBuilder());
     }
 
     @Override
