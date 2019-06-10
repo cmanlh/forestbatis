@@ -865,6 +865,22 @@ public class UserMapperTest {
     }
 
     @Test
+    public void select_stream_orderBy() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.select(new User(), user -> {
+            userList.add(user);
+            return true;
+        }, Order.asc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Lucy".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 18);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
     public void select_stream_fetchSize_orderBy() {
         reset();
         UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
