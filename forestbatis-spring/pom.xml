@@ -8,14 +8,19 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>forestbatis-example</artifactId>
-    <name>forestbatis-example</name>
-    <modules>
-        <module>forestbatis-example-spring</module>
-    </modules>
-    <packaging>pom</packaging>
+
+    <artifactId>forestbatis-spring</artifactId>
+
+    <name>forestbatis-spring</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+        </dependency>
+    </dependencies>
 </project>
