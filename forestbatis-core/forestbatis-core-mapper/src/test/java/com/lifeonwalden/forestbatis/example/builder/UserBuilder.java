@@ -65,13 +65,13 @@ public class UserBuilder {
 
     public final static SelectBuilder GET = FULL_SELECT.overrideQuery(new Eq(Id));
 
-    public final static DeleteBuilder REMOVE = new DeleteBuilder<User>(
+    public final static DeleteBuilder DELETE_QUERY = new DeleteBuilder<User>(
             new TableNode(TABLE),
             DBConfig.config,
             FULL_COLUMN_WITHOUT_NULL_QUERY
     );
 
-    public final static DeleteBuilder DELETE = REMOVE.overrideQuery(new Eq(Id));
+    public final static DeleteBuilder DELETE = DELETE_QUERY.overrideQuery(new Eq(Id));
 
     public final static UpdateBuilder UPDATE_QUERY = new UpdateBuilder<User>(
             new TableNode(TABLE),

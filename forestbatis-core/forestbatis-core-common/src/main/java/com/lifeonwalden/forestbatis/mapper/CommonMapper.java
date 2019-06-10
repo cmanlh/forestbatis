@@ -549,12 +549,22 @@ public interface CommonMapper<P> {
     int[] deleteWithQuery(List<P> paramList, DeleteSqlBuilder<P> deleteSqlBuilder);
 
     /**
-     * 插入，如指定对象字段为null，则数据库相应字段也更新为null
+     * 插入
+     * 如指定对象字段为null，则数据库相应字段更新为null
      *
      * @param value
      * @return
      */
     Integer insert(P value);
+
+    /**
+     * 插入
+     * 如指定对象字段为null，则不插入该字段
+     *
+     * @param value
+     * @return
+     */
+    Integer insertWithoutNull(P value);
 
     /**
      * 插入，并可定义插入时字段赋值的方式
@@ -574,7 +584,7 @@ public interface CommonMapper<P> {
     int[] insert(List<P> valueList);
 
     /**
-     * 批量插入，并可定义插入时字段赋值的方式
+     * 批量插入，并可指定要插入的字段
      *
      * @param valueList
      * @param insertSqlBuilder

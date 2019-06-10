@@ -78,11 +78,6 @@ public class BookMapper extends AbstractKeyMapper<Book> {
     }
 
     @Override
-    protected UpdateBuilder<Book> getBaseUpdateBuilder() {
-        return BookBuilder.UPDATE_QUERY;
-    }
-
-    @Override
     protected SelectBuilder<Book> getBaseSelectBuilder() {
         return BookBuilder.SELECT;
     }

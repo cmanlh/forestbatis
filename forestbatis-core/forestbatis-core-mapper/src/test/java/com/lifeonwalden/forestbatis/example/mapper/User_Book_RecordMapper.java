@@ -63,11 +63,6 @@ public class User_Book_RecordMapper extends AbstractCommonMapper<User_Book_Recor
     }
 
     @Override
-    protected UpdateBuilder<User_Book_Record> getBaseUpdateBuilder() {
-        return BookBuilder.UPDATE_QUERY;
-    }
-
-    @Override
     protected SelectBuilder<User_Book_Record> getBaseSelectBuilder() {
         return BookBuilder.SELECT;
     }

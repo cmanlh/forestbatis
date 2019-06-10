@@ -37,8 +37,6 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
     protected abstract DeleteBuilder<T> getBaseDeleteBuilder();
 
-    protected abstract UpdateBuilder<T> getBaseUpdateBuilder();
-
     protected abstract SelectBuilder<T> getFullSelectBuilder();
 
     protected abstract SelectBuilder<T> getBaseSelectBuilder();
@@ -595,6 +593,11 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     }
 
     @Override
+    public Integer insertWithoutNull(T value) {
+        return insert(value, getBaseInsertBuilder().overrideInsertColumn(false));
+    }
+
+    @Override
     public Integer insert(T value, InsertSqlBuilder<T> insertSqlBuilder) {
         Connection connection = getConnection();
         StatementInfo statementInfo = insertSqlBuilder.build(value);
@@ -652,11 +655,26 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     public Integer truncate() {
         Connection connection = getConnection();
         TableMeta tableMeta = getTable();
+        Config config = getConfig();
+
+        String tableName = tableMeta.getName();
+        String schemaName = "";
+        if (config.isWithSchema()) {
+            schemaName = config.getSchema();
+        }
+
+        if (config.isCaseSensitive()) {
+            tableName = "\"".concat(tableName).concat("\"");
+            if (config.isWithSchema()) {
+                schemaName = "\"".concat(schemaName).concat("\"");
+            }
+        }
+
         try {
-            if (getConfig().isWithSchema()) {
-                return connection.createStatement().executeUpdate("truncate table ".concat(getConfig().getSchema()).concat(".").concat(tableMeta.getName()));
+            if (config.isWithSchema()) {
+                return connection.createStatement().executeUpdate("truncate table ".concat(schemaName).concat(".").concat(tableName));
             } else {
-                return connection.createStatement().executeUpdate("truncate table ".concat(tableMeta.getName()));
+                return connection.createStatement().executeUpdate("truncate table ".concat(tableName));
             }
         } catch (SQLException e) {
             releaseConnection(connection);

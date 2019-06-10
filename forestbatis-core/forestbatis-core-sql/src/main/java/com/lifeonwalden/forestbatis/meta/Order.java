@@ -34,4 +34,12 @@ public class Order implements OrderBy {
     public void toSql(StringBuilder builder, Config config) {
         toSql(builder, config, false);
     }
+
+    public static Order desc(ColumnMeta column) {
+        return new Order(column, OrderEnum.DESC);
+    }
+
+    public static Order asc(ColumnMeta column) {
+        return new Order(column, OrderEnum.ASC);
+    }
 }

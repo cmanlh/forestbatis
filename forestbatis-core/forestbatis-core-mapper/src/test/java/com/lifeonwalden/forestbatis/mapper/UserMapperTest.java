@@ -196,12 +196,12 @@ public class UserMapperTest {
         BigDecimal newIncome = BigDecimal.valueOf(1111.11);
         UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
         userMapper.updateColumns(Arrays.asList(new User().setId("Tom").setIncome(newIncome), new User().setId("Jerry").setIncome(newIncome)), UserBuilder.Age, UserBuilder.Income);
-        List<User> userList = userMapper.select(new User().setIncome(newIncome));
+        List<User> userList = userMapper.select(new User().setIncome(newIncome), new Order(UserBuilder.Birthday, OrderEnum.DESC));
         Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
         User user = userList.get(0);
         Assert.assertTrue("Tom's income : ".concat(String.valueOf(user.getIncome())), newIncome.compareTo(user.getIncome()) == 0);
         Assert.assertNull("Tom's age ".concat(String.valueOf(user.getAge())), user.getAge());
-        Assert.assertTrue("Birthday : ".concat(String.valueOf(user.getBirthday())), new Date("2000/12/12").getTime() == user.getBirthday().getTime());
+        Assert.assertTrue("Tom's Birthday : ".concat(String.valueOf(user.getBirthday())), new Date("2000/12/12").getTime() == user.getBirthday().getTime());
     }
 
     @Test
@@ -235,6 +235,255 @@ public class UserMapperTest {
         userMapper.delete(Arrays.asList(new User().setId("Tom"), new User().setId("Lucy")));
         List<User> userList = userMapper.select(new User());
         Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+    }
+
+    @Test
+    public void selectAll() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.selectAll();
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+    }
+
+    @Test
+    public void selectAll_orderBy() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.selectAll(new Order(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(1);
+        Assert.assertTrue("Lucy's name : ".concat(user.getId()), "Lucy".equals(user.getId()));
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_stream() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectAll(user -> {
+            userList.add(user);
+            return true;
+        });
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+    }
+
+    @Test
+    public void selectAll_stream_orderby() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectAll(user -> {
+            userList.add(user);
+            return true;
+        }, new Order(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(1);
+        Assert.assertTrue("Lucy's name : ".concat(user.getId()), "Lucy".equals(user.getId()));
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_stream_fetchSize() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectAll(user -> {
+            userList.add(user);
+            return true;
+        }, 2);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+    }
+
+    @Test
+    public void selectAll_stream_orderby_fetchSize() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectAll(user -> {
+            userList.add(user);
+            return true;
+        }, 2, new Order(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(1);
+        Assert.assertTrue("Lucy's name : ".concat(user.getId()), "Lucy".equals(user.getId()));
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_special_column() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.selectAll(UserBuilder.Age, UserBuilder.Id);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(0);
+        Assert.assertTrue(user.getId().length() > 0);
+        Assert.assertTrue(user.getAge() > 0);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_special_column_orderBy() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.selectAll(Arrays.asList(UserBuilder.Age, UserBuilder.Id), Order.asc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Lucy".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 18);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_stream_special_columns() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectAll(user -> {
+            userList.add(user);
+            return true;
+        }, UserBuilder.Id, UserBuilder.Age);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(0);
+        Assert.assertTrue(user.getId().length() > 0);
+        Assert.assertTrue(user.getAge() > 0);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_stream_special_columns_fetchSize() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectAll(user -> {
+            userList.add(user);
+            return true;
+        }, 2, UserBuilder.Id, UserBuilder.Age);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(0);
+        Assert.assertTrue(user.getId().length() > 0);
+        Assert.assertTrue(user.getAge() > 0);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_stream_special_columns_orderBy() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectAll(user -> {
+            userList.add(user);
+            return true;
+        }, Arrays.asList(UserBuilder.Id, UserBuilder.Age), Order.asc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Lucy".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 18);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_stream_special_columns_orderBy_fetchSize() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectAll(user -> {
+            userList.add(user);
+            return true;
+        }, 2, Arrays.asList(UserBuilder.Id, UserBuilder.Age), Order.asc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Lucy".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 18);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_without_special_column() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.selectAllWithoutColumns(UserBuilder.Income);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(0);
+        Assert.assertTrue(user.getId().length() > 0);
+        Assert.assertTrue(user.getAge() > 0);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_orderBy_without_special_column() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.selectAllWithoutColumns(Arrays.asList(UserBuilder.Income), Order.asc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Lucy".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 18);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_stream_without_columns() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectAllWithoutColumns(user -> {
+            userList.add(user);
+            return true;
+        }, UserBuilder.Income);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(0);
+        Assert.assertTrue(user.getId().length() > 0);
+        Assert.assertTrue(user.getAge() > 0);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_stream_fetchSize_without_columns() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectAllWithoutColumns(user -> {
+            userList.add(user);
+            return true;
+        }, 2, UserBuilder.Income);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(0);
+        Assert.assertTrue(user.getId().length() > 0);
+        Assert.assertTrue(user.getAge() > 0);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_stream_orderBy_without_columns() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectAllWithoutColumns(user -> {
+            userList.add(user);
+            return true;
+        }, Arrays.asList(UserBuilder.Income), Order.asc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Lucy".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 18);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void selectAll_stream_orderBy_fetchSize_without_columns() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectAllWithoutColumns(user -> {
+            userList.add(user);
+            return true;
+        }, 2, Arrays.asList(UserBuilder.Income), Order.asc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Lucy".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 18);
+        Assert.assertNull(user.getIncome());
     }
 
     @Test
@@ -548,6 +797,14 @@ public class UserMapperTest {
     }
 
     @Test
+    public void select_orderBy() {
+        reset();
+        BookMapper bookMapper = new BookMapper(DBConfig.config, (Null) -> getConnection());
+        List<Book> bookList = bookMapper.select(new Book(), Order.asc(BookBuilder.PublishTime), Order.asc(BookBuilder.Id));
+        Assert.assertTrue("The first is : ".concat(bookList.get(0).getName()), "中国".equals(bookList.get(0).getName()));
+    }
+
+    @Test
     public void select_stream() {
         reset();
         UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
@@ -605,6 +862,198 @@ public class UserMapperTest {
                     return true;
                 }, 2);
         Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+    }
+
+    @Test
+    public void select_stream_fetchSize_orderBy() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.select(new User(), user -> {
+            userList.add(user);
+            return true;
+        }, 2, Order.asc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 4);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Lucy".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 18);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void select_special_column() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.select(new User().setSex(1), UserBuilder.Age, UserBuilder.Id);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(0);
+        Assert.assertTrue(user.getId().length() > 0);
+        Assert.assertTrue(user.getAge() > 0);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void select_special_column_orderBy() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.select(new User().setSex(1), Arrays.asList(UserBuilder.Age, UserBuilder.Id), Order.desc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Tom".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void select_stream_special_columns() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.select(new User().setSex(1), user -> {
+            userList.add(user);
+            return true;
+        }, UserBuilder.Id, UserBuilder.Age);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(0);
+        Assert.assertTrue(user.getId().length() > 0);
+        Assert.assertTrue(user.getAge() > 0);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void select_stream_special_columns_fetchSize() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.select(new User().setSex(1), user -> {
+            userList.add(user);
+            return true;
+        }, 2, UserBuilder.Id, UserBuilder.Age);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(0);
+        Assert.assertTrue(user.getId().length() > 0);
+        Assert.assertTrue(user.getAge() > 0);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void select_stream_special_columns_orderBy() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.select(new User().setSex(1), user -> {
+            userList.add(user);
+            return true;
+        }, Arrays.asList(UserBuilder.Id, UserBuilder.Age), Order.desc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Tom".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void select_stream_special_columns_orderBy_fetchSize() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.select(new User().setSex(1), user -> {
+            userList.add(user);
+            return true;
+        }, 2, Arrays.asList(UserBuilder.Id, UserBuilder.Age), Order.desc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Tom".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void select_without_special_column() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.selectWithoutColumns(new User().setSex(1), UserBuilder.Income);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(0);
+        Assert.assertTrue(user.getId().length() > 0);
+        Assert.assertTrue(user.getAge() > 0);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void select_orderBy_without_special_column() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.selectWithoutColumns(new User().setSex(1), Arrays.asList(UserBuilder.Income), Order.desc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Tom".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void select_stream_without_columns() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectWithoutColumns(new User().setSex(1), user -> {
+            userList.add(user);
+            return true;
+        }, UserBuilder.Income);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(0);
+        Assert.assertTrue(user.getId().length() > 0);
+        Assert.assertTrue(user.getAge() > 0);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void select_stream_fetchSize_without_columns() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectWithoutColumns(new User().setSex(1), user -> {
+            userList.add(user);
+            return true;
+        }, 2, UserBuilder.Income);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(0);
+        Assert.assertTrue(user.getId().length() > 0);
+        Assert.assertTrue(user.getAge() > 0);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void select_stream_orderBy_without_columns() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectWithoutColumns(new User().setSex(1), user -> {
+            userList.add(user);
+            return true;
+        }, Arrays.asList(UserBuilder.Income), Order.desc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Tom".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
+        Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void select_stream_orderBy_fetchSize_without_columns() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = new ArrayList<>();
+        userMapper.selectWithoutColumns(new User().setSex(1), user -> {
+            userList.add(user);
+            return true;
+        }, 2, Arrays.asList(UserBuilder.Income), Order.desc(UserBuilder.Age));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
+        User user = userList.get(1);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Tom".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
+        Assert.assertNull(user.getIncome());
     }
 
     @Test
@@ -815,6 +1264,28 @@ public class UserMapperTest {
     }
 
     @Test
+    public void updateWithQuery() {
+        reset();
+        BigDecimal womanIncome = BigDecimal.valueOf(11111.11);
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.updateWithQuery(new User().setIncome(womanIncome).setSex(2),
+                UserBuilder.UPDATE_QUERY.overrideQuery(new Eq(UserBuilder.Sex)).overrideUpdateColumn(Arrays.asList(UserBuilder.Income)));
+        List<User> userList = userMapper.select(new User());
+        userList.forEach(user -> {
+                    switch (user.getSex()) {
+                        case 1:
+                            Assert.assertTrue(user.getId().concat("'s income : ").concat(user.getIncome().toString()), womanIncome.compareTo(user.getIncome()) != 0);
+                            break;
+                        default:
+                            Assert.assertTrue(user.getId().concat("'s income : ").concat(user.getIncome().toString()), womanIncome.compareTo(user.getIncome()) == 0);
+                            break;
+
+                    }
+                }
+        );
+    }
+
+    @Test
     public void updateWithQuery_batch() {
         reset();
         BigDecimal womanIncome = BigDecimal.valueOf(11111.11);
@@ -841,6 +1312,15 @@ public class UserMapperTest {
     public void deleteWithQuery() {
         reset();
         UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.deleteWithQuery(new User().setAge(15));
+        List<User> userList = userMapper.selectAll();
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 3);
+    }
+
+    @Test
+    public void deleteWithQuery_builder() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
         userMapper.deleteWithQuery(new User().setAge(15), UserBuilder.DELETE.overrideQuery(new Bt(UserBuilder.Age)));
         List<User> userList = userMapper.select(new User());
         Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 1);
@@ -855,6 +1335,89 @@ public class UserMapperTest {
         Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 2);
     }
 
+    @Test
+    public void insert() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.insert(new User().setId("Allan"));
+        Optional<User> _user = userMapper.get(new User().setId("Allan"));
+        Assert.assertTrue(_user.isPresent());
+        User user = _user.get();
+        Assert.assertNull(user.getAge());
+        Assert.assertNull(user.getSex());
+    }
+
+    @Test
+    public void insert_without_null() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.insertWithoutNull(new User().setId("Allan"));
+        Optional<User> _user = userMapper.get(new User().setId("Allan"));
+        Assert.assertTrue(_user.isPresent());
+        User user = _user.get();
+        Assert.assertNull(user.getAge());
+        Assert.assertNotNull(user.getSex());
+    }
+
+    @Test
+    public void insert_builder() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.insert(new User().setId("Allan"), UserBuilder.INSERT.excludeInsertColumn(Arrays.asList(UserBuilder.Sex)));
+        Optional<User> _user = userMapper.get(new User().setId("Allan"));
+        Assert.assertTrue(_user.isPresent());
+        User user = _user.get();
+        Assert.assertNull(user.getAge());
+        Assert.assertNotNull(user.getSex());
+    }
+
+    @Test
+    public void insert_special_column() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.insert(new User().setId("Allan").setIncome(BigDecimal.valueOf(112121)), UserBuilder.INSERT.overrideInsertColumn(Arrays.asList(UserBuilder.Id, UserBuilder.Income, UserBuilder.Age)));
+        Optional<User> _user = userMapper.get(new User().setId("Allan"));
+        Assert.assertTrue(_user.isPresent());
+        User user = _user.get();
+        Assert.assertNull(user.getAge());
+        Assert.assertNotNull(user.getIncome());
+        Assert.assertNotNull(user.getSex());
+    }
+
+    @Test
+    public void insert_batch() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.insert(Arrays.asList(new User().setId("Allan"), new User().setId("Phoebe")));
+        Optional<User> _user = userMapper.get(new User().setId("Allan"));
+        Assert.assertTrue(_user.isPresent());
+        User user = _user.get();
+        Assert.assertNull(user.getAge());
+        Assert.assertNull(user.getSex());
+        Assert.assertTrue(userMapper.selectAll().size() == 6);
+    }
+
+    @Test
+    public void insert_batch_special_column() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.insert(Arrays.asList(new User().setId("Allan").setIncome(BigDecimal.valueOf(112121)), new User().setId("Phoebe").setIncome(BigDecimal.valueOf(112121))), UserBuilder.INSERT.overrideInsertColumn(Arrays.asList(UserBuilder.Id, UserBuilder.Income, UserBuilder.Age)));
+        Optional<User> _user = userMapper.get(new User().setId("Allan"));
+        Assert.assertTrue(_user.isPresent());
+        User user = _user.get();
+        Assert.assertNull(user.getAge());
+        Assert.assertNotNull(user.getIncome());
+        Assert.assertNotNull(user.getSex());
+        Assert.assertTrue(userMapper.selectAll().size() == 6);
+    }
+
+    @Test
+    public void truncate() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        userMapper.truncate();
+        Assert.assertTrue(userMapper.selectAll().size() == 0);
+    }
 
     private void reset() {
         try {

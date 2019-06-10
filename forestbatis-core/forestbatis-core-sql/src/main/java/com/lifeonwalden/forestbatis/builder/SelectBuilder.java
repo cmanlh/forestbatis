@@ -119,7 +119,7 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
         }
 
         StringBuilder builder = new StringBuilder();
-        boolean withAlias = this.tableNode.isJoined() || null != this.queryNode ? this.queryNode.isJoined() : true;
+        boolean withAlias = this.tableNode.isJoined() || (null != this.queryNode ? this.queryNode.isJoined() : true);
 
         SqlCommandType.SELECT.toSql(builder, config, withAlias);
         builder.append(" ");

@@ -73,12 +73,7 @@ public class UserMapper extends AbstractKeyMapper<User> {
 
     @Override
     protected DeleteBuilder<User> getBaseDeleteBuilder() {
-        return UserBuilder.DELETE;
-    }
-
-    @Override
-    protected UpdateBuilder<User> getBaseUpdateBuilder() {
-        return UserBuilder.UPDATE_QUERY;
+        return UserBuilder.DELETE_QUERY;
     }
 
     @Override

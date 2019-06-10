@@ -133,9 +133,9 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
 
         StringBuilder builder = new StringBuilder();
 
-        SqlCommandType.INSERT.toSql(builder,config);
+        SqlCommandType.INSERT.toSql(builder, config);
         builder.append(" ");
-        this.tableNode.toSql(builder,config);
+        this.tableNode.toSql(builder, config);
         builder.append(" ");
 
         if (this.isRuntimeChangeable()) {
@@ -153,7 +153,7 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
                         builder.append(", ");
                         innerbuilder.append(", ");
                     }
-                    builder.append(columnMeta.getLabel());
+                    columnMeta.toSql(builder, this.config, false);
                     columnMeta.getJavaProperty().get().toSql(innerbuilder, this.config);
 
                     notFirstOne = true;
@@ -167,11 +167,12 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
             builder.append("(");
             int idx = 0;
             ColumnMeta columnMeta = this.toInsertColumnList.get(idx);
-            builder.append(columnMeta.getLabel());
+            columnMeta.toSql(builder, this.config, false);
             columnMeta.getJavaProperty().get().toSql(innerbuilder, this.config);
             for (idx = 1; idx < this.toInsertColumnList.size(); idx++) {
                 columnMeta = this.toInsertColumnList.get(idx);
-                builder.append(", ").append(columnMeta.getLabel());
+                builder.append(", ");
+                columnMeta.toSql(builder, this.config, false);
 
                 innerbuilder.append(", ");
                 columnMeta.getJavaProperty().get().toSql(innerbuilder, this.config);
