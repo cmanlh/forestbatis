@@ -1,51 +1,18 @@
 package com.lifeonwalden.forestbatis.example.mapper;
 
-import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.builder.DeleteBuilder;
 import com.lifeonwalden.forestbatis.builder.InsertBuilder;
 import com.lifeonwalden.forestbatis.builder.SelectBuilder;
 import com.lifeonwalden.forestbatis.example.bean.User_Book_Record;
-import com.lifeonwalden.forestbatis.example.builder.BookBuilder;
 import com.lifeonwalden.forestbatis.example.builder.User_Book_RecordBuilder;
-import com.lifeonwalden.forestbatis.mapper.AbstractCommonMapper;
+import com.lifeonwalden.forestbatis.mapper.AbstractSpringCommonMapper;
 import com.lifeonwalden.forestbatis.meta.TableMeta;
 import com.lifeonwalden.forestbatis.result.*;
 import com.lifeonwalden.forestbatis.util.SingletonParameterHandlerFactory;
 import com.lifeonwalden.forestbatis.util.SingletonRecordHandlerFactory;
 import com.lifeonwalden.forestbatis.util.SingletonReturnColumnHandlerFactory;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.function.Function;
-
-public class User_Book_RecordMapper extends AbstractCommonMapper<User_Book_Record> {
-    private Function<Void, Connection> connectionCreator;
-    private Config config;
-
-    public User_Book_RecordMapper(Config config, Function<Void, Connection> connectionCreator) {
-        this.config = config;
-        this.connectionCreator = connectionCreator;
-    }
-
-    @Override
-    protected Config getConfig() {
-        return this.config;
-    }
-
-    @Override
-    protected Connection getConnection() {
-        return this.connectionCreator.apply(null);
-    }
-
-    @Override
-    protected void releaseConnection(Connection connection) {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
+public class User_Book_RecordMapper extends AbstractSpringCommonMapper<User_Book_Record> {
     @Override
     protected SelectBuilder<User_Book_Record> getFullSelectBuilder() {
         return User_Book_RecordBuilder.FULL_SELECT;
@@ -88,6 +55,6 @@ public class User_Book_RecordMapper extends AbstractCommonMapper<User_Book_Recor
 
     @Override
     protected TableMeta getTable() {
-        return BookBuilder.TABLE;
+        return User_Book_RecordBuilder.TABLE;
     }
 }

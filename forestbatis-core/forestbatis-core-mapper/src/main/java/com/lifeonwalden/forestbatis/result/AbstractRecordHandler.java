@@ -1,12 +1,12 @@
 package com.lifeonwalden.forestbatis.result;
 
-import com.lifeonwalden.forestbatis.bean.AbstractDTOMapBean;
 import com.lifeonwalden.forestbatis.bean.ColumnInfo;
 import com.lifeonwalden.forestbatis.exception.DataAccessException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractRecordHandler<T> implements RecordHandler<T> {
 
@@ -15,7 +15,7 @@ public abstract class AbstractRecordHandler<T> implements RecordHandler<T> {
     @Override
     public T convert(ResultSet resultSet, List<ColumnInfo> columnInfoList) {
         T t = newBeanInstance();
-        AbstractDTOMapBean bean = (AbstractDTOMapBean) t;
+        Map bean = (Map) t;
         try {
             String propertyName;
             int index;

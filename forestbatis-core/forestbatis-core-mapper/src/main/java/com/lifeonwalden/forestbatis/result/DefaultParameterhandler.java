@@ -1,6 +1,5 @@
 package com.lifeonwalden.forestbatis.result;
 
-import com.lifeonwalden.forestbatis.bean.AbstractDTOMapBean;
 import com.lifeonwalden.forestbatis.bean.PropertyInfo;
 import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.util.DateUtil;
@@ -13,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class DefaultParameterhandler implements ParameterHandler {
     private static Logger logger = LoggerFactory.getLogger(DefaultParameterhandler.class);
@@ -107,7 +107,7 @@ public class DefaultParameterhandler implements ParameterHandler {
     }
 
     protected <P, T> P fetchValue(PropertyInfo propertyInfo, T param) {
-        AbstractDTOMapBean bean = (AbstractDTOMapBean) param;
+        Map bean = (Map) param;
         if (propertyInfo.isListProperty()) {
             Object _list = bean.get(propertyInfo.getName());
             if (null == _list) {
