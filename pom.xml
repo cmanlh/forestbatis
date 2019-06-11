@@ -8,6 +8,7 @@
         <module>forestbatis-example</module>
         <module>forestbatis-core</module>
         <module>forestbatis-spring</module>
+        <module>forestbatis-generator</module>
     </modules>
     <name>forestbatis</name>
     <description>A static orm framework</description>

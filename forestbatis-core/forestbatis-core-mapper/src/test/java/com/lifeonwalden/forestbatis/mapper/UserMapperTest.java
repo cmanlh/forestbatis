@@ -1,7 +1,9 @@
 package com.lifeonwalden.forestbatis.mapper;
 
 import com.lifeonwalden.forestbatis.bean.ColumnInfo;
+import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.builder.SelectBuilder;
+import com.lifeonwalden.forestbatis.builder.SelectSqlBuilder;
 import com.lifeonwalden.forestbatis.constant.OrderEnum;
 import com.lifeonwalden.forestbatis.example.DBConfig;
 import com.lifeonwalden.forestbatis.example.bean.Book;
@@ -15,6 +17,7 @@ import com.lifeonwalden.forestbatis.example.mapper.UserMapper;
 import com.lifeonwalden.forestbatis.example.mapper.User_Book_RecordMapper;
 import com.lifeonwalden.forestbatis.example.meta.BookMetaInfo;
 import com.lifeonwalden.forestbatis.meta.*;
+import com.lifeonwalden.forestbatis.parsing.PropertyParser;
 import com.lifeonwalden.forestbatis.util.DateUtil;
 import org.junit.After;
 import org.junit.Assert;
@@ -1425,6 +1428,34 @@ public class UserMapperTest {
         Assert.assertNotNull(user.getIncome());
         Assert.assertNotNull(user.getSex());
         Assert.assertTrue(userMapper.selectAll().size() == 6);
+    }
+
+    @Test
+    public void sql() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.select(new User().setSex(2), new SelectSqlBuilder<User>() {
+            @Override
+            public StatementInfo build(User value) {
+                return PropertyParser.parse("select \"id\", \"sex\", 100 as \"score\" from \"User\" where \"sex\" = #{sex, JdbcType=INTEGER}");
+            }
+
+            @Override
+            public StatementInfo build() {
+                return build(null);
+            }
+
+            @Override
+            public boolean isRuntimeChangeable() {
+                return false;
+            }
+        });
+
+        User user = userList.get(0);
+        Assert.assertNotNull(user.getId());
+        Assert.assertNotNull(user.getSex());
+        Assert.assertTrue(user.getSex() == 2);
+        Assert.assertTrue((int) user.get("score") == 100);
     }
 
     @Test
