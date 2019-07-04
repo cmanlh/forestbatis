@@ -15,14 +15,14 @@ import java.util.List;
 /**
  * 通用jdbc数据处理mapper
  *
- * @param <P>
+ * @param <P> 具体表对应对象
  */
 public interface CommonMapper<P> {
 
     /**
      * 返回全表记录
      *
-     * @return
+     * @return 全表记录
      */
     List<P> selectAll();
 
@@ -31,7 +31,7 @@ public interface CommonMapper<P> {
      * 按照指定排序规则
      *
      * @param orderByList 排序信息
-     * @return
+     * @return 全表记录
      */
     List<P> selectAll(OrderBy... orderByList);
 
@@ -78,7 +78,7 @@ public interface CommonMapper<P> {
      * 仅返回指定的列
      *
      * @param returnColumnList 要返回的字段
-     * @return
+     * @return 全表记录
      */
     List<P> selectAll(ColumnMeta... returnColumnList);
 
@@ -89,7 +89,7 @@ public interface CommonMapper<P> {
      *
      * @param returnColumnList 要返回的字段
      * @param orderByList      排序信息
-     * @return
+     * @return 全表记录
      */
     List<P> selectAll(List<ColumnMeta> returnColumnList, OrderBy... orderByList);
 
@@ -144,7 +144,7 @@ public interface CommonMapper<P> {
      * 不返回指定的列
      *
      * @param excludeReturnColumnList 要排除的字段
-     * @return
+     * @return 全表记录
      */
     List<P> selectAllWithoutColumns(ColumnMeta... excludeReturnColumnList);
 
@@ -155,7 +155,7 @@ public interface CommonMapper<P> {
      *
      * @param excludeReturnColumnList 要排除的字段
      * @param orderByList             排序信息
-     * @return
+     * @return 全表记录
      */
     List<P> selectAllWithoutColumns(List<ColumnMeta> excludeReturnColumnList, OrderBy... orderByList);
 
@@ -209,7 +209,7 @@ public interface CommonMapper<P> {
      * 基于条件查询
      *
      * @param param 查询条件
-     * @return
+     * @return 全表记录
      */
     List<P> select(P param);
 
@@ -219,7 +219,7 @@ public interface CommonMapper<P> {
      *
      * @param param       查询条件
      * @param orderByList 排序信息
-     * @return
+     * @return 全表记录
      */
     List<P> select(P param, OrderBy... orderByList);
 
@@ -271,7 +271,7 @@ public interface CommonMapper<P> {
      *
      * @param param            查询条件
      * @param returnColumnList 要返回的字段
-     * @return
+     * @return 结果记录
      */
     List<P> select(P param, ColumnMeta... returnColumnList);
 
@@ -283,7 +283,7 @@ public interface CommonMapper<P> {
      * @param param            查询条件
      * @param returnColumnList 要返回的字段
      * @param orderByList      排序信息
-     * @return
+     * @return 结果记录
      */
     List<P> select(P param, List<ColumnMeta> returnColumnList, OrderBy... orderByList);
 
@@ -355,7 +355,7 @@ public interface CommonMapper<P> {
      * @param param                   查询条件
      * @param excludeReturnColumnList 要排除的字段
      * @param orderByList             排序信息
-     * @return
+     * @return 结果记录
      */
     List<P> selectWithoutColumns(P param, List<ColumnMeta> excludeReturnColumnList, OrderBy... orderByList);
 
@@ -414,7 +414,7 @@ public interface CommonMapper<P> {
      *
      * @param param            查询条件
      * @param selectSqlBuilder SQL生成
-     * @return
+     * @return 结果记录
      */
     List<P> select(P param, SelectSqlBuilder<P> selectSqlBuilder);
 
@@ -444,7 +444,7 @@ public interface CommonMapper<P> {
      *
      * @param param         查询条件
      * @param recordHandler 结果解析
-     * @return
+     * @return 结果记录
      */
     List<P> select(P param, RecordHandler<P> recordHandler);
 
@@ -507,7 +507,7 @@ public interface CommonMapper<P> {
      *
      * @param value            指定对象
      * @param updateSqlBuilder SQL生成
-     * @return
+     * @return 更新数据记录数
      */
     Integer updateWithQuery(P value, UpdateSqlBuilder<P> updateSqlBuilder);
 
@@ -517,7 +517,7 @@ public interface CommonMapper<P> {
      *
      * @param valueList        指定对象
      * @param updateSqlBuilder SQL生成
-     * @return
+     * @return 更新数据记录数
      */
     int[] updateWithQuery(List<P> valueList, UpdateSqlBuilder<P> updateSqlBuilder);
 
@@ -525,7 +525,7 @@ public interface CommonMapper<P> {
      * 根据查询参数删除结果集
      *
      * @param param 查询参数
-     * @return
+     * @return 删除数据记录数
      */
     Integer deleteWithQuery(P param);
 
@@ -534,7 +534,7 @@ public interface CommonMapper<P> {
      *
      * @param param
      * @param deleteSqlBuilder SQL生成
-     * @return
+     * @return 删除数据记录数
      */
     Integer deleteWithQuery(P param, DeleteSqlBuilder<P> deleteSqlBuilder);
 
@@ -544,7 +544,7 @@ public interface CommonMapper<P> {
      *
      * @param paramList        查询参数
      * @param deleteSqlBuilder SQL生成
-     * @return
+     * @return 删除数据记录数
      */
     int[] deleteWithQuery(List<P> paramList, DeleteSqlBuilder<P> deleteSqlBuilder);
 
@@ -562,7 +562,7 @@ public interface CommonMapper<P> {
      * 如指定对象字段为null，则不插入该字段
      *
      * @param value
-     * @return
+     * @return 插入记录数
      */
     Integer insertWithoutNull(P value);
 
@@ -571,7 +571,7 @@ public interface CommonMapper<P> {
      *
      * @param value
      * @param insertSqlBuilder
-     * @return
+     * @return 插入记录数
      */
     Integer insert(P value, InsertSqlBuilder<P> insertSqlBuilder);
 
@@ -579,7 +579,7 @@ public interface CommonMapper<P> {
      * 批量插入，如指定对象字段为null，则数据库相应字段也更新为null
      *
      * @param valueList
-     * @return
+     * @return 插入记录数
      */
     int[] insert(List<P> valueList);
 
@@ -588,14 +588,14 @@ public interface CommonMapper<P> {
      *
      * @param valueList
      * @param insertSqlBuilder
-     * @return
+     * @return 插入记录数
      */
     int[] insert(List<P> valueList, InsertSqlBuilder<P> insertSqlBuilder);
 
     /**
      * truncate表格，慎用
      *
-     * @return
+     * @return 记录数
      */
     Integer truncate();
 

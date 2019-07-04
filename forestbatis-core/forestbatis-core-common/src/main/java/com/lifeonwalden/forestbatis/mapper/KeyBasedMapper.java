@@ -12,7 +12,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      * 基于主键查询，全字段返回
      *
      * @param param 查询条件
-     * @return
+     * @return 记录对象
      */
     Optional<P> get(P param);
 
@@ -21,7 +21,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      *
      * @param param            查询条件
      * @param returnColumnList 要排除的字段
-     * @return
+     * @return 记录对象
      */
     Optional<P> getColumns(P param, ColumnMeta... returnColumnList);
 
@@ -30,7 +30,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      *
      * @param param                   查询条件
      * @param excludeReturnColumnList 要排除的字段
-     * @return
+     * @return 记录对象
      */
     Optional<P> getWithoutColumns(P param, ColumnMeta... excludeReturnColumnList);
 
@@ -38,7 +38,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      * 根据主键更新记录，当value中某属性为null时，对应记录字段也将被更新为null
      *
      * @param value 指定对象
-     * @return
+     * @return 更新记录数
      */
     Integer update(P value);
 
@@ -46,7 +46,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      * 根据主键更新记录，当value中某属性为null时，对应记录字段将不进行更新
      *
      * @param value 指定对象
-     * @return
+     * @return 更新记录数
      */
     Integer updateWithoutNull(P value);
 
@@ -56,7 +56,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      *
      * @param value              指定对象
      * @param toUpdateColumnList 指定要更新的列
-     * @return
+     * @return 更新记录数
      */
     Integer updateColumns(P value, ColumnMeta... toUpdateColumnList);
 
@@ -66,7 +66,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      *
      * @param value               指定对象
      * @param notUpdateColumnList 指定要更新的列
-     * @return
+     * @return 更新记录数
      */
     Integer updateWithoutColumns(P value, ColumnMeta... notUpdateColumnList);
 
@@ -76,7 +76,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      *
      * @param value              指定对象
      * @param toUpdateColumnList 指定要更新的列
-     * @return
+     * @return 更新记录数
      */
     Integer updateColumnsWithoutNull(P value, ColumnMeta... toUpdateColumnList);
 
@@ -86,7 +86,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      *
      * @param value               指定对象
      * @param notUpdateColumnList 指定要更新的列
-     * @return
+     * @return 更新记录数
      */
     Integer updateWithoutColumnsNull(P value, ColumnMeta... notUpdateColumnList);
 
@@ -94,7 +94,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      * 根据主键更新记录，当value中某属性为null时，对应记录字段也将被更新为null
      *
      * @param valueList 指定对象
-     * @return
+     * @return 更新记录数
      */
     int[] update(List<P> valueList);
 
@@ -104,7 +104,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      *
      * @param valueList          指定对象
      * @param toUpdateColumnList 指定要更新的列
-     * @return
+     * @return 更新记录数
      */
     int[] updateColumns(List<P> valueList, ColumnMeta... toUpdateColumnList);
 
@@ -114,7 +114,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      *
      * @param valueList           指定对象
      * @param notUpdateColumnList 指定要更新的列
-     * @return
+     * @return 更新记录数
      */
     int[] updateWithoutColumns(List<P> valueList, ColumnMeta... notUpdateColumnList);
 
@@ -122,7 +122,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      * 根据主键删除记录
      *
      * @param param 查询参数
-     * @return
+     * @return 删除记录数
      */
     Integer delete(P param);
 
@@ -131,7 +131,7 @@ public interface KeyBasedMapper<P> extends CommonMapper<P> {
      * 指定对象与返回结果按照下标一一对应
      *
      * @param paramList 查询参数
-     * @return
+     * @return 删除记录数
      */
     int[] delete(List<P> paramList);
 }
