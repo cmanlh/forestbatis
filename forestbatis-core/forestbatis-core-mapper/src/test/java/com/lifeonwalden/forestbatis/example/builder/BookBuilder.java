@@ -25,6 +25,8 @@ public class BookBuilder {
     };
     public final static PropertyMeta publishTime = new AbstractPropertyMeta(BookMetaInfo.publishTime, JdbcType.DATETIME) {
     };
+    public final static PropertyMeta publishTimeStart = new AbstractPropertyMeta(BookMetaInfo.publishTimeStart, JdbcType.DATETIME) {
+    };
     private final static List<ColumnMeta> columnList = new ArrayList<>();
     public final static TableMeta TABLE = new AbstractTableMeta(TABLE_NAME, ALIAS_NAME, columnList) {
     };
@@ -35,6 +37,8 @@ public class BookBuilder {
     public final static ColumnMeta Publisher = new AbstractColumnMeta(BookMetaInfo.publisher, JdbcType.VARCHAR, TABLE, publisher) {
     };
     public final static ColumnMeta PublishTime = new AbstractColumnMeta(BookMetaInfo.publishTime, JdbcType.DATETIME, TABLE, publishTime) {
+    };
+    public final static ColumnMeta PublishTimeStart = new AbstractColumnMeta(BookMetaInfo.publishTime, JdbcType.DATETIME, TABLE, publishTimeStart, true) {
     };
 
     static {
@@ -47,7 +51,8 @@ public class BookBuilder {
     public final static QueryNode<Book> FULL_COLUMN_WITHOUT_NULL_QUERY =
             new Eq<Book>(Name, user -> user.isPresent() && null != user.get().getName())
                     .and(new Eq<Book>(Publisher, user -> user.isPresent() && null != user.get().getPublisher()))
-                    .and(new Eq<Book>(PublishTime, user -> user.isPresent() && null != user.get().getPublishTime()));
+                    .and(new Eq<Book>(PublishTime, user -> user.isPresent() && null != user.get().getPublishTime()))
+                    .and(new Bte<Book>(PublishTimeStart, user -> user.isPresent() && null != user.get().getPublishTimeStart()));
 
     public final static SelectBuilder FULL_SELECT = new SelectBuilder<Book>(
             new TableNode(TABLE),

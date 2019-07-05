@@ -21,6 +21,9 @@ public abstract class AbstractColumnMeta implements ColumnMeta {
     // 对应java类相映射的属性
     protected PropertyMeta javaProperty;
 
+    // 是否为列查询扩展
+    protected boolean extension = false;
+
     public AbstractColumnMeta(String label) {
         this.label = label;
     }
@@ -41,6 +44,14 @@ public abstract class AbstractColumnMeta implements ColumnMeta {
         this.jdbcType = jdbcType;
         this.table = table;
         this.javaProperty = javaProperty;
+    }
+
+    public AbstractColumnMeta(String label, JdbcType jdbcType, TableMeta table, PropertyMeta javaProperty, boolean extension) {
+        this.label = label;
+        this.jdbcType = jdbcType;
+        this.table = table;
+        this.javaProperty = javaProperty;
+        this.extension = extension;
     }
 
 
@@ -109,9 +120,11 @@ public abstract class AbstractColumnMeta implements ColumnMeta {
             builder.append(caseSensitiveSign).append(this.getLabel()).append(caseSensitiveSign);
         }
 
-        if (null != this.javaProperty) {
-            if (!this.getLabel().equals(this.javaProperty.getName())) {
-                builder.append(" as ").append(caseSensitiveSign).append(this.javaProperty.getName()).append(caseSensitiveSign);
+        if (!this.extension) {
+            if (null != this.javaProperty) {
+                if (!this.getLabel().equals(this.javaProperty.getName())) {
+                    builder.append(" as ").append(caseSensitiveSign).append(this.javaProperty.getName()).append(caseSensitiveSign);
+                }
             }
         }
     }

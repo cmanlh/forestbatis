@@ -2,9 +2,7 @@ package com.lifeonwalden.forestbatis.example.bean;
 
 import com.lifeonwalden.forestbatis.bean.AbstractDTOMapBean;
 import com.lifeonwalden.forestbatis.example.meta.BookMetaInfo;
-import com.lifeonwalden.forestbatis.example.meta.BookMetaInfo;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 public class Book extends AbstractDTOMapBean {
@@ -45,6 +43,16 @@ public class Book extends AbstractDTOMapBean {
 
     public Book setPublishTime(Date publishTime) {
         this.dataMap.put(BookMetaInfo.publishTime, publishTime);
+
+        return this;
+    }
+
+    public Date getPublishTimeStart() {
+        return (Date) this.dataMap.get(BookMetaInfo.publishTimeStart);
+    }
+
+    public Book setPublishTimeStart(Date publishTimeStart) {
+        this.dataMap.put(BookMetaInfo.publishTimeStart, publishTimeStart);
 
         return this;
     }

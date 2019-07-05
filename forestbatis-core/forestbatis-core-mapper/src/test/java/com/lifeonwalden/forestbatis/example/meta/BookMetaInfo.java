@@ -5,4 +5,5 @@ public interface BookMetaInfo {
     String name = "name";
     String publisher = "publisher";
     String publishTime = "publishTime";
+    String publishTimeStart = "publishTimeStart";
 }

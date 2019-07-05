@@ -514,6 +514,14 @@ public class UserMapperTest {
     }
 
     @Test
+    public void select_with_bte_start() {
+        reset();
+        BookMapper bookMapper = new BookMapper(DBConfig.config, (Null) -> getConnection());
+        List<Book> bookList = bookMapper.select(new Book().setPublishTimeStart(new Date("1980/12/12")));
+        Assert.assertTrue("User size : ".concat(String.valueOf(bookList.size())), bookList.size() == 3);
+    }
+
+    @Test
     public void select_with_bte_int() {
         reset();
         UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
