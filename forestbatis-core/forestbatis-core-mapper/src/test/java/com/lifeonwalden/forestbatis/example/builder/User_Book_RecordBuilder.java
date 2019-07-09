@@ -51,27 +51,23 @@ public class User_Book_RecordBuilder {
 
     public final static SelectBuilder FULL_SELECT = new SelectBuilder<User_Book_Record>(
             new TableNode(TABLE),
-            DBConfig.config,
             TABLE.getColumn().get()
     );
     public final static SelectBuilder SELECT = FULL_SELECT.overrideQuery(FULL_COLUMN_WITHOUT_NULL_QUERY);
 
     public final static DeleteBuilder DELETE_QUERY = new DeleteBuilder<User_Book_Record>(
             new TableNode(TABLE),
-            DBConfig.config,
             FULL_COLUMN_WITHOUT_NULL_QUERY
     );
 
     public final static UpdateBuilder UPDATE_QUERY = new UpdateBuilder<User_Book_Record>(
             new TableNode(TABLE),
-            DBConfig.config,
             TABLE.getColumn().get(),
             FULL_COLUMN_WITHOUT_NULL_QUERY
     );
 
     public final static InsertBuilder INSERT = new InsertBuilder<User_Book_Record>(
             new TableNode(TABLE),
-            DBConfig.config,
             TABLE.getColumn().get()
     );
 }

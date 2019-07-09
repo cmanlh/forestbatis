@@ -5,7 +5,6 @@ import com.lifeonwalden.forestbatis.builder.InsertBuilder;
 import com.lifeonwalden.forestbatis.builder.SelectBuilder;
 import com.lifeonwalden.forestbatis.builder.UpdateBuilder;
 import com.lifeonwalden.forestbatis.constant.JdbcType;
-import com.lifeonwalden.forestbatis.example.DBConfig;
 import com.lifeonwalden.forestbatis.example.bean.Book;
 import com.lifeonwalden.forestbatis.example.meta.BookMetaInfo;
 import com.lifeonwalden.forestbatis.meta.*;
@@ -56,7 +55,6 @@ public class BookBuilder {
 
     public final static SelectBuilder FULL_SELECT = new SelectBuilder<Book>(
             new TableNode(TABLE),
-            DBConfig.config,
             TABLE.getColumn().get()
     );
     public final static SelectBuilder SELECT = FULL_SELECT.overrideQuery(FULL_COLUMN_WITHOUT_NULL_QUERY);
@@ -65,7 +63,6 @@ public class BookBuilder {
 
     public final static DeleteBuilder DELETE_QUERY = new DeleteBuilder<Book>(
             new TableNode(TABLE),
-            DBConfig.config,
             FULL_COLUMN_WITHOUT_NULL_QUERY
     );
 
@@ -73,7 +70,6 @@ public class BookBuilder {
 
     public final static UpdateBuilder UPDATE_QUERY = new UpdateBuilder<Book>(
             new TableNode(TABLE),
-            DBConfig.config,
             TABLE.getColumn().get(),
             FULL_COLUMN_WITHOUT_NULL_QUERY
     ).excludeUpdateColumn(Arrays.asList(Id));
@@ -84,7 +80,6 @@ public class BookBuilder {
 
     public final static InsertBuilder INSERT = new InsertBuilder<Book>(
             new TableNode(TABLE),
-            DBConfig.config,
             TABLE.getColumn().get()
     );
 }

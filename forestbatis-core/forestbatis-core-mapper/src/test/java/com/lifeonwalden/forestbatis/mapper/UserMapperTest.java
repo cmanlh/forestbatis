@@ -1,6 +1,7 @@
 package com.lifeonwalden.forestbatis.mapper;
 
 import com.lifeonwalden.forestbatis.bean.ColumnInfo;
+import com.lifeonwalden.forestbatis.bean.Config;
 import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.builder.SelectBuilder;
 import com.lifeonwalden.forestbatis.builder.SelectSqlBuilder;
@@ -660,7 +661,6 @@ public class UserMapperTest {
         User_Book_RecordMapper recordMapper = new User_Book_RecordMapper(DBConfig.config, (Null) -> getConnection());
         SelectBuilder<User_Book_Record> joinSelect = new SelectBuilder<>(new TableNode(BookBuilder.TABLE)
                 .rightJoin(new JoinNode(User_Book_RecordBuilder.TABLE, new JoinCondition(User_Book_RecordBuilder.Book_id, BookBuilder.Id))),
-                DBConfig.config,
                 Arrays.asList(User_Book_RecordBuilder.USER_ID, BookBuilder.Name, User_Book_RecordBuilder.BorrowDate, User_Book_RecordBuilder.ReturnDate));
         List<User_Book_Record> recordList = recordMapper.select(new User_Book_Record(), joinSelect);
         Assert.assertTrue("Record size : ".concat(String.valueOf(recordList.size())), recordList.size() == 4);
@@ -1444,12 +1444,12 @@ public class UserMapperTest {
         UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
         List<User> userList = userMapper.select(new User().setSex(2), new SelectSqlBuilder<User>() {
             @Override
-            public StatementInfo build(User value) {
+            public StatementInfo build(User value,Config config) {
                 return PropertyParser.parse("select \"id\", \"sex\", 100 as \"score\" from \"User\" where \"sex\" = #{sex, JdbcType=INTEGER}");
             }
 
             @Override
-            public StatementInfo build() {
+            public StatementInfo build(Config config) {
                 return build(null);
             }
 

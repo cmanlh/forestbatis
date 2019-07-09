@@ -15,7 +15,6 @@ import java.util.Arrays;
 public class UserBuilder {
     public final static SelectBuilder SELECT = new SelectBuilder<User>(
             new TableNode(UserTableInfo.TABLE),
-            DBConfig.config,
             UserTableInfo.TABLE.getColumn().get(),
             new Eq<User>(UserTableInfo.Id, user -> user.isPresent() && null != user.get().getId())
                     .and(new Eq<User>(UserTableInfo.Name, user -> user.isPresent() && null != user.get().getName()))
@@ -25,20 +24,17 @@ public class UserBuilder {
 
     public final static DeleteBuilder DELETE = new DeleteBuilder<User>(
             new TableNode(UserTableInfo.TABLE),
-            DBConfig.config,
             new Eq(UserTableInfo.Id)
     );
 
     public final static UpdateBuilder UPDATE = new UpdateBuilder<User>(
             new TableNode(UserTableInfo.TABLE),
-            DBConfig.config,
             UserTableInfo.TABLE.getColumn().get(),
             new Eq(UserTableInfo.Id)
     ).excludeUpdateColumn(Arrays.asList(UserTableInfo.Id));
 
     public final static InsertBuilder INSERT = new InsertBuilder<User>(
             new TableNode(UserTableInfo.TABLE),
-            DBConfig.config,
             UserTableInfo.TABLE.getColumn().get()
     );
 }

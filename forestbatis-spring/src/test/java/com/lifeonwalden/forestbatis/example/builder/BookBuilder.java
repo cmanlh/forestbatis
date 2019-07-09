@@ -51,7 +51,6 @@ public class BookBuilder {
 
     public final static SelectBuilder FULL_SELECT = new SelectBuilder<Book>(
             new TableNode(TABLE),
-            DBConfig.config,
             TABLE.getColumn().get()
     );
     public final static SelectBuilder SELECT = FULL_SELECT.overrideQuery(FULL_COLUMN_WITHOUT_NULL_QUERY);
@@ -60,7 +59,6 @@ public class BookBuilder {
 
     public final static DeleteBuilder DELETE_QUERY = new DeleteBuilder<Book>(
             new TableNode(TABLE),
-            DBConfig.config,
             FULL_COLUMN_WITHOUT_NULL_QUERY
     );
 
@@ -68,7 +66,6 @@ public class BookBuilder {
 
     public final static UpdateBuilder UPDATE_QUERY = new UpdateBuilder<Book>(
             new TableNode(TABLE),
-            DBConfig.config,
             TABLE.getColumn().get(),
             FULL_COLUMN_WITHOUT_NULL_QUERY
     ).excludeUpdateColumn(Arrays.asList(Id));
@@ -79,7 +76,6 @@ public class BookBuilder {
 
     public final static InsertBuilder INSERT = new InsertBuilder<Book>(
             new TableNode(TABLE),
-            DBConfig.config,
             TABLE.getColumn().get()
     );
 }

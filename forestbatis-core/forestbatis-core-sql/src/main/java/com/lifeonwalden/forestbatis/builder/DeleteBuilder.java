@@ -16,17 +16,15 @@ public class DeleteBuilder<T> implements DeleteSqlBuilder<T> {
     private QueryNode queryNode;
     private TableNode tableNode;
     private boolean runtimeChangeable;
-    private Config config;
 
     private volatile StatementInfo cachedStatement;
 
-    public DeleteBuilder(TableNode tableNode, Config config) {
-        this(tableNode, config, null);
+    public DeleteBuilder(TableNode tableNode) {
+        this(tableNode, null);
     }
 
-    public DeleteBuilder(TableNode tableNode, Config config, QueryNode queryNode) {
+    public DeleteBuilder(TableNode tableNode, QueryNode queryNode) {
         this.tableNode = tableNode;
-        this.config = config;
         this.queryNode = queryNode;
         if (null == queryNode) {
             this.runtimeChangeable = false;
@@ -42,11 +40,11 @@ public class DeleteBuilder<T> implements DeleteSqlBuilder<T> {
      * @return
      */
     public DeleteBuilder overrideQuery(QueryNode queryNode) {
-        return new DeleteBuilder<T>(this.tableNode, this.config, queryNode);
+        return new DeleteBuilder<T>(this.tableNode, queryNode);
     }
 
     @Override
-    public StatementInfo build(T value) {
+    public StatementInfo build(T value, Config config) {
         if (this.isRuntimeChangeable() == false && this.cachedStatement != null) {
             return this.cachedStatement;
         }
@@ -54,13 +52,13 @@ public class DeleteBuilder<T> implements DeleteSqlBuilder<T> {
         StringBuilder builder = new StringBuilder();
         boolean withAlias = this.tableNode.isJoined() || this.queryNode.isJoined();
 
-        SqlCommandType.DELETE.toSql(builder,config, withAlias);
-        NodeRelation.FORM.toSql(builder,config, withAlias);
-        this.tableNode.toSql(builder,config, withAlias);
+        SqlCommandType.DELETE.toSql(builder, config, withAlias);
+        NodeRelation.FORM.toSql(builder, config, withAlias);
+        this.tableNode.toSql(builder, config, withAlias);
 
         if (null != this.queryNode && QueryNodeEnableType.DISABLED != this.queryNode.enabled(value)) {
-            NodeRelation.WHERE.toSql(builder,config, withAlias);
-            queryNode.toSql(builder, this.config, withAlias, value);
+            NodeRelation.WHERE.toSql(builder, config, withAlias);
+            queryNode.toSql(builder, config, withAlias, value);
         }
 
         if (false == this.isRuntimeChangeable()) {
@@ -72,8 +70,8 @@ public class DeleteBuilder<T> implements DeleteSqlBuilder<T> {
     }
 
     @Override
-    public StatementInfo build() {
-        return build(null);
+    public StatementInfo build(Config config) {
+        return build(null, config);
     }
 
     @Override

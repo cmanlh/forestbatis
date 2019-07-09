@@ -400,7 +400,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     @Override
     public List<T> select(T param, SelectSqlBuilder<T> selectSqlBuilder, RecordHandler<T> recordHandler) {
         Connection connection = getConnection();
-        StatementInfo statementInfo = selectSqlBuilder.build(param);
+        StatementInfo statementInfo = selectSqlBuilder.build(param, getConfig());
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
@@ -446,7 +446,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     @Override
     public void select(T param, SelectSqlBuilder<T> selectSqlBuilder, RecordHandler<T> recordHandler, StreamResultSetCallback<T> streamResultSetCallback, int fetchSize) {
         Connection connection = getConnection();
-        StatementInfo statementInfo = selectSqlBuilder.build(param);
+        StatementInfo statementInfo = selectSqlBuilder.build(param, getConfig());
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             preparedStatement.setFetchSize(fetchSize);
@@ -487,7 +487,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     @Override
     public Integer updateWithQuery(T value, UpdateSqlBuilder<T> updateSqlBuilder) {
         Connection connection = getConnection();
-        StatementInfo statementInfo = updateSqlBuilder.build(value);
+        StatementInfo statementInfo = updateSqlBuilder.build(value, getConfig());
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
@@ -513,7 +513,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
 
         Connection connection = getConnection();
         try {
-            StatementInfo statementInfo = updateSqlBuilder.build();
+            StatementInfo statementInfo = updateSqlBuilder.build(getConfig());
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
                 for (T value : valueList) {
@@ -541,7 +541,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     @Override
     public Integer deleteWithQuery(T param, DeleteSqlBuilder<T> deleteSqlBuilder) {
         Connection connection = getConnection();
-        StatementInfo statementInfo = deleteSqlBuilder.build(param);
+        StatementInfo statementInfo = deleteSqlBuilder.build(param, getConfig());
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
@@ -566,7 +566,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
         }
 
         Connection connection = getConnection();
-        StatementInfo statementInfo = deleteSqlBuilder.build();
+        StatementInfo statementInfo = deleteSqlBuilder.build(getConfig());
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
@@ -600,7 +600,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
     @Override
     public Integer insert(T value, InsertSqlBuilder<T> insertSqlBuilder) {
         Connection connection = getConnection();
-        StatementInfo statementInfo = insertSqlBuilder.build(value);
+        StatementInfo statementInfo = insertSqlBuilder.build(value, getConfig());
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {
@@ -630,7 +630,7 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
         }
 
         Connection connection = getConnection();
-        StatementInfo statementInfo = insertSqlBuilder.build();
+        StatementInfo statementInfo = insertSqlBuilder.build(getConfig());
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
             if (statementInfo.getProps().isPresent()) {

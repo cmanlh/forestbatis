@@ -20,28 +20,26 @@ import java.util.List;
 public class SelectBuilder<T> implements SelectSqlBuilder<T> {
     protected List<ColumnMeta> toReturnColumnList;
     private QueryNode queryNode;
-    private Config config;
     private TableNode tableNode;
     private List<? extends OrderBy> orderList;
     private boolean runtimeChangeable;
 
     private volatile StatementInfo cachedStatement;
 
-    public SelectBuilder(TableNode tableNode, Config config, List<ColumnMeta> toReturnColumnList) {
-        this(tableNode, config, toReturnColumnList, null, null);
+    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList) {
+        this(tableNode, toReturnColumnList, null, null);
     }
 
-    public SelectBuilder(TableNode tableNode, Config config, List<ColumnMeta> toReturnColumnList, QueryNode queryNode) {
-        this(tableNode, config, toReturnColumnList, queryNode, null);
+    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, QueryNode queryNode) {
+        this(tableNode, toReturnColumnList, queryNode, null);
     }
 
-    public SelectBuilder(TableNode tableNode, Config config, List<ColumnMeta> toReturnColumnList, List<? extends OrderBy> orderList) {
-        this(tableNode, config, toReturnColumnList, null, orderList);
+    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, List<? extends OrderBy> orderList) {
+        this(tableNode, toReturnColumnList, null, orderList);
     }
 
-    public SelectBuilder(TableNode tableNode, Config config, List<ColumnMeta> toReturnColumnList, QueryNode queryNode, List<? extends OrderBy> orderList) {
+    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, QueryNode queryNode, List<? extends OrderBy> orderList) {
         this.tableNode = tableNode;
-        this.config = config;
         this.toReturnColumnList = toReturnColumnList;
         this.queryNode = queryNode;
         this.orderList = orderList;
@@ -60,7 +58,7 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
      * @return
      */
     public SelectBuilder overrideReturnColumn(List<ColumnMeta> toReturnColumnList) {
-        return new SelectBuilder<T>(this.tableNode, this.config, toReturnColumnList, this.queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, toReturnColumnList, this.queryNode, this.orderList);
     }
 
     /**
@@ -76,7 +74,7 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
                 _toReturnColumnList.add(columnMeta);
             }
         });
-        return new SelectBuilder<T>(this.tableNode, this.config, _toReturnColumnList, this.queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList);
     }
 
     /**
@@ -89,7 +87,7 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
         List<ColumnMeta> _toReturnColumnList = new ArrayList<>();
         _toReturnColumnList.addAll(this.toReturnColumnList);
         _toReturnColumnList.addAll(toAddReturnColumnList);
-        return new SelectBuilder<T>(this.tableNode, this.config, _toReturnColumnList, this.queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList);
     }
 
     /**
@@ -99,7 +97,7 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
      * @return
      */
     public SelectBuilder overrideOrder(List<? extends OrderBy> orderList) {
-        return new SelectBuilder<T>(this.tableNode, this.config, this.toReturnColumnList, this.queryNode, orderList);
+        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, this.queryNode, orderList);
     }
 
     /**
@@ -109,11 +107,11 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
      * @return
      */
     public SelectBuilder overrideQuery(QueryNode queryNode) {
-        return new SelectBuilder<T>(this.tableNode, this.config, this.toReturnColumnList, queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, queryNode, this.orderList);
     }
 
     @Override
-    public StatementInfo build(T value) {
+    public StatementInfo build(T value, Config config) {
         if (this.isRuntimeChangeable() == false && this.cachedStatement != null) {
             return this.cachedStatement;
         }
@@ -129,14 +127,14 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
         } else {
             int index = 0;
             ColumnMeta column = this.toReturnColumnList.get(index);
-            column.toSql(builder, this.config, withAlias);
+            column.toSql(builder, config, withAlias);
             for (index = 1; index < this.toReturnColumnList.size(); index++) {
                 builder.append(", ");
-                this.toReturnColumnList.get(index).toSql(builder, this.config, withAlias);
+                this.toReturnColumnList.get(index).toSql(builder, config, withAlias);
             }
         }
 
-        NodeRelation.FORM.toSql(builder, this.config, withAlias);
+        NodeRelation.FORM.toSql(builder, config, withAlias);
 
         if (null == this.tableNode) {
             throw new RuntimeException("Has to specify a table or join table list for query");
@@ -144,17 +142,17 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
         this.tableNode.toSql(builder, config, withAlias);
 
         if (null != this.queryNode && QueryNodeEnableType.DISABLED != this.queryNode.enabled(value)) {
-            NodeRelation.WHERE.toSql(builder, this.config, withAlias);
-            queryNode.toSql(builder, this.config, withAlias, value);
+            NodeRelation.WHERE.toSql(builder, config, withAlias);
+            queryNode.toSql(builder, config, withAlias, value);
         }
 
         if (null != this.orderList && this.orderList.size() > 0) {
-            NodeRelation.ORDER_BY.toSql(builder, this.config, withAlias);
+            NodeRelation.ORDER_BY.toSql(builder, config, withAlias);
             int index = 0;
             this.orderList.get(index).toSql(builder, config, withAlias);
             for (index = 1; index < this.orderList.size(); index++) {
                 builder.append(", ");
-                this.orderList.get(index).toSql(builder, this.config, withAlias);
+                this.orderList.get(index).toSql(builder, config, withAlias);
             }
         }
 
@@ -167,8 +165,8 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
     }
 
     @Override
-    public StatementInfo build() {
-        return build(null);
+    public StatementInfo build(Config config) {
+        return build(null, config);
     }
 
     @Override

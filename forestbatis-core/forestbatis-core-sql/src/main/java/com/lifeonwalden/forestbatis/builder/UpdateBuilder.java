@@ -20,7 +20,6 @@ import java.util.Map;
 public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
     protected List<ColumnMeta> toUpdateColumnList;
     private TableNode tableNode;
-    private Config config;
     private QueryNode queryNode;
     // 是否将null字段更新到数据库
     private boolean updateNull;
@@ -28,22 +27,21 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
 
     private volatile StatementInfo cachedStatement;
 
-    public UpdateBuilder(TableNode tableNode, Config config, List<ColumnMeta> toUpdateColumnList) {
-        this(tableNode, config, toUpdateColumnList, null, true);
+    public UpdateBuilder(TableNode tableNode, List<ColumnMeta> toUpdateColumnList) {
+        this(tableNode, toUpdateColumnList, null, true);
     }
 
-    public UpdateBuilder(TableNode tableNode, Config config, List<ColumnMeta> toUpdateColumnList, boolean updateNull) {
-        this(tableNode, config, toUpdateColumnList, null, updateNull);
+    public UpdateBuilder(TableNode tableNode, List<ColumnMeta> toUpdateColumnList, boolean updateNull) {
+        this(tableNode, toUpdateColumnList, null, updateNull);
     }
 
-    public UpdateBuilder(TableNode tableNode, Config config, List<ColumnMeta> toUpdateColumnList, QueryNode queryNode) {
-        this(tableNode, config, toUpdateColumnList, queryNode, true);
+    public UpdateBuilder(TableNode tableNode, List<ColumnMeta> toUpdateColumnList, QueryNode queryNode) {
+        this(tableNode, toUpdateColumnList, queryNode, true);
     }
 
-    public UpdateBuilder(TableNode tableNode, Config config, List<ColumnMeta> toUpdateColumnList, QueryNode queryNode, boolean updateNull) {
+    public UpdateBuilder(TableNode tableNode, List<ColumnMeta> toUpdateColumnList, QueryNode queryNode, boolean updateNull) {
         this.toUpdateColumnList = toUpdateColumnList;
         this.tableNode = tableNode;
-        this.config = config;
         this.queryNode = queryNode;
         this.updateNull = updateNull;
 
@@ -65,7 +63,7 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
      * @return
      */
     public UpdateBuilder overrideUpdateColumn(List<ColumnMeta> toUpdateColumnList) {
-        return new UpdateBuilder<T>(this.tableNode, this.config, toUpdateColumnList, this.queryNode, this.updateNull);
+        return new UpdateBuilder<T>(this.tableNode, toUpdateColumnList, this.queryNode, this.updateNull);
     }
 
     /**
@@ -75,7 +73,7 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
      * @return
      */
     public UpdateBuilder overrideUpdateColumn(boolean updateNull) {
-        return new UpdateBuilder<T>(this.tableNode, this.config, this.toUpdateColumnList, this.queryNode, updateNull);
+        return new UpdateBuilder<T>(this.tableNode, this.toUpdateColumnList, this.queryNode, updateNull);
     }
 
     /**
@@ -86,7 +84,7 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
      * @return
      */
     public UpdateBuilder overrideUpdateColumn(List<ColumnMeta> toUpdateColumnList, boolean updateNull) {
-        return new UpdateBuilder<T>(this.tableNode, this.config, toUpdateColumnList, this.queryNode, updateNull);
+        return new UpdateBuilder<T>(this.tableNode, toUpdateColumnList, this.queryNode, updateNull);
     }
 
     /**
@@ -102,7 +100,7 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
                 _toUpdateColumnList.add(columnMeta);
             }
         });
-        return new UpdateBuilder<T>(this.tableNode, this.config, _toUpdateColumnList, this.queryNode, this.updateNull);
+        return new UpdateBuilder<T>(this.tableNode, _toUpdateColumnList, this.queryNode, this.updateNull);
     }
 
     /**
@@ -119,7 +117,7 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
                 _toUpdateColumnList.add(columnMeta);
             }
         });
-        return new UpdateBuilder<T>(this.tableNode, this.config, _toUpdateColumnList, this.queryNode, updateNull);
+        return new UpdateBuilder<T>(this.tableNode, _toUpdateColumnList, this.queryNode, updateNull);
     }
 
     /**
@@ -132,7 +130,7 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
         List<ColumnMeta> _toUpdateColumnList = new ArrayList<>();
         _toUpdateColumnList.addAll(this.toUpdateColumnList);
         _toUpdateColumnList.addAll(toAddUpdateColumnList);
-        return new UpdateBuilder<T>(this.tableNode, this.config, _toUpdateColumnList, this.queryNode, this.updateNull);
+        return new UpdateBuilder<T>(this.tableNode, _toUpdateColumnList, this.queryNode, this.updateNull);
     }
 
     /**
@@ -146,7 +144,7 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
         List<ColumnMeta> _toUpdateColumnList = new ArrayList<>();
         _toUpdateColumnList.addAll(this.toUpdateColumnList);
         _toUpdateColumnList.addAll(toAddUpdateColumnList);
-        return new UpdateBuilder<T>(this.tableNode, this.config, _toUpdateColumnList, this.queryNode, updateNull);
+        return new UpdateBuilder<T>(this.tableNode, _toUpdateColumnList, this.queryNode, updateNull);
     }
 
     /**
@@ -156,7 +154,7 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
      * @return
      */
     public UpdateBuilder overrideQuery(QueryNode queryNode) {
-        return new UpdateBuilder<T>(this.tableNode, this.config, this.toUpdateColumnList, queryNode, this.updateNull);
+        return new UpdateBuilder<T>(this.tableNode, this.toUpdateColumnList, queryNode, this.updateNull);
     }
 
     /**
@@ -166,11 +164,11 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
      * @return
      */
     public UpdateBuilder overrideQuery(QueryNode queryNode, boolean updateNull) {
-        return new UpdateBuilder<T>(this.tableNode, this.config, this.toUpdateColumnList, queryNode, updateNull);
+        return new UpdateBuilder<T>(this.tableNode, this.toUpdateColumnList, queryNode, updateNull);
     }
 
     @Override
-    public StatementInfo build(T value) {
+    public StatementInfo build(T value, Config config) {
         if (this.isRuntimeChangeable() == false && this.cachedStatement != null) {
             return this.cachedStatement;
         }
@@ -178,10 +176,10 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
         StringBuilder builder = new StringBuilder();
         boolean withAlias = this.tableNode.isJoined() || this.queryNode.isJoined();
 
-        SqlCommandType.UPDATE.toSql(builder, this.config);
+        SqlCommandType.UPDATE.toSql(builder, config);
         builder.append(" ");
-        this.tableNode.toSql(builder, this.config, withAlias);
-        NodeRelation.SET.toSql(builder, this.config);
+        this.tableNode.toSql(builder, config, withAlias);
+        NodeRelation.SET.toSql(builder, config);
 
         if (this.isRuntimeChangeable()) {
             Map<String, Object> _value = toValue(value);
@@ -196,9 +194,9 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
                         builder.append(", ");
                     }
                     columnMeta = this.toUpdateColumnList.get(idx);
-                    columnMeta.toSql(builder, this.config, withAlias);
-                    NodeRelation.EQ.toSql(builder, this.config);
-                    columnMeta.getJavaProperty().get().toSql(builder, this.config);
+                    columnMeta.toSql(builder, config, withAlias);
+                    NodeRelation.EQ.toSql(builder, config);
+                    columnMeta.getJavaProperty().get().toSql(builder, config);
 
                     notFirstOne = true;
                 }
@@ -206,22 +204,22 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
         } else {
             int idx = 0;
             ColumnMeta columnMeta = this.toUpdateColumnList.get(idx);
-            columnMeta.toSql(builder, this.config, withAlias);
-            NodeRelation.EQ.toSql(builder, this.config);
-            columnMeta.getJavaProperty().get().toSql(builder, this.config);
+            columnMeta.toSql(builder, config, withAlias);
+            NodeRelation.EQ.toSql(builder, config);
+            columnMeta.getJavaProperty().get().toSql(builder, config);
             for (idx = 1; idx < this.toUpdateColumnList.size(); idx++) {
                 builder.append(", ");
 
                 columnMeta = this.toUpdateColumnList.get(idx);
-                columnMeta.toSql(builder, this.config, withAlias);
-                NodeRelation.EQ.toSql(builder, this.config);
-                columnMeta.getJavaProperty().get().toSql(builder, this.config);
+                columnMeta.toSql(builder, config, withAlias);
+                NodeRelation.EQ.toSql(builder, config);
+                columnMeta.getJavaProperty().get().toSql(builder, config);
             }
         }
 
         if (null != this.queryNode && QueryNodeEnableType.DISABLED != this.queryNode.enabled(value)) {
-            NodeRelation.WHERE.toSql(builder, this.config, withAlias);
-            queryNode.toSql(builder, this.config, withAlias, value);
+            NodeRelation.WHERE.toSql(builder, config, withAlias);
+            queryNode.toSql(builder, config, withAlias, value);
         }
 
         if (false == this.isRuntimeChangeable()) {
@@ -233,8 +231,8 @@ public class UpdateBuilder<T> implements UpdateSqlBuilder<T> {
     }
 
     @Override
-    public StatementInfo build() {
-        return build(null);
+    public StatementInfo build(Config config) {
+        return build(null, config);
     }
 
     @Override

@@ -57,7 +57,6 @@ public class UserBuilder {
 
     public final static SelectBuilder FULL_SELECT = new SelectBuilder<User>(
             new TableNode(TABLE),
-            DBConfig.config,
             TABLE.getColumn().get()
     );
 
@@ -67,7 +66,6 @@ public class UserBuilder {
 
     public final static DeleteBuilder DELETE_QUERY = new DeleteBuilder<User>(
             new TableNode(TABLE),
-            DBConfig.config,
             FULL_COLUMN_WITHOUT_NULL_QUERY
     );
 
@@ -75,7 +73,6 @@ public class UserBuilder {
 
     public final static UpdateBuilder UPDATE_QUERY = new UpdateBuilder<User>(
             new TableNode(TABLE),
-            DBConfig.config,
             TABLE.getColumn().get(),
             FULL_COLUMN_WITHOUT_NULL_QUERY
     ).excludeUpdateColumn(Arrays.asList(Id));
@@ -86,7 +83,6 @@ public class UserBuilder {
 
     public final static InsertBuilder INSERT = new InsertBuilder<User>(
             new TableNode(TABLE),
-            DBConfig.config,
             TABLE.getColumn().get()
     );
 }

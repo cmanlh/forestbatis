@@ -19,17 +19,15 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
     private TableNode tableNode;
     // 是否将null字段插入数据库
     private boolean insertNull;
-    private Config config;
 
     private volatile StatementInfo cachedStatement;
 
-    public InsertBuilder(TableNode tableNode, Config config, List<ColumnMeta> toInsertColumnList) {
-        this(tableNode, config, toInsertColumnList, true);
+    public InsertBuilder(TableNode tableNode, List<ColumnMeta> toInsertColumnList) {
+        this(tableNode, toInsertColumnList, true);
     }
 
-    public InsertBuilder(TableNode tableNode, Config config, List<ColumnMeta> toInsertColumnList, boolean insertNull) {
+    public InsertBuilder(TableNode tableNode, List<ColumnMeta> toInsertColumnList, boolean insertNull) {
         this.tableNode = tableNode;
-        this.config = config;
         this.toInsertColumnList = toInsertColumnList;
         this.insertNull = insertNull;
     }
@@ -41,7 +39,7 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
      * @return
      */
     public InsertBuilder overrideInsertColumn(List<ColumnMeta> toInsertColumnList) {
-        return new InsertBuilder<T>(this.tableNode, this.config, toInsertColumnList, this.insertNull);
+        return new InsertBuilder<T>(this.tableNode, toInsertColumnList, this.insertNull);
     }
 
     /**
@@ -52,7 +50,7 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
      * @return
      */
     public InsertBuilder overrideInsertColumn(List<ColumnMeta> toInsertColumnList, boolean insertNull) {
-        return new InsertBuilder<T>(this.tableNode, this.config, toInsertColumnList, insertNull);
+        return new InsertBuilder<T>(this.tableNode, toInsertColumnList, insertNull);
     }
 
     /**
@@ -62,7 +60,7 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
      * @return
      */
     public InsertBuilder overrideInsertColumn(boolean insertNull) {
-        return new InsertBuilder<T>(this.tableNode, this.config, this.toInsertColumnList, insertNull);
+        return new InsertBuilder<T>(this.tableNode, this.toInsertColumnList, insertNull);
     }
 
     /**
@@ -78,7 +76,7 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
                 _toInsertColumnList.add(columnMeta);
             }
         });
-        return new InsertBuilder<T>(this.tableNode, this.config, _toInsertColumnList, this.insertNull);
+        return new InsertBuilder<T>(this.tableNode, _toInsertColumnList, this.insertNull);
     }
 
     /**
@@ -95,7 +93,7 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
                 _toInsertColumnList.add(columnMeta);
             }
         });
-        return new InsertBuilder<T>(this.tableNode, this.config, _toInsertColumnList, insertNull);
+        return new InsertBuilder<T>(this.tableNode, _toInsertColumnList, insertNull);
     }
 
     /**
@@ -108,7 +106,7 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
         List<ColumnMeta> _toInsertColumnList = new ArrayList<>();
         _toInsertColumnList.addAll(this.toInsertColumnList);
         _toInsertColumnList.addAll(toAddInsertColumnList);
-        return new InsertBuilder<T>(this.tableNode, this.config, _toInsertColumnList, this.insertNull);
+        return new InsertBuilder<T>(this.tableNode, _toInsertColumnList, this.insertNull);
     }
 
     /**
@@ -122,11 +120,11 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
         List<ColumnMeta> _toInsertColumnList = new ArrayList<>();
         _toInsertColumnList.addAll(this.toInsertColumnList);
         _toInsertColumnList.addAll(toAddInsertColumnList);
-        return new InsertBuilder<T>(this.tableNode, this.config, _toInsertColumnList, insertNull);
+        return new InsertBuilder<T>(this.tableNode, _toInsertColumnList, insertNull);
     }
 
     @Override
-    public StatementInfo build(T value) {
+    public StatementInfo build(T value, Config config) {
         if (this.isRuntimeChangeable() == false && this.cachedStatement != null) {
             return this.cachedStatement;
         }
@@ -153,8 +151,8 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
                         builder.append(", ");
                         innerbuilder.append(", ");
                     }
-                    columnMeta.toSql(builder, this.config, false);
-                    columnMeta.getJavaProperty().get().toSql(innerbuilder, this.config);
+                    columnMeta.toSql(builder, config, false);
+                    columnMeta.getJavaProperty().get().toSql(innerbuilder, config);
 
                     notFirstOne = true;
                 }
@@ -167,15 +165,15 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
             builder.append("(");
             int idx = 0;
             ColumnMeta columnMeta = this.toInsertColumnList.get(idx);
-            columnMeta.toSql(builder, this.config, false);
-            columnMeta.getJavaProperty().get().toSql(innerbuilder, this.config);
+            columnMeta.toSql(builder, config, false);
+            columnMeta.getJavaProperty().get().toSql(innerbuilder, config);
             for (idx = 1; idx < this.toInsertColumnList.size(); idx++) {
                 columnMeta = this.toInsertColumnList.get(idx);
                 builder.append(", ");
-                columnMeta.toSql(builder, this.config, false);
+                columnMeta.toSql(builder, config, false);
 
                 innerbuilder.append(", ");
-                columnMeta.getJavaProperty().get().toSql(innerbuilder, this.config);
+                columnMeta.getJavaProperty().get().toSql(innerbuilder, config);
             }
             builder.append(")");
 
@@ -190,8 +188,8 @@ public class InsertBuilder<T> implements InsertSqlBuilder<T> {
     }
 
     @Override
-    public StatementInfo build() {
-        return build(null);
+    public StatementInfo build(Config config) {
+        return build(null, config);
     }
 
     @Override
