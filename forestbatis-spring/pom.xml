@@ -4,7 +4,7 @@
     <parent>
         <artifactId>forestbatis</artifactId>
         <groupId>com.lifeonwalden</groupId>
-        <version>1.0.4-SNAPSHOT</version>
+        <version>1.0.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.lifeonwalden</groupId>
             <artifactId>forestbatis-core-mapper</artifactId>
-            <version>1.0.4-SNAPSHOT</version>
+            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
