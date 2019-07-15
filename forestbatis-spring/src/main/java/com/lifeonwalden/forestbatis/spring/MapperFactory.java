@@ -35,6 +35,10 @@ public class MapperFactory implements InitializingBean {
         this.dataSource = dataSource;
     }
 
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
     public void setConfig(Config config) {
         this.config = config;
     }
