@@ -41,6 +41,7 @@ public abstract class AbstractRecordHandler<T> implements RecordHandler<T> {
                         }
                         break;
                     }
+                    case NUMERIC:
                     case DECIMAL:
                         bean.put(propertyName, resultSet.getBigDecimal(index));
                         break;

@@ -59,6 +59,7 @@ public class DefaultParameterhandler implements ParameterHandler {
                     }
                     break;
                 }
+                case NUMERIC:
                 case DECIMAL: {
                     BigDecimal value = fetchValue(propertyInfo, param);
                     if (null == value) {
