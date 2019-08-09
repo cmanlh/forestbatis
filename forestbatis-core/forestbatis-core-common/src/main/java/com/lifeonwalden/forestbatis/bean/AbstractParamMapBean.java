@@ -20,22 +20,30 @@ public abstract class AbstractParamMapBean extends AbstractMapBean {
         if (null == clazz || clazz.isInstance(value)) {
             _value = value;
         } else if (value instanceof String) {
-            if (Integer.class.equals(clazz)) {
-                _value = Integer.parseInt((String) value);
-            } else if (BigDecimal.class.equals(clazz)) {
-                _value = new BigDecimal((String) value);
-            } else if (Boolean.class.equals(clazz)) {
-                _value = new Boolean((String) value);
-            } else if (Date.class.equals(clazz)) {
-                _value = new Date(Long.parseLong((String) value));
-            } else if (Long.class.equals(clazz)) {
-                _value = Long.parseLong((String) value);
+            if (((String) value).isEmpty()) {
+                _value = null;
             } else {
-                throw new RuntimeException("Invalid data format : " + key);
+                if (Integer.class.equals(clazz)) {
+                    _value = Integer.parseInt((String) value);
+                } else if (BigDecimal.class.equals(clazz)) {
+                    _value = new BigDecimal((String) value);
+                } else if (Boolean.class.equals(clazz)) {
+                    _value = new Boolean((String) value);
+                } else if (Date.class.equals(clazz)) {
+                    _value = new Date(Long.parseLong((String) value));
+                } else if (Long.class.equals(clazz)) {
+                    _value = Long.parseLong((String) value);
+                } else {
+                    throw new RuntimeException("Invalid data format : " + key);
+                }
             }
         } else {
             throw new RuntimeException("Invalid data format : " + key);
         }
-        return dataMap.put(key, _value);
+        if (null != _value) {
+            return dataMap.put(key, _value);
+        } else {
+            return dataMap.remove(key);
+        }
     }
 }
