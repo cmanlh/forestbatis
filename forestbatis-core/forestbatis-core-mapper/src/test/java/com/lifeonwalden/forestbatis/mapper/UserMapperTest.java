@@ -18,6 +18,7 @@ import com.lifeonwalden.forestbatis.example.mapper.UserMapper;
 import com.lifeonwalden.forestbatis.example.mapper.User_Book_RecordMapper;
 import com.lifeonwalden.forestbatis.example.meta.BookMetaInfo;
 import com.lifeonwalden.forestbatis.meta.*;
+import com.lifeonwalden.forestbatis.meta.func.*;
 import com.lifeonwalden.forestbatis.parsing.PropertyParser;
 import com.lifeonwalden.forestbatis.util.DateUtil;
 import org.junit.After;
@@ -488,6 +489,72 @@ public class UserMapperTest {
         Assert.assertTrue("Id is ".concat(user.getId()), "Lucy".equals(user.getId()));
         Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 18);
         Assert.assertNull(user.getIncome());
+    }
+
+    @Test
+    public void select_count() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.select(new User(), UserBuilder.SELECT.overrideReturnColumn(Arrays.asList(new Count(new AbstractPropertyMeta("userCnt") {
+        }))));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 1);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.get(0).get("userCnt"))), (long) userList.get(0).get("userCnt") == 4);
+    }
+
+    @Test
+    public void select_sum() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.select(new User(),
+                UserBuilder.SELECT
+                        .overrideReturnColumn(Arrays.asList(UserBuilder.Sex, new Sum(UserBuilder.Income, new AbstractPropertyMeta("totalIncome") {
+                        })))
+                        .overrideGroup(new Group(UserBuilder.Sex))
+        );
+        Assert.assertTrue("Male income : ".concat(String.valueOf(userList.get(0).get("totalIncome"))), BigDecimal.valueOf(18888.870000).compareTo((BigDecimal) userList.get(0).get("totalIncome")) == 0);
+        Assert.assertTrue("Female income : ".concat(String.valueOf(userList.get(1).get("totalIncome"))), BigDecimal.valueOf(12080.120000).compareTo((BigDecimal) userList.get(1).get("totalIncome")) == 0);
+    }
+
+    @Test
+    public void select_max() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.select(new User(),
+                UserBuilder.SELECT
+                        .overrideReturnColumn(Arrays.asList(UserBuilder.Sex, new Max(UserBuilder.Income, new AbstractPropertyMeta("maxIncome") {
+                        })))
+                        .overrideGroup(new Group(UserBuilder.Sex))
+        );
+        Assert.assertTrue("Male maxIncome : ".concat(String.valueOf(userList.get(0).get("maxIncome"))), BigDecimal.valueOf(9999.990000).compareTo((BigDecimal) userList.get(0).get("maxIncome")) == 0);
+        Assert.assertTrue("Female maxIncome : ".concat(String.valueOf(userList.get(1).get("maxIncome"))), BigDecimal.valueOf(12080.120000).compareTo((BigDecimal) userList.get(1).get("maxIncome")) == 0);
+    }
+
+    @Test
+    public void select_min() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.select(new User(),
+                UserBuilder.SELECT
+                        .overrideReturnColumn(Arrays.asList(UserBuilder.Sex, new Min(UserBuilder.Income, new AbstractPropertyMeta("minIncome") {
+                        })))
+                        .overrideGroup(new Group(UserBuilder.Sex))
+        );
+        Assert.assertTrue("Male minIncome : ".concat(String.valueOf(userList.get(0).get("minIncome"))), BigDecimal.valueOf(8888.880000).compareTo((BigDecimal) userList.get(0).get("minIncome")) == 0);
+        Assert.assertTrue("Female minIncome : ".concat(String.valueOf(userList.get(1).get("minIncome"))), BigDecimal.valueOf(12080.120000).compareTo((BigDecimal) userList.get(1).get("minIncome")) == 0);
+    }
+
+    @Test
+    public void select_avg() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.select(new User(),
+                UserBuilder.SELECT
+                        .overrideReturnColumn(Arrays.asList(UserBuilder.Sex, new Avg(UserBuilder.Income, new AbstractPropertyMeta("avgIncome") {
+                        })))
+                        .overrideGroup(new Group(UserBuilder.Sex))
+        );
+        Assert.assertTrue("Male avgIncome : ".concat(String.valueOf(userList.get(0).get("avgIncome"))), BigDecimal.valueOf(9444.435000).compareTo((BigDecimal) userList.get(0).get("avgIncome")) == 0);
+        Assert.assertTrue("Female avgIncome : ".concat(String.valueOf(userList.get(1).get("avgIncome"))), BigDecimal.valueOf(12080.120000).compareTo((BigDecimal) userList.get(1).get("avgIncome")) == 0);
     }
 
     @Test
@@ -1444,7 +1511,7 @@ public class UserMapperTest {
         UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
         List<User> userList = userMapper.select(new User().setSex(2), new SelectSqlBuilder<User>() {
             @Override
-            public StatementInfo build(User value,Config config) {
+            public StatementInfo build(User value, Config config) {
                 return PropertyParser.parse("select \"id\", \"sex\", 100 as \"score\" from \"User\" where \"sex\" = #{sex, JdbcType=INTEGER}");
             }
 

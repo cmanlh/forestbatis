@@ -5,10 +5,7 @@ import com.lifeonwalden.forestbatis.bean.StatementInfo;
 import com.lifeonwalden.forestbatis.constant.NodeRelation;
 import com.lifeonwalden.forestbatis.constant.QueryNodeEnableType;
 import com.lifeonwalden.forestbatis.constant.SqlCommandType;
-import com.lifeonwalden.forestbatis.meta.ColumnMeta;
-import com.lifeonwalden.forestbatis.meta.OrderBy;
-import com.lifeonwalden.forestbatis.meta.QueryNode;
-import com.lifeonwalden.forestbatis.meta.TableNode;
+import com.lifeonwalden.forestbatis.meta.*;
 import com.lifeonwalden.forestbatis.parsing.PropertyParser;
 
 import java.util.ArrayList;
@@ -22,27 +19,45 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
     private QueryNode queryNode;
     private TableNode tableNode;
     private List<? extends OrderBy> orderList;
+    private Group group;
     private boolean runtimeChangeable;
 
     private volatile StatementInfo cachedStatement;
 
     public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList) {
-        this(tableNode, toReturnColumnList, null, null);
+        this(tableNode, toReturnColumnList, null, null, null);
+    }
+
+    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, Group group) {
+        this(tableNode, toReturnColumnList, null, null, group);
     }
 
     public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, QueryNode queryNode) {
-        this(tableNode, toReturnColumnList, queryNode, null);
+        this(tableNode, toReturnColumnList, queryNode, null, null);
+    }
+
+    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, QueryNode queryNode, Group group) {
+        this(tableNode, toReturnColumnList, queryNode, null, group);
     }
 
     public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, List<? extends OrderBy> orderList) {
-        this(tableNode, toReturnColumnList, null, orderList);
+        this(tableNode, toReturnColumnList, null, orderList, null);
+    }
+
+    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, List<? extends OrderBy> orderList, Group group) {
+        this(tableNode, toReturnColumnList, null, orderList, group);
     }
 
     public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, QueryNode queryNode, List<? extends OrderBy> orderList) {
+        this(tableNode, toReturnColumnList, queryNode, orderList, null);
+    }
+
+    public SelectBuilder(TableNode tableNode, List<ColumnMeta> toReturnColumnList, QueryNode queryNode, List<? extends OrderBy> orderList, Group group) {
         this.tableNode = tableNode;
         this.toReturnColumnList = toReturnColumnList;
         this.queryNode = queryNode;
         this.orderList = orderList;
+        this.group = group;
 
         if (null == this.queryNode) {
             this.runtimeChangeable = false;
@@ -58,7 +73,7 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
      * @return
      */
     public SelectBuilder overrideReturnColumn(List<ColumnMeta> toReturnColumnList) {
-        return new SelectBuilder<T>(this.tableNode, toReturnColumnList, this.queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, toReturnColumnList, this.queryNode, this.orderList, this.group);
     }
 
     /**
@@ -74,7 +89,7 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
                 _toReturnColumnList.add(columnMeta);
             }
         });
-        return new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList, this.group);
     }
 
     /**
@@ -87,7 +102,7 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
         List<ColumnMeta> _toReturnColumnList = new ArrayList<>();
         _toReturnColumnList.addAll(this.toReturnColumnList);
         _toReturnColumnList.addAll(toAddReturnColumnList);
-        return new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList, this.group);
     }
 
     /**
@@ -97,7 +112,17 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
      * @return
      */
     public SelectBuilder overrideOrder(List<? extends OrderBy> orderList) {
-        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, this.queryNode, orderList);
+        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, this.queryNode, orderList, this.group);
+    }
+
+    /**
+     * 覆盖聚合并构造一个新的SQL构建器
+     *
+     * @param group
+     * @return
+     */
+    public SelectBuilder overrideGroup(Group group) {
+        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, this.queryNode, this.orderList, group);
     }
 
     /**
@@ -107,7 +132,7 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
      * @return
      */
     public SelectBuilder overrideQuery(QueryNode queryNode) {
-        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, queryNode, this.orderList);
+        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, queryNode, this.orderList, this.group);
     }
 
     @Override
@@ -144,6 +169,11 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
         if (null != this.queryNode && QueryNodeEnableType.DISABLED != this.queryNode.enabled(value)) {
             NodeRelation.WHERE.toSql(builder, config, withAlias);
             queryNode.toSql(builder, config, withAlias, value);
+        }
+
+        if (null != this.group) {
+            NodeRelation.GROUP_BY.toSql(builder, config, withAlias);
+            this.group.toSql(builder, config, withAlias);
         }
 
         if (null != this.orderList && this.orderList.size() > 0) {
