@@ -46,9 +46,11 @@ public abstract class AbstractRecordHandler<T> implements RecordHandler<T> {
                         bean.put(propertyName, resultSet.getBigDecimal(index));
                         break;
                     case DATE:
+                        bean.put(propertyName, resultSet.getDate(index));
+                        break;
                     case TIMESTAMP:
                     case DATETIME:
-                        bean.put(propertyName, resultSet.getDate(index));
+                        bean.put(propertyName, resultSet.getTimestamp(index));
                         break;
                     case BIGINT: {
                         long value = resultSet.getLong(index);
