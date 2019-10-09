@@ -8,7 +8,7 @@ import com.lifeonwalden.forestbatis.meta.SqlNode;
  */
 public enum NodeRelation implements SqlNode {
     AND("and"), OR("or"), EQ("="), NEQ("<>"), BT(">"), LT("<"), BTE(">="), LTE("<="), LIKE("like"), NOT_LIKE("not like"), IN("in"), NOT_IN("not in"), EXISTS("exists"), NOT_EXISTS("not exists"), IS_NULL("is null"), IS_NOT_NULL("is not null"),
-    ON("on"), LEFT_JOIN("left join"), RIGHT_JOIN("right join"), INNER_JOIN("inner join"), ORDER_BY("order by"), FORM("from"), WHERE("where"), SET("set"), GROUP_BY("group by");
+    ON("on"), LEFT_JOIN("left join"), RIGHT_JOIN("right join"), INNER_JOIN("inner join"), ORDER_BY("order by"), FORM("from"), WHERE("where"), SET("set"), GROUP_BY("group by"), LOGICAL_AND("&"), LOGICAL_OR("|");
 
     private String sign;
 

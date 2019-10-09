@@ -515,6 +515,22 @@ public class UserMapperTest {
         Assert.assertTrue("Female income : ".concat(String.valueOf(userList.get(1).get("totalIncome"))), BigDecimal.valueOf(12080.120000).compareTo((BigDecimal) userList.get(1).get("totalIncome")) == 0);
     }
 
+    //    @Test
+    // hsqldb not support bit operation through operator
+    public void select_logical_and() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.select(new User().setAge(15),
+                UserBuilder.SELECT.overrideQuery(new LogicalAnd(UserBuilder.Age, UserBuilder.age, UserBuilder.age))
+        );
+
+        Assert.assertEquals(1, userList.size());
+        User user = userList.get(0);
+        Assert.assertTrue("Id is ".concat(user.getId()), "Tom".equals(user.getId()));
+        Assert.assertTrue("Age is ".concat(String.valueOf(user.getAge())), user.getAge() == 15);
+        Assert.assertNull(user.getIncome());
+    }
+
     @Test
     public void select_max() {
         reset();
