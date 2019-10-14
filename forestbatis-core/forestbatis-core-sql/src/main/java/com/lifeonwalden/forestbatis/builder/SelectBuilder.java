@@ -21,6 +21,7 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
     private List<? extends OrderBy> orderList;
     private Group group;
     private boolean runtimeChangeable;
+    private boolean withDistinct = false;
 
     private volatile StatementInfo cachedStatement;
 
@@ -67,13 +68,26 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
     }
 
     /**
+     * @param withDistinct
+     */
+    public SelectBuilder overrideDistinct(boolean withDistinct) {
+        SelectBuilder<T> selectBuilder = new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, this.queryNode, this.orderList, this.group);
+        selectBuilder.withDistinct = withDistinct;
+
+        return selectBuilder;
+    }
+
+    /**
      * 覆盖返回列并构造一个新的SQL构建器
      *
      * @param toReturnColumnList
      * @return
      */
     public SelectBuilder overrideReturnColumn(List<ColumnMeta> toReturnColumnList) {
-        return new SelectBuilder<T>(this.tableNode, toReturnColumnList, this.queryNode, this.orderList, this.group);
+        SelectBuilder<T> selectBuilder = new SelectBuilder<T>(this.tableNode, toReturnColumnList, this.queryNode, this.orderList, this.group);
+        selectBuilder.withDistinct = withDistinct;
+
+        return selectBuilder;
     }
 
     /**
@@ -89,7 +103,11 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
                 _toReturnColumnList.add(columnMeta);
             }
         });
-        return new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList, this.group);
+
+        SelectBuilder<T> selectBuilder = new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList, this.group);
+        selectBuilder.withDistinct = withDistinct;
+
+        return selectBuilder;
     }
 
     /**
@@ -102,7 +120,10 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
         List<ColumnMeta> _toReturnColumnList = new ArrayList<>();
         _toReturnColumnList.addAll(this.toReturnColumnList);
         _toReturnColumnList.addAll(toAddReturnColumnList);
-        return new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList, this.group);
+        SelectBuilder<T> selectBuilder = new SelectBuilder<T>(this.tableNode, _toReturnColumnList, this.queryNode, this.orderList, this.group);
+        selectBuilder.withDistinct = withDistinct;
+
+        return selectBuilder;
     }
 
     /**
@@ -112,7 +133,10 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
      * @return
      */
     public SelectBuilder overrideOrder(List<? extends OrderBy> orderList) {
-        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, this.queryNode, orderList, this.group);
+        SelectBuilder<T> selectBuilder = new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, this.queryNode, orderList, this.group);
+        selectBuilder.withDistinct = withDistinct;
+
+        return selectBuilder;
     }
 
     /**
@@ -122,7 +146,10 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
      * @return
      */
     public SelectBuilder overrideGroup(Group group) {
-        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, this.queryNode, this.orderList, group);
+        SelectBuilder<T> selectBuilder = new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, this.queryNode, this.orderList, group);
+        selectBuilder.withDistinct = withDistinct;
+
+        return selectBuilder;
     }
 
     /**
@@ -132,7 +159,10 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
      * @return
      */
     public SelectBuilder overrideQuery(QueryNode queryNode) {
-        return new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, queryNode, this.orderList, this.group);
+        SelectBuilder<T> selectBuilder = new SelectBuilder<T>(this.tableNode, this.toReturnColumnList, queryNode, this.orderList, this.group);
+        selectBuilder.withDistinct = withDistinct;
+
+        return selectBuilder;
     }
 
     @Override
@@ -146,6 +176,10 @@ public class SelectBuilder<T> implements SelectSqlBuilder<T> {
 
         SqlCommandType.SELECT.toSql(builder, config, withAlias);
         builder.append(" ");
+
+        if (this.withDistinct) {
+            builder.append(" distinct ");
+        }
 
         if (null == this.toReturnColumnList || this.toReturnColumnList.isEmpty()) {
             builder.append(1);

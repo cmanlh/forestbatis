@@ -580,6 +580,14 @@ public class UserMapperTest {
     }
 
     @Test
+    public void select_distinct() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.select(new User(), UserBuilder.SELECT.overrideDistinct(true).overrideReturnColumn(Arrays.asList(UserBuilder.Sex)));
+        Assert.assertTrue(userList.size() == 2);
+    }
+
+    @Test
     public void select_avg() {
         reset();
         UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
