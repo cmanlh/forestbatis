@@ -502,6 +502,26 @@ public class UserMapperTest {
     }
 
     @Test
+    public void select_count_distinct() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.select(new User(), UserBuilder.SELECT.overrideReturnColumn(Arrays.asList(new Count(new AbstractPropertyMeta("userCnt") {
+        }, UserBuilder.Sex))));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 1);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.get(0).get("userCnt"))), (long) userList.get(0).get("userCnt") == 2);
+    }
+
+    @Test
+    public void select_count_distinct_double() {
+        reset();
+        UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
+        List<User> userList = userMapper.select(new User(), UserBuilder.SELECT.overrideReturnColumn(Arrays.asList(new Count(new AbstractPropertyMeta("userCnt") {
+        }, UserBuilder.Sex, UserBuilder.Age))));
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.size())), userList.size() == 1);
+        Assert.assertTrue("User size : ".concat(String.valueOf(userList.get(0).get("userCnt"))), (long) userList.get(0).get("userCnt") == 4);
+    }
+
+    @Test
     public void select_sum() {
         reset();
         UserMapper userMapper = new UserMapper(DBConfig.config, (Null) -> getConnection());
