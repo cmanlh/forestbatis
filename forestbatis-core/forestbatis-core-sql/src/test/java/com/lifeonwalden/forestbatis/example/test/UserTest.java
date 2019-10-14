@@ -1,6 +1,7 @@
 package com.lifeonwalden.forestbatis.example.test;
 
 import com.lifeonwalden.forestbatis.builder.SelectBuilder;
+import com.lifeonwalden.forestbatis.constant.NodeRelation;
 import com.lifeonwalden.forestbatis.constant.OrderEnum;
 import com.lifeonwalden.forestbatis.example.bean.User;
 import com.lifeonwalden.forestbatis.example.builder.UserBuilder;
@@ -421,5 +422,15 @@ public class UserTest {
         String sql = UserBuilder.UPDATE.overrideQuery(new Like(UserTableInfo.Name)).build(new User().setId("id").setName("Tom"), DBConfig.config).getSql();
         Assert.assertTrue(sql,
                 "update User set name = ?, age = ?, birthday = ? where name like ?".equals(sql));
+    }
+
+    @Test
+    public void logicalNode() {
+        String sql = UserBuilder.SELECT
+                .overrideQuery(new Logical(UserTableInfo.Age, new LogicalNode(UserTableInfo.Age, NodeRelation.LOGICAL_AND), new LogicalNode(UserTableInfo.sex, NodeRelation.LOGICAL_OR), new LogicalNode(UserTableInfo.id, null)))
+                .build(new User(), DBConfig.config)
+                .getSql();
+
+        Assert.assertTrue("select id, name, age, birthday from User where (age & ? | ? = age)".equals(sql));
     }
 }
