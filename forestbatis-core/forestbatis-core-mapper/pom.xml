@@ -4,7 +4,7 @@
     <parent>
         <artifactId>forestbatis-core</artifactId>
         <groupId>com.lifeonwalden</groupId>
-        <version>1.0.12-SNAPSHOT</version>
+        <version>1.0.12</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.lifeonwalden</groupId>
             <artifactId>forestbatis-core-sql</artifactId>
-            <version>1.0.12-SNAPSHOT</version>
+            <version>1.0.12</version>
         </dependency>
         <dependency>
             <groupId>org.hsqldb</groupId>
