@@ -12,6 +12,7 @@ import com.lifeonwalden.forestbatis.result.ParameterHandler;
 import com.lifeonwalden.forestbatis.result.RecordHandler;
 import com.lifeonwalden.forestbatis.result.ReturnColumnHanlder;
 import com.lifeonwalden.forestbatis.result.StreamResultSetCallback;
+import com.lifeonwalden.forestbatis.util.DatabaseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -448,8 +449,19 @@ public abstract class AbstractCommonMapper<T> implements CommonMapper<T> {
         Connection connection = getConnection();
         StatementInfo statementInfo = selectSqlBuilder.build(param, getConfig());
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(statementInfo.getSql());
-            preparedStatement.setFetchSize(fetchSize);
+
+            PreparedStatement preparedStatement = null;
+            switch (DatabaseUtil.fromProductName(connection.getMetaData().getDatabaseProductName())) {
+                case MYSQL: {
+                    preparedStatement = connection.prepareStatement(statementInfo.getSql(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+                    preparedStatement.setFetchSize(Integer.MIN_VALUE);
+                    break;
+                }
+                default: {
+                    preparedStatement = connection.prepareStatement(statementInfo.getSql());
+                    preparedStatement.setFetchSize(fetchSize);
+                }
+            }
             if (statementInfo.getProps().isPresent()) {
                 getParameterHandler().set(statementInfo, preparedStatement, param);
             } else if (logger.isDebugEnabled()) {

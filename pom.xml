@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.lifeonwalden</groupId>
     <artifactId>forestbatis</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.14-SNAPSHOT</version>
     <modules>
         <module>forestbatis-example</module>
         <module>forestbatis-core</module>

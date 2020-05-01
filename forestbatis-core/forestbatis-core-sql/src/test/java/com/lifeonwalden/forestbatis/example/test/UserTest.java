@@ -1,6 +1,7 @@
 package com.lifeonwalden.forestbatis.example.test;
 
 import com.lifeonwalden.forestbatis.builder.SelectBuilder;
+import com.lifeonwalden.forestbatis.constant.NodeRelation;
 import com.lifeonwalden.forestbatis.constant.OrderEnum;
 import com.lifeonwalden.forestbatis.example.bean.User;
 import com.lifeonwalden.forestbatis.example.builder.UserBuilder;
@@ -8,6 +9,7 @@ import com.lifeonwalden.forestbatis.example.meta.AccountTableInfo;
 import com.lifeonwalden.forestbatis.example.meta.UserCreditTableInfo;
 import com.lifeonwalden.forestbatis.example.meta.UserTableInfo;
 import com.lifeonwalden.forestbatis.meta.*;
+import com.lifeonwalden.forestbatis.meta.func.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -60,6 +62,40 @@ public class UserTest {
     }
 
     @Test
+    public void base_withFunc_count() {
+        String sql = UserBuilder.SELECT.overrideReturnColumn(Arrays.asList(new Count(new AbstractPropertyMeta("cnt") {
+        }))).build(DBConfig.config).getSql();
+        Assert.assertTrue(sql, "select count(1) as cnt from User".equals(sql));
+    }
+
+    @Test
+    public void base_withFunc_sum() {
+        String sql = UserBuilder.SELECT.overrideReturnColumn(Arrays.asList(new Sum(UserTableInfo.Age))).build(DBConfig.config).getSql();
+        Assert.assertTrue(sql, "select sum(age) as age from User".equals(sql));
+    }
+
+    @Test
+    public void base_withFunc_max() {
+        String sql = UserBuilder.SELECT.overrideReturnColumn(Arrays.asList(new Max(UserTableInfo.Age, new AbstractPropertyMeta("maxAge") {
+        }))).build(DBConfig.config).getSql();
+        Assert.assertTrue(sql, "select max(age) as maxAge from User".equals(sql));
+    }
+
+    @Test
+    public void base_withFunc_min() {
+        String sql = UserBuilder.SELECT.overrideReturnColumn(Arrays.asList(new Min(UserTableInfo.Age, new AbstractPropertyMeta("minAge") {
+        }))).build(DBConfig.config).getSql();
+        Assert.assertTrue(sql, "select min(age) as minAge from User".equals(sql));
+    }
+
+    @Test
+    public void base_withFunc_avg() {
+        String sql = UserBuilder.SELECT.overrideReturnColumn(Arrays.asList(new Avg(UserTableInfo.Age, new AbstractPropertyMeta("avgAge") {
+        }))).build(DBConfig.config).getSql();
+        Assert.assertTrue(sql, "select avg(age) as avgAge from User".equals(sql));
+    }
+
+    @Test
     public void base_withExcludeColumn() {
         String sql = UserBuilder.SELECT.excludeReturnColumn(Arrays.asList(UserTableInfo.Name)).build(DBConfig.config).getSql();
         Assert.assertTrue(sql, "select id, age, birthday from User".equals(sql));
@@ -76,6 +112,22 @@ public class UserTest {
     public void base_withOrder() {
         String sql = UserBuilder.SELECT.overrideOrder(Arrays.asList(new Order(UserTableInfo.Birthday))).build(DBConfig.config).getSql();
         Assert.assertTrue(sql, "select id, name, age, birthday from User order by birthday asc".equals(sql));
+    }
+
+    @Test
+    public void base_withGroup() {
+        String sql = UserBuilder.SELECT.overrideGroup(new Group(UserTableInfo.Sex))
+                .overrideReturnColumn(Arrays.asList(UserTableInfo.Sex, new Avg(UserTableInfo.Age, new AbstractPropertyMeta("avgAge") {
+                }))).build(DBConfig.config).getSql();
+        Assert.assertTrue(sql, "select sex, avg(age) as avgAge from User group by sex".equals(sql));
+    }
+
+    @Test
+    public void base_withGroupMultiColumn() {
+        String sql = UserBuilder.SELECT.overrideGroup(new Group(UserTableInfo.Sex, UserTableInfo.Name))
+                .overrideReturnColumn(Arrays.asList(UserTableInfo.Sex, new Avg(UserTableInfo.Age, new AbstractPropertyMeta("avgAge") {
+                }))).build(DBConfig.config).getSql();
+        Assert.assertTrue(sql, "select sex, avg(age) as avgAge from User group by sex, name".equals(sql));
     }
 
     @Test
@@ -163,6 +215,20 @@ public class UserTest {
                         .setQuery(new Eq(UserTableInfo.Id, AccountTableInfo.UserId))))).build(DBConfig.config).getSql();
         Assert.assertTrue(sql,
                 "select u.id, u.name, u.age, u.birthday from User u where  exists (select 1 from Account a where u.id = a.userId)".equals(sql));
+    }
+
+    @Test
+    public void base_withExists_group() {
+        String sql = UserBuilder.SELECT.overrideQuery(
+                new Exists(new TempTable("account", new SubSelect()
+                        .setTableNode(new TableNode(AccountTableInfo.TABLE))
+                        .setQuery(new Eq(UserTableInfo.Id, AccountTableInfo.UserId)))))
+                .overrideReturnColumn(Arrays.asList(UserTableInfo.Sex, new Avg(UserTableInfo.Age, new AbstractPropertyMeta("avgAge") {
+                })))
+                .overrideGroup(new Group(UserTableInfo.Sex))
+                .build(DBConfig.config).getSql();
+        Assert.assertTrue(sql,
+                "select u.sex, avg(u.age) as avgAge from User u where  exists (select 1 from Account a where u.id = a.userId) group by u.sex".equals(sql));
     }
 
     @Test
@@ -356,5 +422,15 @@ public class UserTest {
         String sql = UserBuilder.UPDATE.overrideQuery(new Like(UserTableInfo.Name)).build(new User().setId("id").setName("Tom"), DBConfig.config).getSql();
         Assert.assertTrue(sql,
                 "update User set name = ?, age = ?, birthday = ? where name like ?".equals(sql));
+    }
+
+    @Test
+    public void logicalNode() {
+        String sql = UserBuilder.SELECT
+                .overrideQuery(new Logical(UserTableInfo.Age, new LogicalNode(UserTableInfo.Age, NodeRelation.LOGICAL_AND), new LogicalNode(UserTableInfo.sex, NodeRelation.LOGICAL_OR), new LogicalNode(UserTableInfo.id, null)))
+                .build(new User(), DBConfig.config)
+                .getSql();
+
+        Assert.assertTrue("select id, name, age, birthday from User where (age & ? | ? = age)".equals(sql));
     }
 }
